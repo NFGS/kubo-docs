@@ -16,7 +16,7 @@ técnica seria no se conforma con que funcione: busca dónde se romperá al crec
 dónde miente un indicador y qué falta para ser un producto y no una demostración.
 
 Se encontraron **17 hallazgos**, todos corregidos y medidos en esta misma sesión, y
-**16 pendientes** priorizados con su plan.
+**31 pendientes** priorizados con su plan.
 
 Los dos más graves no eran de rendimiento:
 
@@ -151,23 +151,6 @@ servicios **en paralelo** dentro de la red privada, devolviendo una sola respues
 - Tiempo de espera por servicio: 5 s.
 - La ruta la atiende el gateway (`GATEWAY_OWNED_PATHS`), no se reenvía.
 
-### A-04 · Cadena de auditoría con condición de carrera — Alta
-
-`record()` leía el último hash y luego insertaba. Dos peticiones concurrentes
-podían leer el mismo hash anterior y **partir la cadena**: dos entradas apuntando
-al mismo predecesor, y la manipulación dejaba de ser detectable.
-
-**Corrección**: `pg_advisory_xact_lock` al inicio de la transacción. Serializa la
-escritura de la cadena sin bloquear ninguna tabla y se libera automáticamente al
-terminar la transacción.
-
-### A-05 · Numeración de ventas con `COUNT(*)` — Media
-
-Cada venta contaba todas las ventas del negocio (verificado con `EXPLAIN`: `Index
-Only Scan` sobre 50.000 filas). Ahora se toma el **máximo** del consecutivo, que el
-índice único `(tenant_id, number)` resuelve en tiempo logarítmico. La restricción
-única sigue protegiendo la concurrencia y el reintento ya existente la resuelve.
-
 ### A-04 · La auditoría de seguridad se borraba a sí misma — Alta
 
 El código registraba el intento fallido y el robo de token **dentro de la misma
@@ -215,6 +198,23 @@ día se rota la llave, el gateway reconoce el nuevo `kid` casi de inmediato. El
 tiempo de espera existe para que nadie pueda saturar el servicio de identidad
 pidiendo el JWKS con `kid` inventados.
 
+### A-06 · Cadena de auditoría con condición de carrera — Alta
+
+`record()` leía el último hash y luego insertaba. Dos peticiones concurrentes
+podían leer el mismo hash anterior y **partir la cadena**: dos entradas apuntando
+al mismo predecesor, y la manipulación dejaba de ser detectable.
+
+**Corrección**: `pg_advisory_xact_lock` al inicio de la transacción. Serializa la
+escritura de la cadena sin bloquear ninguna tabla y se libera automáticamente al
+terminar la transacción.
+
+### A-09 · Numeración de ventas con `COUNT(*)` — Media
+
+Cada venta contaba todas las ventas del negocio (verificado con `EXPLAIN`: `Index
+Only Scan` sobre 50.000 filas). Ahora se toma el **máximo** del consecutivo, que el
+índice único `(tenant_id, number)` resuelve en tiempo logarítmico. La restricción
+única sigue protegiendo la concurrencia y el reintento ya existente la resuelve.
+
 ### A-06 a A-08 · Integridad de la bitácora
 
 | Hallazgo | Corrección |
@@ -261,6 +261,7 @@ como pendiente P-23.
 | P-03 | **Refresh token en cookie `httpOnly`** (BFF) | Un XSS podría robar el token de refresco | 2 días |
 | P-04 | **Recuperación de contraseña** | Hoy solo un administrador puede restablecerla desde la base | 1 día |
 | P-05 | **Respaldos automatizados + simulacro de restauración** | Documentado pero no ejecutado: un respaldo sin probar no es un respaldo | 1 día |
+| P-27 | **TLS/HTTPS en la instalación** (Caddy y verificación en el humo) | Sin cifrado en tránsito, las credenciales viajan en claro por la red del local | 1 día |
 
 ### 5.2 Calidad e ingeniería
 
@@ -276,6 +277,9 @@ como pendiente P-23.
 | P-13 | **Paginación** en productos, ventas y movimientos | El ERP corta en 300/200 registros; un negocio grande los supera | 1 día |
 | P-14 | **Empaquetado de imágenes por digest** y reservas de recursos | Las etiquetas (`postgres:17`) pueden cambiar; conviene fijar el digest | 0.5 día |
 | P-23 | **Versionar el algoritmo de hash de auditoría** | Un cambio de algoritmo deja el histórico sin verificar (ver nota de migración) | 1 día |
+| P-26 | **Accesibilidad automatizada** (axe en CI) | Hoy solo hay revisión manual de contraste y foco | 0.5 día |
+| P-30 | **Segundo factor (TOTP)** para el propietario | Robo de credenciales del administrador | 1–2 días |
+| P-31 | **Límite de tasa por usuario** (no solo por negocio o IP) | Abuso desde una cuenta comprometida | 0.5 día |
 
 ### 5.3 Alcance funcional (lo que separa el MVP de un producto)
 
@@ -287,8 +291,20 @@ como pendiente P-23.
 | P-18 | **Facturación electrónica DIAN** (UBL 2.1, CUFE, QR) | Requisito legal para facturar; exige ser Proveedor Tecnológico |
 | P-19 | **Notificaciones** (WhatsApp / correo) | Cobranza, confirmaciones y avisos de stock: el quinto servicio planificado |
 | P-20 | **Usuarios y roles en la interfaz** | Hoy el API existe pero el dueño no puede crear vendedores sin ayuda técnica |
-| P-21 | **Reportes exportables** (CSV/PDF) | Contabilidad y bancos piden soportes |
+| P-21 | **Reportes exportables** (CSV/PDF) y **comprobante de venta imprimible** (ticket) | Contabilidad y bancos piden soportes; el mostrador necesita el comprobante |
 | P-22 | **Multi-bodega** y transferencias | Para negocios con más de un punto |
+| P-24 | **Importación de datos** (Excel/CSV y ruta Dolibarr) | Sin esto, digitalizar un catálogo existente es manual: la primera barrera de adopción |
+| P-25 | **Servicio de Documentos** (adjuntos y plantillas) | Completa el quinto servicio planificado junto con las notificaciones |
+
+### 5.4 Escala (Fase 5, backlog declarado)
+
+| ID | Pendiente | Por qué |
+| --- | --- | --- |
+| P-28 | mTLS entre gateway y servicios | Movimiento lateral dentro del clúster |
+| P-29 | Rotación de claves de cifrado de campo (KEK/DEK) | Compromiso de una clave a largo plazo |
+
+Líneas declaradas sin ID: instalación remota (Terraform/Ansible), multi-tenant SaaS
+(zona horaria por negocio y onboarding), app móvil nativa y operador de respaldos.
 
 ## 6. Evaluación arquitectónica
 
@@ -306,12 +322,12 @@ como pendiente P-23.
 
 ### Lo que hay que cambiar
 
-| Cambio | Motivo | ADR a escribir |
-| --- | --- | --- |
-| Outbox transaccional | Único punto donde el sistema puede perder un dato ya confirmado al usuario | ADR-0009 |
-| Interceptor de tenant + RLS activo | Convertir el aislamiento en garantía del motor, no del programador | ADR-0010 |
-| BFF como capa formal | Ya existe para el tablero; conviene declararlo patrón del gateway y no un caso puntual | ADR-0011 |
-| Zona horaria por negocio en la tabla `tenants` | Hoy es global por instalación; en multi-tenant debe ser un atributo del negocio | ADR-0012 |
+| Cambio | Motivo | ADR a escribir | Fase |
+| --- | --- | --- | --- |
+| Outbox transaccional | Único punto donde el sistema puede perder un dato ya confirmado al usuario | ADR-0009 | Fase 1 |
+| Interceptor de tenant + RLS activo | Convertir el aislamiento en garantía del motor, no del programador | ADR-0010 | Fase 1 |
+| BFF como capa formal | Ya existe para el tablero; conviene declararlo patrón del gateway y no un caso puntual | ADR-0011 | Fase 2 |
+| Zona horaria por negocio en la tabla `tenants` | Hoy es global por instalación; en multi-tenant debe ser un atributo del negocio | ADR-0012 | Fase 4 |
 
 ### Escalado
 
@@ -322,37 +338,22 @@ como pendiente P-23.
 | Varios negocios | Activar RLS, zona horaria por tenant, BFF, caché de lecturas | Producto SaaS |
 | Clúster | k3s + mTLS entre servicios + operador de respaldos | > 50 negocios |
 
-## 7. Plan de mejora propuesto
+## 7. Plan de mejora
 
-### Fase 2 — Confiabilidad (2 semanas)
+El plan de cierre completo vive en [`11-plan-de-cierre.md`](11-plan-de-cierre.md).
+Resumen:
 
-1. Outbox transaccional en el ERP + publicador de barrido (P-01).
-2. Interceptor de transacción y activación de RLS en las tres bases (P-02).
-3. Respaldos automatizados con simulacro de restauración documentado (P-05).
-4. Cookie `httpOnly` para el refresh token (P-03) y recuperación de contraseña (P-04).
+| Fase | Foco | Duración estimada (30 h/semana) |
+| --- | --- | --- |
+| 0 | Consistencia de la documentación | 2–3 h (completada) |
+| 1 | Confiabilidad: outbox, RLS, cookie, respaldos, TLS | ≈3 semanas |
+| 2 | Calidad y observabilidad: CI, OTel, pruebas, accesibilidad | ≈4 semanas |
+| 3 | Núcleo comercial: compras, caja, usuarios, importación, comprobantes | 5–7 semanas |
+| 4 | Diferenciadores: verticales, DIAN, notificaciones, multi-bodega | 5–6 semanas |
+| 5 | Escala: k3s + mTLS, SaaS multi-tenant, app móvil | backlog declarado |
 
-**Criterio de aceptación**: `make smoke` en verde + prueba de caída del bus sin
-pérdida de eventos + restauración cronometrada por debajo de 4 h.
-
-### Fase 3 — Calidad y observabilidad (2 semanas)
-
-5. CI por repositorio con lint, pruebas, SAST, escaneo de secretos y SBOM (P-06).
-6. OpenTelemetry en los cuatro lenguajes, con tablero en Grafana (P-07).
-7. Pruebas de integración con Testcontainers y contrato OpenAPI ejecutable (P-08, P-09).
-8. E2E con Playwright y carga con k6 a 50 cajas concurrentes (P-10).
-
-**Criterio de aceptación**: una regresión de seguridad o de contrato bloquea el
-merge; p95 del POS por debajo de 300 ms con 50 cajas.
-
-### Fase 4 — Producto (4 semanas)
-
-9. Compras y proveedores, sesiones de caja, usuarios y roles en la interfaz (P-15, P-16, P-20).
-10. Vertical Packs para los cuatro rubros (P-17).
-11. Notificaciones por WhatsApp y correo (P-19) y reportes exportables (P-21).
-12. Facturación electrónica DIAN como puerto enchufable (P-18).
-
-**Criterio de aceptación**: un negocio real opera una semana completa sin soporte
-técnico presencial, con cierre de caja diario y factura emitida.
+Cada fase cierra solo con su criterio medido; el detalle de pasos, IDs y criterios
+de aceptación está en el documento enlazado.
 
 ## 8. Conclusión
 
@@ -372,7 +373,7 @@ Lo que falta no es cosmético: son las piezas que convierten una demostración
 técnica sólida en un producto que un tendero puede usar todos los días sin
 sobresaltos — **garantía de entrega de eventos, aislamiento impuesto por el motor,
 automatización de calidad y los módulos que el negocio realmente pide** (compras,
-caja, usuarios). El plan de las fases 2 a 4 está ordenado por riesgo, no por
+caja, usuarios). El plan de las fases 1 a 4 está ordenado por riesgo, no por
 lucimiento: primero lo que puede perder o mezclar datos, después lo que evita
 regresiones, y al final lo que amplía el mercado.
 

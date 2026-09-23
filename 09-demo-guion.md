@@ -8,9 +8,9 @@ sola toma, sin edición, con el sistema ya levantado.
 ```bash
 cd "Documents/Proyectos de Programación/Kubo"
 make foreign-stop        # libera RAM (detiene Dolibarr, Guacamole, Open Notebook)
-make up                  # levanta los 8 contenedores
+make up                  # levanta los 10 contenedores
 make seed                # carga catálogo, clientes y ventas de ejemplo
-make smoke               # verifica 37 comprobaciones end-to-end
+make smoke               # verifica 44 comprobaciones end-to-end
 ```
 
 Deja abiertas estas ventanas:
@@ -176,7 +176,7 @@ ls kubo-docs/
 | Un contenedor no responde | "Reviso la sonda de salud del servicio…" y ejecuta `make ps` |
 | El tablero tarda | "La consistencia es eventual: el evento viaja por RabbitMQ" |
 | Falla el modo offline | Muestra la cola en `IndexedDB` desde las herramientas del navegador |
-| Falla la demo por completo | Ejecuta `make smoke` y muestra las 37 comprobaciones en verde |
+| Falla la demo por completo | Ejecuta `make smoke` y muestra las 44 comprobaciones en verde |
 
 ## Evidencia complementaria
 

@@ -32,7 +32,7 @@ openssl rand -base64 48 # KUBO_ERP_SECRET_KEY_BASE
 Levantar:
 
 ```bash
-make up      # construye y arranca los 8 contenedores
+make up      # construye y arranca los 10 contenedores
 make seed    # datos de demostración (omitir en producción)
 make smoke   # verificación end-to-end
 ```
@@ -143,15 +143,16 @@ El sistema está diseñado para crecer sin reescribir:
 1. **Más memoria/CPU**: subir los `mem_limit` del compose.
 2. **Más carga en la caja**: escalar el ERP horizontalmente (`docker compose up -d --scale kubo-erp=3`) porque es sin estado; el gateway reparte.
 3. **Bases separadas**: mover cada base a su propia instancia cambiando solo la URL de conexión.
-4. **Clúster**: los mismos artefactos corren en Kubernetes; falta mTLS entre servicios y la activación de RLS (fase 2).
+4. **Clúster**: los mismos artefactos corren en Kubernetes; falta mTLS entre servicios (Fase 5, P-28) y la activación de RLS (Fase 1, P-02).
 
 ## 8. Lo que falta para producción real
 
-| Pendiente | Impacto |
-| --- | --- |
-| *Transactional outbox* | Un evento puede perderse si el proceso muere justo tras el `commit` |
-| Activación de RLS | El aislamiento depende hoy de la disciplina del código |
-| Refresh token en cookie `httpOnly` | Un XSS podría robar el token de refresco |
-| Recuperación de contraseña | Hoy la cambia un administrador desde la base |
-| CI/CD y escaneos automatizados | Las verificaciones son manuales (`make smoke`) |
-| Monitoreo centralizado | Solo hay sondas de salud y logs locales |
+| Pendiente | ID · Fase | Impacto |
+| --- | --- | --- |
+| *Transactional outbox* | P-01 · Fase 1 | Un evento puede perderse si el proceso muere justo tras el `commit` |
+| Activación de RLS | P-02 · Fase 1 | El aislamiento depende hoy de la disciplina del código |
+| Refresh token en cookie `httpOnly` | P-03 · Fase 1 | Un XSS podría robar el token de refresco |
+| Recuperación de contraseña | P-04 · Fase 1 | Hoy la cambia un administrador desde la base |
+| TLS/HTTPS verificado en la instalación | P-27 · Fase 1 | Las credenciales viajan en claro por la red del local |
+| CI/CD y escaneos automatizados | P-06 · Fase 2 | Las verificaciones son manuales (`make smoke`) |
+| Monitoreo centralizado | P-07 · Fase 2 | Solo hay sondas de salud y logs locales |

@@ -3,7 +3,7 @@
 | Campo | Valor |
 | --- | --- |
 | Fecha | 2026-09-23 |
-| Estado | Aceptada (outbox diferido a fase 2) |
+| Estado | Aceptada (outbox diferido a la Fase 1, P-01) |
 
 ## Contexto
 
@@ -30,7 +30,7 @@ El patrón *transactional outbox* (guardar el evento en la misma transacción de
 venta y publicarlo después desde una tabla de salida) elimina la ventana en la
 que un evento puede perderse si el proceso muere justo después del `commit`. En
 el MVP se asume esa pérdida eventual y se documenta; la implementación del outbox
-es el primer trabajo de la fase 2.
+es el primer trabajo de la Fase 1 (P-01, ADR-0009).
 
 ## Consecuencias
 

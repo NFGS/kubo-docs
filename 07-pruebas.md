@@ -137,14 +137,14 @@ el usuario):
 El detalle de las mediciones, los planes de ejecución y su análisis están en
 [`10-auditoria.md`](10-auditoria.md).
 
-## 6. Pruebas pendientes (fase 2)
+## 6. Pruebas pendientes (fases 1 y 2)
 
-| Prueba | Por qué falta |
-| --- | --- |
-| Integración con base de datos real por servicio | Requiere Testcontainers por lenguaje |
-| Contratos (Pact/OpenAPI) automatizados | Hoy el contrato se verifica en la prueba de humo |
-| Carga (k6): 50 cajas simultáneas | Falta escenario de estrés |
-| E2E de navegador (Playwright) | Hoy la interfaz se verifica manualmente |
-| Escaneo SAST/SCA y de secretos en CI | Las verificaciones son manuales |
-| Simulacro de restauración de respaldo | Documentado, no ejecutado |
-| Accesibilidad automatizada (axe) | Solo revisión manual de contraste y foco |
+| Prueba | ID · Fase | Por qué falta |
+| --- | --- | --- |
+| Simulacro de restauración de respaldo | P-05 · Fase 1 | Documentado, no ejecutado |
+| Integración con base de datos real por servicio | P-08 · Fase 2 | Requiere Testcontainers por lenguaje |
+| Contratos (Pact/OpenAPI) automatizados | P-09 · Fase 2 | Hoy el contrato se verifica en la prueba de humo |
+| Carga (k6): 50 cajas simultáneas | P-10 · Fase 2 | Falta escenario de estrés |
+| E2E de navegador (Playwright) | P-10 · Fase 2 | Hoy la interfaz se verifica manualmente |
+| Escaneo SAST/SCA y de secretos en CI | P-06 · Fase 2 | Las verificaciones son manuales |
+| Accesibilidad automatizada (axe) | P-26 · Fase 2 | Solo revisión manual de contraste y foco |

@@ -15,7 +15,7 @@ flowchart LR
 
   DUENO -->|"tablero, catálogo,<br/>clientes"| KUBO
   VENDEDOR -->|"punto de venta"| KUBO
-  KUBO -.->|"comprobantes y avisos<br/>(fase 2)"| CLIENTE
+  KUBO -.->|"comprobantes y avisos<br/>(Fase 4)"| CLIENTE
 ```
 
 ## 2. Vista de contenedores (C4 nivel 2)
@@ -172,7 +172,7 @@ sequenceDiagram
 | **Mantenibilidad** | Un lenguaje por contexto con su ecosistema natural; arquitectura limpia dentro de cada servicio; contratos explícitos entre repos. |
 | **Portabilidad** | Todo corre en Docker Compose: el mismo artefacto sirve para el mini-PC del local y para un servidor en la nube. |
 | **Observabilidad** | Sonda `/health` en cada servicio con estado de sus dependencias, `correlation-id` propagado por el gateway y logs JSON estructurados. |
-| **Costo** | Consumo en reposo cercano a 1.5 GB de RAM y 8 contenedores; cabe en un VPS de USD 6–12 al mes o en un equipo modesto del local. |
+| **Costo** | Consumo en reposo cercano a 1.5 GB de RAM y 10 contenedores; cabe en un VPS de USD 6–12 al mes o en un equipo modesto del local. |
 
 ## 6. Decisiones arquitectónicas
 

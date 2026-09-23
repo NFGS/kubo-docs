@@ -51,7 +51,7 @@ privada vive solo en `kubo-iam`.
 | **Datos personales** | **AES-256-GCM** campo a campo (documento, teléfono) | `make smoke` inspecciona el texto cifrado en PostgreSQL |
 | Búsqueda sobre cifrado | **Índice ciego** HMAC-SHA256 normalizado | `make smoke` verifica que el índice no contiene el valor |
 | Contraseñas | BCrypt con sal por usuario | — |
-| Respaldos | Cifrado con `age` antes de salir del servidor | Fase 2 |
+| Respaldos | Cifrado con `age` antes de salir del servidor | Fase 1 (P-05) |
 
 Formato almacenado: `base64(iv ‖ tag ‖ ciphertext)`. El **tag de GCM** hace que
 cualquier manipulación del texto cifrado sea detectable: el descifrado falla y el
@@ -79,8 +79,9 @@ servicio devuelve `null` en lugar de un valor corrupto.
 1. Toda tabla de negocio lleva `tenant_id` y toda consulta lo filtra.
 2. El `tenant_id` **nunca** viene del cuerpo ni de un parámetro: se toma del
    claim del JWT, que el gateway propaga como cabecera.
-3. La política de *row level security* está escrita y versionada en cada servicio
-   (`db/rls/enable-rls.sql`) lista para activarse como segunda barrera.
+3. La política de *row level security* está escrita y versionada en `kubo-iam`
+   (`db/rls/enable-rls.sql`), lista para activarse como segunda barrera; CRM y ERP
+   la reciben en la Fase 1 (P-02), junto con el interceptor de transacción.
 4. **Verificación automática**: `make smoke` registra un segundo negocio y
    comprueba que no ve ni un cliente ni un producto del primero.
 
@@ -130,14 +131,14 @@ consciente y **documentada como riesgo**: un XSS exitoso podría robarlo. Las
 mitigaciones aplicadas son: el access token vive solo en memoria, el refresh
 **rota en cada uso** y el reuso se detecta invalidando la familia completa. La
 solución definitiva (cookie `httpOnly` + `SameSite=Strict` con BFF) está prevista
-para la fase 2.
+para la Fase 1 (P-03).
 
 ## 8. Cumplimiento normativo
 
 | Norma | Cómo se aborda |
 | --- | --- |
 | **Ley 1581 de 2012** (protección de datos personales, Colombia) | Cifrado de datos personales, minimización (enmascarado en listados), borrado lógico reversible, trazabilidad de accesos. **Pendiente**: registro de autorizaciones del titular, política de retención y procedimiento de supresión definitiva |
-| **Facturación electrónica DIAN** | Fuera del alcance del MVP (requiere ser Proveedor Tecnológico autorizado). El dominio deja preparado el puerto de facturación para emitir UBL 2.1 con CUFE y QR en la fase 3 |
+| **Facturación electrónica DIAN** | Fuera del alcance del MVP (requiere ser Proveedor Tecnológico autorizado). El dominio deja preparado el puerto de facturación para emitir UBL 2.1 con CUFE y QR en la Fase 4 (P-18) |
 | **Habeas data en la interfaz** | El manual de usuario documenta qué datos se guardan, para qué y cómo se solicitan al cliente |
 
 ## 9. Verificación
@@ -156,14 +157,14 @@ La prueba de humo comprueba, entre otras cosas:
 - Índice ciego sin el valor en claro.
 - Segundo negocio que no ve datos del primero.
 
-## 10. Pendientes de seguridad (fase 2)
+## 10. Pendientes de seguridad
 
-| Pendiente | Riesgo que cierra |
-| --- | --- |
-| Refresh token en cookie `httpOnly` + `SameSite` | Robo de token por XSS |
-| Activación de RLS con interceptor de transacción | Error humano en un filtro de consulta |
-| mTLS entre gateway y servicios | Movimiento lateral dentro del clúster |
-| Rotación de claves de cifrado de campo | Compromiso de una clave a largo plazo |
-| Segundo factor (TOTP) para el propietario | Robo de credenciales |
-| Análisis SAST/SCA automatizado en CI y escaneo de secretos | Dependencias vulnerables y credenciales filtradas |
-| Rate limiting por usuario (no solo por negocio) | Abuso desde una cuenta comprometida |
+| Pendiente | ID · Fase | Riesgo que cierra |
+| --- | --- | --- |
+| Refresh token en cookie `httpOnly` + `SameSite` | P-03 · Fase 1 | Robo de token por XSS |
+| Activación de RLS con interceptor de transacción | P-02 · Fase 1 | Error humano en un filtro de consulta |
+| Rate limiting por usuario (no solo por negocio) | P-31 · Fase 1 | Abuso desde una cuenta comprometida |
+| Análisis SAST/SCA automatizado en CI y escaneo de secretos | P-06 · Fase 2 | Dependencias vulnerables y credenciales filtradas |
+| Segundo factor (TOTP) para el propietario | P-30 · Fase 4 | Robo de credenciales |
+| mTLS entre gateway y servicios | P-28 · Fase 5 | Movimiento lateral dentro del clúster |
+| Rotación de claves de cifrado de campo | P-29 · Fase 5 | Compromiso de una clave a largo plazo |

@@ -40,6 +40,7 @@ DOCUMENTOS=(
   "08-trazabilidad.md"
   "09-demo-guion.md"
   "10-auditoria.md"
+  "11-plan-de-cierre.md"
   "adr/ADR-0001-microservicios-monolito-modular.md"
   "adr/ADR-0002-polyrepo-contratos.md"
   "adr/ADR-0003-multitenancy-hibrido.md"

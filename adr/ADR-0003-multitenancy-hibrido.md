@@ -37,4 +37,6 @@ primero) y se deja la segunda barrera preparada.
 - **Negativas**: hoy el aislamiento depende de la disciplina del código. Se
   mitiga con la prueba automática de aislamiento y con la política SQL ya
   escrita.
-- **Siguiente paso**: interceptor de transacción + activación de RLS en la fase 2.
+- **Siguiente paso**: interceptor de transacción + activación de RLS en la Fase 1
+  (P-02). Hoy el script `db/rls/enable-rls.sql` solo existe en `kubo-iam`; CRM y
+  ERP lo reciben en esa misma fase.
