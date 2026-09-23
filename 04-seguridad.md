@@ -64,6 +64,11 @@ servicio devuelve `null` en lugar de un valor corrupto.
 - `KUBO_FIELD_ENCRYPTION_KEY` y `KUBO_BLIND_INDEX_KEY` son de 32 bytes en hex;
   el servicio **falla al arrancar** si no cumplen el formato, en lugar de cifrar
   con una clave débil.
+- El servicio **rechaza explícitamente las claves de ejemplo** de `.env.example`:
+  desplegar copiando la plantilla sin generar claves produce un error claro
+  (`«conserva el valor de ejemplo; genere una clave real»`) en vez de proteger
+  los datos con una clave conocida por cualquiera. Cubierto por dos pruebas
+  unitarias.
 - La llave de firma JWT puede llegar como PEM; si no, el servicio genera un par
   **efímero** en memoria y lo advierte en los logs (solo desarrollo).
 - **Pendiente**: envoltura KEK/DEK por negocio con KMS para la versión en nube, y
