@@ -17,7 +17,10 @@ herramientas de construcción incompatibles entre sí.
 PWA, infraestructura, documentación y el repositorio raíz de workspace. La
 comunicación entre repos se gobierna por **contratos explícitos**:
 
-- HTTP: OpenAPI 3.1 (documentado en `kubo-docs/03-api.md`).
+- HTTP: contrato documentado en `kubo-docs/03-api.md` con ejemplos ejecutables.
+  La **especificación OpenAPI 3.1 en archivo** (y las pruebas de contrato
+  automatizadas) quedan para la fase 2: hoy el contrato se verifica con la prueba
+  de humo end-to-end, que ejerce todos los endpoints desde el gateway.
 - Eventos: sobre estable versionado (`event_id`, `event_type`, `version`,
   `occurred_at`, `tenant_id`, `data`).
 - Base de datos: cada servicio es dueño exclusivo de su esquema; **ningún
