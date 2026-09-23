@@ -14,10 +14,15 @@ Estas verificaciones no dependen de capturas: se ejecutan y devuelven un
 resultado verificable.
 
 ```bash
-make smoke          # 37 comprobaciones end-to-end, todas en verde
-make ps             # los 9 contenedores en estado healthy
-docker stats --no-stream   # consumo por servicio (~930 MB en total)
+make smoke          # 44 comprobaciones end-to-end, todas en verde
+make ps             # los 10 contenedores en estado healthy
+make reset-demo     # deja la demostracion limpia (borra y recarga la semilla)
+docker stats --no-stream   # consumo por servicio (~880 MB en total)
 ```
+
+> Antes de grabar el video conviene ejecutar `make reset-demo`: elimina los
+> clientes y productos que dejan las ejecuciones del humo y recarga la semilla,
+> de modo que la demostración muestre solo datos presentables.
 
 ## Capturas pendientes (para el video)
 
