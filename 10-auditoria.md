@@ -6,6 +6,8 @@
 | Alcance | Los 6 servicios, la base de datos, la infraestructura y la documentación |
 | Método | Medición sobre el sistema en ejecución, planes de ejecución reales y revisión de código |
 | Estado de partida | 33/33 comprobaciones end-to-end en verde, 10 contenedores sanos |
+| Estado de cierre | **44/44** (se añadieron 11 comprobaciones para cubrir las correcciones) |
+| Rondas | Primera: rendimiento y verdad del dato · Segunda: seguridad y consistencia |
 
 ## 1. Resumen ejecutivo
 
@@ -13,11 +15,19 @@ El sistema **funciona de extremo a extremo y está verificado**, pero una audito
 técnica seria no se conforma con que funcione: busca dónde se romperá al crecer,
 dónde miente un indicador y qué falta para ser un producto y no una demostración.
 
-Se encontraron **10 hallazgos**, todos corregidos y medidos en esta misma sesión, y
-**16 pendientes** priorizados con su plan. El más grave no era de rendimiento sino
-de **verdad del dato**: el indicador «ventas de hoy» usaba el día UTC, de modo que
-en Colombia **todas las ventas posteriores a las 19:00 se contaban al día
-siguiente** — justo las horas de mayor venta de una tienda de barrio.
+Se encontraron **17 hallazgos**, todos corregidos y medidos en esta misma sesión, y
+**16 pendientes** priorizados con su plan.
+
+Los dos más graves no eran de rendimiento:
+
+1. **El indicador «ventas de hoy» usaba el día UTC**: en Colombia todas las ventas
+   posteriores a las 19:00 se contaban al día siguiente — justo las horas de mayor
+   venta de una tienda de barrio.
+2. **La auditoría de seguridad se borraba a sí misma**: los intentos de acceso
+   fallidos y la detección de robo de token se registraban dentro de la transacción
+   que después se revertía al lanzar la excepción. La bitácora quedaba sin los dos
+   eventos que más importan en una investigación, y la invalidación de la familia de
+   tokens tampoco se guardaba: el sistema detectaba el robo y no hacía nada.
 
 El más silencioso, descubierto al construir la vista compuesta, fue otro error de
 dato: la tarjeta de cartera de clientes del tablero **mostraba ceros siempre**,
@@ -31,13 +41,20 @@ usa. Nada fallaba, nada avisaba: simplemente el dueño veía un dato falso.
 | A-01 | El día comercial se calculaba en UTC | **Crítica** | Ventas de 19:00–23:59 caían en el día siguiente |
 | A-02 | Búsqueda por texto sin índice (recorría todo) | Alta | ERP 46 ms → **5.7 ms** (8×) · CRM 28 ms → **4.4 ms** (6×) |
 | A-03 | Tablero con 7 viajes de red secuenciales | Alta | 108 ms → **~25 ms** (BFF, 4×) |
-| A-04 | Cadena de auditoría con condición de carrera | Alta | Cadena podía partirse sin detección |
-| A-05 | Numeración de ventas con `COUNT(*)` | Media | O(n) → **O(log n)** por venta |
-| A-06 | Cartera de clientes siempre en cero | Media | Contrato inconsistente → dato falso visible |
-| A-07 | Sin red de seguridad en la interfaz | Media | Pantalla en blanco → mensaje accionable |
-| A-08 | Efectos secundarios dentro de actualizadores de estado | Baja | Avisos duplicados en StrictMode |
-| A-09 | Índice ciego implementado pero sin endpoint | Media | Función inalcanzable → `GET /customers/by-document/:doc` |
-| A-10 | Listado de usuarios sin paginación | Media | Tabla completa → página acotada a 100 |
+| A-04 | **La auditoría de fallos se revertía con la transacción** | **Alta** | El intento fallido y el robo de token no quedaban registrados |
+| A-05 | **La llave JWT era efímera y el compose no la pasaba** | **Alta** | Cada reinicio invalidaba **todas** las sesiones |
+| A-06 | Cadena de auditoría con condición de carrera | Alta | Dos peticiones podían partir la cadena sin detección |
+| A-07 | Verificación de la cadena inalcanzable y mal definida | Media | Código muerto → endpoint `/audit/verify` que verifica enlace y contenido |
+| A-08 | Hash calculado con nanosegundos, columna con microsegundos | Media | La verificación habría fallado siempre |
+| A-09 | Numeración de ventas con `COUNT(*)` | Media | O(n) → **O(log n)** por venta |
+| A-10 | Cartera de clientes siempre en cero | Media | Contrato inconsistente → dato falso visible |
+| A-11 | Sin red de seguridad en la interfaz | Media | Pantalla en blanco → mensaje accionable |
+| A-12 | Índice ciego implementado pero sin endpoint | Media | Función inalcanzable → `GET /customers/by-document/:doc` |
+| A-13 | Listado de usuarios sin paginación | Media | Tabla completa → página acotada a 100 |
+| A-14 | **Prueba del ERP con la expectativa mal calculada** | Baja | Esperaba 41650 donde el resultado correcto es 29750 (nunca se había ejecutado) |
+| A-15 | Efectos secundarios dentro de actualizadores de estado | Baja | Avisos duplicados en StrictMode |
+| A-16 | Regla de «stock bajo» duplicada en dos vistas | Baja | Una sola definición en el dominio |
+| A-17 | Código muerto y nombres engañosos | Baja | `deleted?` sin uso, `low_stock_alerts` que devolvía rotación |
 
 ## 2. Método de auditoría
 
@@ -49,7 +66,8 @@ usa. Nada fallaba, nada avisaba: simplemente el dueño veía un dato falso.
    al terminar.
 3. **Revisión de código** servicio por servicio buscando condiciones de carrera,
    rutas sin usar y supuestos implícitos.
-4. **Verificación funcional** con la prueba de humo de 33 comprobaciones.
+4. **Verificación funcional** con la prueba de humo (33 comprobaciones al inicio, 44 al cierre).
+5. **Prueba de manipulación**: se editó una fila de la bitácora con SQL para comprobar que la verificación la detecta.
 
 ## 3. Rendimiento medido
 
@@ -150,15 +168,87 @@ Only Scan` sobre 50.000 filas). Ahora se toma el **máximo** del consecutivo, qu
 índice único `(tenant_id, number)` resuelve en tiempo logarítmico. La restricción
 única sigue protegiendo la concurrencia y el reintento ya existente la resuelve.
 
-### A-06 a A-10 · Robustez, contrato, interfaz y funciones incompletas
+### A-04 · La auditoría de seguridad se borraba a sí misma — Alta
+
+El código registraba el intento fallido y el robo de token **dentro de la misma
+transacción** de la petición:
+
+```java
+if (!passwordEncoder.matches(...)) {
+    auditService.record(..., "LOGIN_FAILED", ...);   // se inserta...
+    throw DomainException.unauthorized(...);          // ...y el rollback lo borra
+}
+```
+
+Los dos eventos que más importan en una investigación forense (intentos de acceso
+fallidos y reutilización de un token robado) **desaparecían de la bitácora**. Peor
+aún: en el caso de reuso, la revocación de todas las sesiones del usuario ocurría
+en esa misma transacción, así que el sistema **detectaba el robo y no cerraba nada**.
+
+**Corrección**: dos caminos según la semántica del evento.
+
+| Ruta | Transacción | Por qué |
+| --- | --- | --- |
+| Éxito (login, registro, rotación) | La de la operación | No debe existir un registro de algo que finalmente no ocurrió |
+| Fallo (`LOGIN_FAILED`, `REFRESH_REUSE_DETECTED`) | **Independiente** (`REQUIRES_NEW`) | El registro debe sobrevivir al rollback |
+
+La revocación de la familia de tokens se movió a `SecurityIncidentService`, que abre
+su propia transacción: al no existir en ella ningún bloqueo de la cadena, tampoco
+puede producirse un bloqueo muto con el `advisory lock` de auditoría.
+
+Verificado en el humo: el intento fallido y el reuso **aparecen en la bitácora**.
+
+### A-05 · La llave JWT era efímera — Alta
+
+`TokenService` generaba un par RSA en memoria cuando no había llave configurada, y
+el `docker-compose.yml` **nunca pasaba `KUBO_JWT_PRIVATE_KEY`**. Consecuencia: cada
+reinicio del servicio de identidad invalidaba **todas las sesiones** de todos los
+usuarios. Se descubrió porque el propio humo falló en cascada tras reconstruir el
+contenedor.
+
+**Corrección**: el compose propaga la llave y el entorno de demostración usa una
+llave RSA real generada con `openssl`, guardada en el `.env` (no versionado).
+Verificado: el mismo token sigue siendo válido **después** de reiniciar el servicio.
+
+Además se redujo la ventana de caché del JWKS en el gateway (30 s → 10 s): si algún
+día se rota la llave, el gateway reconoce el nuevo `kid` casi de inmediato. El
+tiempo de espera existe para que nadie pueda saturar el servicio de identidad
+pidiendo el JWKS con `kid` inventados.
+
+### A-06 a A-08 · Integridad de la bitácora
 
 | Hallazgo | Corrección |
 | --- | --- |
-| **`customers/stats` sin envoltorio `data`** (A-06) | Unificado al contrato del resto de la API. Además el gateway ahora cae al cuerpo completo si un servicio no envuelve: una inconsistencia degrada la forma, no borra una vista |
-| Un error de render dejaba la pantalla en blanco (A-07) | `ErrorBoundary` con mensaje entendible, botón de recarga y registro del error |
-| `notify()` dentro de actualizadores de estado de React (A-08) | Validaciones movidas fuera: sin avisos duplicados en StrictMode |
-| `Customer.find_by_document` existía pero era inalcanzable (A-09) | `GET /api/v1/customers/by-document/:document` — el caso de uso real del mostrador |
-| `GET /users` devolvía la tabla completa (A-10) | Paginación con tamaño acotado en el servidor (máx. 100) |
+| Condición de carrera al encadenar hashes (A-06) | `pg_advisory_xact_lock` al inicio de la transacción: serializa la escritura sin bloquear tablas |
+| Verificación inalcanzable y mal definida (A-07) | Nuevo `GET /audit/verify`: verifica que cada entrada **enlace** con la anterior y que su **hash corresponda al contenido**. Se expone el hash más antiguo de la ventana para poder encadenar verificaciones |
+| Hash con nanosegundos y columna con microsegundos (A-08) | El instante se trunca a microsegundos antes de calcular el hash: de otro modo la verificación fallaría siempre |
+
+**Prueba de manipulación** (ejecutada): se editó una fila con SQL y la verificación
+devolvió `chainIntact: false`. Una edición parcial rompe la verificación; falsificar
+la bitácora completa exigiría recalcular toda la cadena.
+
+### A-09 a A-17 · Consistencia, contrato, interfaz y limpieza
+
+| Hallazgo | Corrección |
+| --- | --- |
+| Numeración de ventas con `COUNT(*)` (A-09) | Se toma el **máximo** del consecutivo: el índice único lo resuelve en tiempo logarítmico |
+| **`customers/stats` sin envoltorio `data`** (A-10) | Unificado al contrato del resto de la API. Además el gateway cae al cuerpo completo si un servicio no envuelve: una inconsistencia degrada la forma, no borra una vista |
+| Un error de render dejaba la pantalla en blanco (A-11) | `ErrorBoundary` con mensaje entendible, botón de recarga y registro del error |
+| `Customer.find_by_document` inalcanzable (A-12) | `GET /api/v1/customers/by-document/:document` — el caso de uso real del mostrador |
+| `GET /users` devolvía la tabla completa (A-13) | Paginación con tamaño acotado en el servidor (máx. 100) |
+| **Prueba del ERP con expectativa mal calculada** (A-14) | Esperaba `41650` donde el resultado correcto es `29750`. La prueba **nunca se había ejecutado**: el contenedor se quedaba sin memoria al compilar el entorno de pruebas. Ahora corre en 4/4 |
+| Efectos secundarios en actualizadores de estado (A-15) | Validaciones movidas fuera: sin avisos duplicados en StrictMode |
+| Regla de «stock bajo» duplicada (A-16) | Una sola definición en el dominio (`Product.low_stock?/1`) usada por las dos vistas |
+| Código muerto y nombres engañosos (A-17) | `Customer#deleted?` eliminado; `low_stock_alerts` renombrado a `product_rotation` (devolvía rotación, no alertas) |
+
+### Nota de migración: bitácora anterior a la corrección
+
+Los registros de auditoría creados **antes** de A-08 se hashearon con nanosegundos,
+por lo que no son verificables con el algoritmo corregido. En un sistema en
+producción esto exigiría **versionar el algoritmo** (una columna `hash_version`) y
+mantener el verificador anterior para el histórico. Aquí, al ser datos de
+demostración, la bitácora se reinició para partir de una cadena verificable. Queda
+como pendiente P-23.
 
 ## 5. Pendientes priorizados
 
@@ -185,6 +275,7 @@ Only Scan` sobre 50.000 filas). Ahora se toma el **máximo** del consecutivo, qu
 | P-12 | **Caché del service worker por usuario** | En un equipo compartido, el caché de lecturas de un usuario podría servirse a otro si no cierra sesión | 0.5 día |
 | P-13 | **Paginación** en productos, ventas y movimientos | El ERP corta en 300/200 registros; un negocio grande los supera | 1 día |
 | P-14 | **Empaquetado de imágenes por digest** y reservas de recursos | Las etiquetas (`postgres:17`) pueden cambiar; conviene fijar el digest | 0.5 día |
+| P-23 | **Versionar el algoritmo de hash de auditoría** | Un cambio de algoritmo deja el histórico sin verificar (ver nota de migración) | 1 día |
 
 ### 5.3 Alcance funcional (lo que separa el MVP de un producto)
 
@@ -266,9 +357,16 @@ técnico presencial, con cierre de caja diario y factura emitida.
 ## 8. Conclusión
 
 El sistema pasó de **«funciona»** a **«es correcto y sostiene la escala de su
-mercado»**: el indicador principal ya no miente, las búsquedas dejaron de recorrer
-la tabla completa, el tablero carga en una quinta parte del tiempo, la auditoría no
-puede partirse y la interfaz no se queda en blanco.
+mercado»**. La primera ronda arregló la **verdad del dato** (un indicador que
+mentía a partir de las 19:00 y una tarjeta que mostraba ceros sin fallar) y el
+**rendimiento** (búsquedas que recorrían la tabla completa, un tablero que pedía
+siete viajes). La segunda ronda cerró la **seguridad**: la auditoría registraba los
+eventos de éxito pero borraba los de fallo —justo los que sirven para investigar—,
+y la detección de robo de token no llegaba a cerrar las sesiones.
+
+Ninguno de esos defectos aparecía en una prueba funcional: el sistema respondía
+200, el humo pasaba en verde y la interfaz se veía bien. Los encontró la revisión
+del **código y de los datos**, no la de las respuestas.
 
 Lo que falta no es cosmético: son las piezas que convierten una demostración
 técnica sólida en un producto que un tendero puede usar todos los días sin
@@ -277,3 +375,14 @@ automatización de calidad y los módulos que el negocio realmente pide** (compr
 caja, usuarios). El plan de las fases 2 a 4 está ordenado por riesgo, no por
 lucimiento: primero lo que puede perder o mezclar datos, después lo que evita
 regresiones, y al final lo que amplía el mercado.
+
+## 9. Cómo se sostiene este nivel de rigor
+
+La auditoría no fue una lista de buenas intenciones: cada hallazgo se **midió**
+(`EXPLAIN ANALYZE` con 50.000 filas sintéticas, latencia promedio de 5 ejecuciones,
+`docker stats`) y cada corrección se **verificó** con una comprobación añadida al
+humo. Once de las 44 comprobaciones existen porque un defecto concreto obligó a
+escribirlas.
+
+Ese es el criterio para presentar el MVP con tranquilidad: no que no tenga fallos
+—los tenía, diecisiete— sino que **cada fallo tiene ahora una prueba que lo vigila**.

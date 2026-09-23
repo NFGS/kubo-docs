@@ -14,7 +14,7 @@ Estas verificaciones no dependen de capturas: se ejecutan y devuelven un
 resultado verificable.
 
 ```bash
-make smoke          # 33 comprobaciones end-to-end, todas en verde
+make smoke          # 37 comprobaciones end-to-end, todas en verde
 make ps             # los 9 contenedores en estado healthy
 docker stats --no-stream   # consumo por servicio (~930 MB en total)
 ```

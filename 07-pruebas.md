@@ -9,14 +9,14 @@ servicio, una prueba de humo end-to-end y verificaciones manuales de operación.
 make smoke
 ```
 
-Ejecuta **37 comprobaciones** contra el sistema en ejecución, usando el API
-Gateway como un cliente real. Resultado esperado: `37 pruebas exitosas, 0 fallidas`.
+Ejecuta **44 comprobaciones** contra el sistema en ejecución, usando el API
+Gateway como un cliente real. Resultado esperado: `44 pruebas exitosas, 0 fallidas`.
 
 | Bloque | Qué verifica | Comprobaciones |
 | --- | --- | --- |
 | 1. Salud | Los cinco servicios de aplicación responden `UP` | 5 |
-| 2. Autenticación | Login devuelve token; el token es **RS256**; trae el negocio; el **JWKS** publica la llave | 4 |
-| 3. Control de acceso | Sin token → `401`; token falsificado → `401`; cabecera `X-User-Id` inyectada → **ignorada** | 3 |
+| 2. Autenticación | Login devuelve token; el token es **RS256**; trae el negocio; el **JWKS** publica la llave; el refresco emite uno nuevo; el token refrescado autentica; **reutilizar un token rotado → `401`** | 7 |
+| 3. Control de acceso y auditoría | Sin token → `401`; token falsificado → `401`; cabecera `X-User-Id` inyectada → **ignorada**; **cadena de auditoría intacta**; entradas verificadas; **el intento fallido queda en la bitácora**; **el reuso de token queda en la bitácora** | 7 |
 | 4. Clientes y cifrado | Crear cliente; detalle con documento completo; listado **enmascarado**; texto **cifrado** en PostgreSQL; índice ciego correcto; **búsqueda por documento** | 6 |
 | 5. Inventario y venta | Crear producto; entrada deja 10 unidades; venta por `35700.00`; IVA desagregado `5700.00`; stock baja a 7; **kardex** con 2 movimientos; sobreventa → `409` | 8 |
 | 6. Evento y tablero | La venta llega al modelo de lectura; MongoDB guarda el evento; el tablero la reporta; **la vista compuesta trae las 7 vistas en una petición**; sin vistas caídas; **la zona horaria del negocio viaja en la respuesta** | 6 |
@@ -35,7 +35,7 @@ cd kubo-iam && mvn test
 # kubo-gateway — tabla de rutas y rutas públicas (3 pruebas)
 cd kubo-gateway && npm test
 
-# kubo-crm — cifrado de campos (6 pruebas, sin base de datos)
+# kubo-crm — cifrado de campos (8 pruebas, sin base de datos)
 cd kubo-crm && ruby test/field_cipher_test.rb
 
 # kubo-erp — aritmética de dinero (4 pruebas, sin base de datos)
@@ -45,7 +45,29 @@ cd kubo-erp && mix test test/kubo_erp/sales_totals_test.exs
 cd kubo-analytics && pip install -r requirements-dev.txt && pytest -q
 ```
 
-**Total: 22 pruebas unitarias** más 37 comprobaciones end-to-end.
+**Total: 24 pruebas unitarias** más 44 comprobaciones end-to-end.
+
+### Cómo ejecutar cada suite
+
+```bash
+make smoke                                    # 44 comprobaciones end-to-end
+
+cd kubo-iam        && mvn test                # 3 pruebas
+cd kubo-gateway    && npm test                # 3 pruebas
+cd kubo-crm        && ruby test/field_cipher_test.rb   # 8 pruebas
+cd kubo-analytics  && pytest -q               # 6 pruebas
+```
+
+Las 4 pruebas de `kubo-erp` son puras (aritmética decimal) y **no pueden ejecutarse
+dentro del contenedor de producción**: al compilar el entorno de pruebas el
+contenedor se queda sin memoria (límite de 512 MB). Se ejecutan en un contenedor
+con más memoria o en CI:
+
+```bash
+docker run --rm -m 3g -v "$PWD/kubo-erp:/app" -w /app -e MIX_ENV=test elixir:1.17-slim \
+  bash -c "mix local.hex --force && mix local.rebar --force && mix deps.get && mix compile &&
+           ERL_LIBS=/app/_build/test/lib elixir -e 'ExUnit.start(); Code.require_file(\"test/kubo_erp/sales_totals_test.exs\")'"
+```
 
 ### Qué cubren las pruebas unitarias
 
