@@ -9,17 +9,17 @@ servicio, una prueba de humo end-to-end y verificaciones manuales de operación.
 make smoke
 ```
 
-Ejecuta **33 comprobaciones** contra el sistema en ejecución, usando el API
-Gateway como un cliente real. Resultado esperado: `33 pruebas exitosas, 0 fallidas`.
+Ejecuta **37 comprobaciones** contra el sistema en ejecución, usando el API
+Gateway como un cliente real. Resultado esperado: `37 pruebas exitosas, 0 fallidas`.
 
 | Bloque | Qué verifica | Comprobaciones |
 | --- | --- | --- |
 | 1. Salud | Los cinco servicios de aplicación responden `UP` | 5 |
 | 2. Autenticación | Login devuelve token; el token es **RS256**; trae el negocio; el **JWKS** publica la llave | 4 |
 | 3. Control de acceso | Sin token → `401`; token falsificado → `401`; cabecera `X-User-Id` inyectada → **ignorada** | 3 |
-| 4. Clientes y cifrado | Crear cliente; detalle con documento completo; listado **enmascarado**; texto **cifrado** en PostgreSQL; índice ciego correcto | 5 |
+| 4. Clientes y cifrado | Crear cliente; detalle con documento completo; listado **enmascarado**; texto **cifrado** en PostgreSQL; índice ciego correcto; **búsqueda por documento** | 6 |
 | 5. Inventario y venta | Crear producto; entrada deja 10 unidades; venta por `35700.00`; IVA desagregado `5700.00`; stock baja a 7; **kardex** con 2 movimientos; sobreventa → `409` | 8 |
-| 6. Evento y tablero | La venta llega al modelo de lectura; MongoDB guarda el evento; el tablero la reporta | 3 |
+| 6. Evento y tablero | La venta llega al modelo de lectura; MongoDB guarda el evento; el tablero la reporta; **la vista compuesta trae las 7 vistas en una petición**; sin vistas caídas; **la zona horaria del negocio viaja en la respuesta** | 6 |
 | 7. Anulación | La venta queda `VOIDED`; el inventario vuelve a 10 | 2 |
 | 8. Aislamiento | Un segundo negocio no ve clientes ni catálogo del primero | 3 |
 
@@ -45,7 +45,7 @@ cd kubo-erp && mix test test/kubo_erp/sales_totals_test.exs
 cd kubo-analytics && pip install -r requirements-dev.txt && pytest -q
 ```
 
-**Total: 22 pruebas unitarias** más 33 comprobaciones end-to-end.
+**Total: 22 pruebas unitarias** más 37 comprobaciones end-to-end.
 
 ### Qué cubren las pruebas unitarias
 
@@ -97,17 +97,23 @@ done; echo                                                                      
 
 ## 5. Rendimiento observado
 
-Medido en un equipo de 16 núcleos con 4 GB disponibles para el stack:
+Medido en un equipo de 16 núcleos, a través del gateway (la latencia que percibe
+el usuario):
 
 | Operación | Tiempo |
 | --- | --- |
-| Login (BCrypt + firma RSA) | ~180 ms |
+| Login (BCrypt + firma RSA) | ~75 ms |
 | Registrar venta (transacción + kardex) | ~45 ms |
-| Consultar catálogo (300 productos) | ~20 ms |
-| Tablero completo (5 agregaciones) | ~60 ms |
+| Consultar catálogo (300 productos) | ~6 ms |
+| **Tablero completo (vista compuesta BFF)** | **~25 ms** (antes 108 ms en 7 viajes) |
+| Búsqueda por texto con 50.000 registros (ERP) | ~5.7 ms (antes 46 ms) |
+| Búsqueda por texto con 50.000 registros (CRM) | ~4.4 ms (antes 28 ms) |
 | Propagación del evento a MongoDB | < 1 s |
 | Arranque completo del sistema | ~50 s |
-| Consumo en reposo | ~1.6 GB |
+| Consumo en reposo | ~930 MB |
+
+El detalle de las mediciones, los planes de ejecución y su análisis están en
+[`10-auditoria.md`](10-auditoria.md).
 
 ## 6. Pruebas pendientes (fase 2)
 

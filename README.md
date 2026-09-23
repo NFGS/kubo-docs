@@ -16,6 +16,7 @@ la primera vez y para consultarse por secciones después.
 | [07 — Pruebas](07-pruebas.md) | Calidad | ¿Qué se probó, cómo y con qué resultado? |
 | [08 — Trazabilidad](08-trazabilidad.md) | Evaluación | ¿Qué requisito se cumplió y dónde se comprueba? |
 | [09 — Guion de demostración](09-demo-guion.md) | Presentación | Guion del video de 6 minutos |
+| [10 — Auditoría técnica](10-auditoria.md) | Arquitectura · Calidad | Hallazgos, mediciones, correcciones aplicadas y plan de mejora |
 | [ADRs](adr/) | Arquitectura | Las ocho decisiones que definen el sistema |
 
 ## Decisiones de arquitectura (ADR)

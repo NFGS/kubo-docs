@@ -88,6 +88,7 @@ Llave pública RSA que el gateway usa para verificar firmas.
 | --- | --- | --- |
 | GET | `/customers?q=&stage=` | Listado (documento y teléfono **enmascarados**) |
 | GET | `/customers/{id}` | Detalle (valores descifrados) |
+| GET | `/customers/by-document/{documento}` | Búsqueda exacta por documento (índice ciego) |
 | POST | `/customers` | Crear |
 | PATCH | `/customers/{id}` | Actualizar |
 | DELETE | `/customers/{id}` | Borrado lógico |
@@ -174,14 +175,47 @@ curl -X POST http://localhost:9080/api/v1/products/{id}/stock \
 
 | Método | Ruta | Descripción |
 | --- | --- | --- |
+| GET | `/dashboard/overview` | **Vista compuesta (BFF)**: el gateway consulta en paralelo las 7 vistas y devuelve una sola respuesta |
 | GET | `/dashboard/summary` | Ventas, ingreso, IVA, ticket promedio, unidades, hoy |
-| GET | `/dashboard/sales-by-day?days=14` | Serie diaria |
+| GET | `/dashboard/sales-by-day?days=14` | Serie diaria (en la zona horaria del negocio) |
 | GET | `/dashboard/top-products?limit=10` | Productos más vendidos |
 | GET | `/dashboard/top-customers?limit=10` | Mejores clientes |
 | GET | `/dashboard/payment-methods` | Distribución por medio de pago |
 | GET | `/dashboard/recent-sales?limit=10` | Últimas ventas |
 | GET | `/dashboard/rotation` | Productos con más salida en 7 días |
 | POST | `/events` | Vía de respaldo para reenviar eventos por HTTP |
+
+### Vista compuesta (patrón BFF)
+
+```bash
+curl http://localhost:9080/api/v1/dashboard/overview -H "Authorization: Bearer ${TOKEN}"
+```
+
+```json
+{
+  "data": {
+    "summary": { "sales_count": 10, "revenue": 141900.0, "today": { "revenue": 0, "sales_count": 0 } },
+    "sales_by_day": [ { "date": "2026-09-23", "revenue": 141900.0, "sales_count": 10 } ],
+    "top_products": [ { "product_name": "Cafe molido 250 g", "quantity": 6, "revenue": 57000.0 } ],
+    "payment_methods": [ { "payment_method": "CASH", "revenue": 45300.0, "sales_count": 3 } ],
+    "recent_sales": [ { "number": "V-000010", "total": 35700.0 } ],
+    "rotation": [ { "product_name": "Panela 500 g", "quantity_7d": 4 } ],
+    "customers": { "total": 11, "by_stage": { "LEAD": 8, "PROSPECT": 1, "CUSTOMER": 2 } }
+  }
+}
+```
+
+Por qué existe: sin esta capa la PWA necesitaba **siete viajes de red** para pintar
+el tablero (108 ms medidos). El gateway consulta los servicios en paralelo dentro
+de la red privada y responde en ~25 ms. Si una vista falla, la respuesta incluye
+`unavailable: ["top_products"]` y el tablero se muestra parcial en lugar de caer.
+
+### Zona horaria del negocio
+
+Los indicadores de «hoy» y la serie diaria se calculan en la zona horaria del
+negocio (`KUBO_TIMEZONE`, por defecto `America/Bogota`), no en UTC. Sin esto, en
+Colombia las ventas de 19:00 a 23:59 se atribuirían al día siguiente. La respuesta
+de `/sales/stats` incluye `timezone` y `business_date` para poder auditarlo.
 
 ## 7. Eventos de dominio
 

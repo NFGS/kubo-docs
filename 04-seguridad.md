@@ -98,6 +98,12 @@ incluye el hash del anterior, de modo que alterar o borrar un registro intermedi
 rompe la cadena y es detectable. Se auditan, entre otros: registro de negocio,
 inicio de sesión correcto y fallido, rotación de token, reuso detectado.
 
+**Serialización de la cadena**: leer el último hash e insertar el nuevo debe ser
+atómico. Sin un bloqueo, dos peticiones concurrentes leerían el mismo hash anterior
+y la cadena quedaría partida en dos ramas, lo que haría indetectable una
+manipulación posterior. `AuditService` toma un `pg_advisory_xact_lock` al inicio de
+la transacción: se libera solo al terminar y no bloquea ninguna tabla.
+
 Los logs son **JSON estructurados** y el gateway **redacta la cabecera
 `Authorization`** y las cookies. Nunca se registran contraseñas, tokens ni datos
 personales: Rails filtra `document_number`, `phone` y `email` en sus logs.
