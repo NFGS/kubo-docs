@@ -204,6 +204,7 @@ Cada decisión relevante está registrada como ADR:
 | [0009](adr/ADR-0009-outbox-transaccional.md) | Outbox transaccional para la entrega de eventos |
 | [0010](adr/ADR-0010-rls-activo.md) | RLS activo con interceptor de transacción |
 | [0011](adr/ADR-0011-bff-capa-formal.md) | BFF como capa formal del gateway |
+| [0012](adr/ADR-0012-zona-horaria-por-negocio.md) | Zona horaria por negocio |
 
 ## 7. Estructura del workspace
 

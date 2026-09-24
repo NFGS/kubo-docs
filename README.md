@@ -35,8 +35,9 @@ la primera vez y para consultarse por secciones después.
 | [0009](adr/ADR-0009-outbox-transaccional.md) | Outbox transaccional para la entrega de eventos |
 | [0010](adr/ADR-0010-rls-activo.md) | RLS activo con interceptor de transacción |
 | [0011](adr/ADR-0011-bff-capa-formal.md) | BFF como capa formal del gateway |
+| [0012](adr/ADR-0012-zona-horaria-por-negocio.md) | Zona horaria por negocio |
 
-ADR planificadas: **0012** zona horaria por negocio (Fase 4). Ver
+Las siguientes ADR se registran al abrir cada paso de la Fase 4. Ver
 [`11-plan-de-cierre.md`](11-plan-de-cierre.md).
 
 ## Documentación por servicio

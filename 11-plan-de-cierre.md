@@ -6,7 +6,7 @@
 | Objetivo | Producto comercializable en la región (Fases 0–4); la Fase 5 queda como backlog declarado |
 | Punto de partida | 44/44 comprobaciones en verde · 10 contenedores sanos · 9 repositorios limpios |
 | Dedicación | ~30 h/semana (≈ 3.75 jornadas de 8 h) |
-| Estado | Fases 0–3 completadas · Fase 4 planificada · Fase 5 como backlog declarado |
+| Estado | Fases 0–3 completadas · Fase 4 en curso (F4.6 completado) · Fase 5 como backlog declarado |
 
 Este documento ordena los 31 pendientes de [`10-auditoria.md`](10-auditoria.md) en
 fases con criterio de cierre medible. No sustituye a la auditoría: la usa como
@@ -207,6 +207,17 @@ verificados:
 **Criterio de aceptación**: dos verticales activables sin tocar el núcleo · factura
 DIAN emitida en ambiente de habilitación · notificación real entregada ·
 transferencia entre dos bodegas con kardex en ambas.
+
+**Estado: en curso (2026-09-24).**
+
+- **F4.6 ADR-0012 · zona horaria por negocio: completado.** `tenants.timezone`
+  en IAM (migración `V5`), claim `tenant_timezone` en el token, cabecera
+  `x-tenant-timezone` propagada por el gateway (reescrita siempre con el valor
+  verificado, nunca la del cliente) y aplicada por el ERP con validación contra
+  la base de zonas (400 `INVALID_TIMEZONE` si es desconocida) y respaldo
+  configurado. Evidencia: IAM 35 pruebas (claim), gateway 8/8 (cabecera),
+  ERP 5/5 de integración (precedencia), humo **109/109** (zona del negocio,
+  zona distinta honrada y zona inválida rechazada).
 
 ### Fase 5 — Escala (backlog declarado)
 
