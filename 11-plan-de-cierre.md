@@ -6,7 +6,7 @@
 | Objetivo | Producto comercializable en la región (Fases 0–4); la Fase 5 queda como backlog declarado |
 | Punto de partida | 44/44 comprobaciones en verde · 10 contenedores sanos · 9 repositorios limpios |
 | Dedicación | ~30 h/semana (≈ 3.75 jornadas de 8 h) |
-| Estado | Fases 0–2 completadas (P-08 parcial) · Fase 3 en curso · Fases 4–5 planificadas |
+| Estado | Fases 0–3 completadas · Fase 4 planificada · Fase 5 como backlog declarado |
 
 Este documento ordena los 31 pendientes de [`10-auditoria.md`](10-auditoria.md) en
 fases con criterio de cierre medible. No sustituye a la auditoría: la usa como
@@ -104,7 +104,7 @@ Dos defectos reales aparecieron al integrar la fase y quedaron corregidos:
 **Criterio de aceptación**: una regresión de seguridad o de contrato bloquea el
 merge · p95 del POS por debajo de 300 ms con 50 cajas · cobertura de dominio ≥ 80 %.
 
-**Estado: completada (2026-09-24), con P-08 parcial.** Evidencia:
+**Estado: completada (2026-09-24).** Evidencia:
 
 - **P-06 CI**: `.gitlab-ci.yml` en los ocho repositorios (pruebas, SAST, secretos,
   dependencias) y gate local `make ci` → **9/9 en verde** (secretos, suites,
@@ -122,9 +122,25 @@ merge · p95 del POS por debajo de 300 ms con 50 cajas · cobertura de dominio �
   (los listados mentían en `total`), digests de imágenes y axe en CI.
 - **Cobertura**: IAM **85.5 %** de dominio (gate JaCoCo ≥ 80 % en `mvn verify`)
   y analítica **91 %** en su módulo de dominio (gate `--cov-fail-under=80`).
-- **P-08 parcial**: integración con Testcontainers en IAM (RLS + cadena de
-  auditoría contra PostgreSQL real, 2 pruebas). Queda pendiente replicarlo en
-  analítica y los demás servicios.
+- **P-08 integración con infraestructura real**: en los cinco servicios, contra
+  el motor y no contra dobles. IAM: RLS + cadena de auditoría sobre PostgreSQL
+  (2 pruebas). Analítica: deduplicación y proyección sobre MongoDB efímero
+  (testcontainers, 2 pruebas). ERP: RLS sin contexto = 0 filas, numeración
+  consecutiva por negocio, atomicidad venta + bandeja de salida y kardex con
+  anulación sobre PostgreSQL real (4 pruebas). CRM: aislamiento RLS entre
+  negocios y round-trip del cifrado con índice ciego sobre PostgreSQL real
+  (2 pruebas). Gateway: ventana de límite de tasa, 429 al exceder y cuota
+  independiente por usuario contra Redis real (3 pruebas). En todos, las
+  pruebas corren como el **rol de la aplicación**, no como superusuario: un
+  superusuario ignora RLS incluso con `FORCE` y la prueba dejaría de probar
+  algo. Los runners son `kubo-infra/scripts/erp-tests.sh`, `crm-tests.sh` y
+  `analytics-tests.sh` (integrados en `make ci`), y cada `.gitlab-ci.yml` añade
+  el servicio correspondiente (postgres/redis).
+- **Defectos reales corregidos al añadir P-08**: el CI de analítica no podía
+  importar `app` (faltaba `pytest.ini` con `pythonpath`) ni tenía instalado
+  `pytest-cov` pese a usar `--cov-fail-under`; el guard de las pruebas de
+  integración exigía el binario `docker` cuando basta el socket; y el volcado de
+  `schema.rb` rompía las migraciones del CRM en el contenedor de pruebas.
 
 Defectos reales corregidos durante la fase (además de los de implementación):
 numeración de ventas con `ON CONFLICT` que devolvía un id inexistente, RLS con
