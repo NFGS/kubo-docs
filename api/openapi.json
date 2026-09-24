@@ -190,6 +190,59 @@
           }
         }
       }
+    },
+    "/reports/sales.csv": {
+      "get": {
+        "summary": "Reporte de ventas en CSV",
+        "description": "Filtro opcional `from`/`to` (YYYY-MM-DD) interpretado en la zona horaria del negocio. Una fecha invalida responde 400 con code INVALID_DATE_RANGE.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "format": "date" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ventas en CSV (numero, fecha, cliente, medio_pago, estado, subtotal, impuesto, total)",
+            "content": {
+              "text/csv": {
+                "schema": { "type": "string" }
+              }
+            }
+          },
+          "400": {
+            "description": "Rango de fechas invalido",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports/inventory.csv": {
+      "get": {
+        "summary": "Inventario valorizado en CSV",
+        "responses": {
+          "200": {
+            "description": "Inventario en CSV (sku, nombre, stock, stock_minimo, costo, precio, valor_inventario)",
+            "content": {
+              "text/csv": {
+                "schema": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

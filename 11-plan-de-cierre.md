@@ -145,18 +145,37 @@ real, y la cobertura de listados que reportaba el tamaño de página como total.
 **Criterio de aceptación**: un negocio carga su catálogo desde Excel, abre caja,
 vende, imprime el comprobante y cierra el turno con arqueo cuadrado.
 
-**Estado: en curso (2026-09-24).** Completado el primer paso aprobado:
+**Estado: completada (2026-09-24).** Los cinco pasos quedaron construidos y
+verificados:
 
 - **P-15 Compras y proveedores**: dominio completo en el ERP (proveedores con
   borrado lógico, compras con detalle, numeración atómica `C-000001`, RLS en las
   tres tablas nuevas), la compra suma inventario, deja el kardex (`PURCHASE`),
   actualiza el costo del producto **sin IVA** y emite `purchase.received` por la
   bandeja de salida; la anulación revierte el stock (`PURCHASE_VOID`).
-- API expuesta por el gateway, 9 comprobaciones nuevas en el humo (87 en total),
-  2 contratos OpenAPI nuevos (10 en total) y pantalla **Compras** en la PWA
-  (proveedores, registro con líneas y anulación), auditada con axe.
-- Pendiente de la fase: **P-16 sesiones de caja**, P-20 usuarios y roles en la
-  interfaz, P-24 importación de datos y P-21 reportes y comprobante.
+- **P-16 Sesiones de caja**: apertura con base, una sola caja abierta por negocio
+  (índice único parcial), ventas ligadas al turno, cierre con arqueo (esperado =
+  base + efectivo de ventas completas − anuladas) y diferencia calculada.
+- **P-20 Usuarios y roles**: correo único global en IAM (índice funcional sobre
+  `lower(email)`), creación y edición de usuarios por el propietario
+  (`requireAdmin`), cambio de rol, habilitar/deshabilitar con efecto inmediato en
+  el ingreso (`USER_DISABLED`).
+- **P-24 Importación de catálogo (CSV)**: detección de separador `,`/`;`, alias de
+  cabeceras en español e inglés, alta o actualización por SKU, stock por kardex
+  (`IMPORT`), errores por línea con número, límite de 1000 filas; en la PWA con
+  modal de archivo o texto pegado y resumen de creados/actualizados/errores.
+- **P-21 Reportes y comprobante**: `GET /reports/sales.csv` (filtro `from`/`to`
+  interpretado en la **zona horaria del negocio**, fechas ISO con offset) y
+  `GET /reports/inventory.csv` valorizado; fechas inválidas responden 400. La PWA
+  descarga ambos reportes y el POS imprime el comprobante de la última venta sin
+  depender de internet.
+- **Defecto corregido durante el cierre**: el ERP no traía base de datos de zonas
+  horarias (`tzdata`), así que `DateTime.now("America/Bogota")` fallaba y el día
+  comercial caía silenciosamente a UTC entre las 19:00 y las 23:59 locales (el
+  mismo defecto A-01, latente en otra capa). Se añadió `tzdata`, se registró el
+  respaldo y el humo verifica que el filtro de fechas respeta la zona del negocio.
+- **Evidencia**: humo **102/102** (12 bloques, repetible en el mismo minuto),
+  contratos **12/12**, E2E **4/4** con auditoría axe, `make ci` en verde.
 
 ### Fase 4 — Diferenciadores (5–6 semanas)
 
