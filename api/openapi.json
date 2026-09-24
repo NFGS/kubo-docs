@@ -146,6 +146,36 @@
         }
       }
     },
+    "/users": {
+      "get": {
+        "summary": "Usuarios del negocio (paginado)",
+        "responses": {
+          "200": {
+            "description": "Pagina de usuarios",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UsersPage" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cash-sessions/current": {
+      "get": {
+        "summary": "Sesion de caja abierta con su arqueo (o null)",
+        "responses": {
+          "200": {
+            "description": "Turno abierto, con el esperado en caja, o data null si no hay caja abierta",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CashSessionCurrent" }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dashboard/overview": {
       "get": {
         "summary": "Vista compuesta del tablero (BFF)",
@@ -180,8 +210,20 @@
           "email": { "type": "string" },
           "fullName": { "type": "string" },
           "role": { "type": "string" },
+          "status": { "type": ["string", "null"] },
           "tenantId": { "type": "string" },
           "tenantName": { "type": "string" }
+        }
+      },
+      "UsersPage": {
+        "type": "object",
+        "required": ["content", "totalElements"],
+        "properties": {
+          "content": { "type": "array", "items": { "$ref": "#/components/schemas/User" } },
+          "totalElements": { "type": "integer", "minimum": 0 },
+          "totalPages": { "type": "integer" },
+          "size": { "type": "integer" },
+          "number": { "type": "integer" }
         }
       },
       "LoginResponse": {
@@ -373,6 +415,49 @@
           "total": { "type": "integer", "minimum": 0 },
           "limit": { "type": "integer", "minimum": 1, "maximum": 200 },
           "offset": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "CashSessionSummary": {
+        "type": "object",
+        "required": ["sales_count", "voided_count", "total_sales", "cash_sales", "other_sales", "cash_returns", "expected_cash"],
+        "properties": {
+          "sales_count": { "type": "integer", "minimum": 0 },
+          "voided_count": { "type": "integer", "minimum": 0 },
+          "total_sales": { "type": "string" },
+          "cash_sales": { "type": "string" },
+          "other_sales": { "type": "string" },
+          "cash_returns": { "type": "string" },
+          "expected_cash": { "type": "string" }
+        }
+      },
+      "CashSessionDetail": {
+        "type": "object",
+        "required": ["id", "status", "opening_amount", "summary"],
+        "properties": {
+          "id": { "type": "string" },
+          "status": { "enum": ["OPEN", "CLOSED"] },
+          "opened_by": { "type": ["string", "null"] },
+          "opened_at": { "type": ["string", "null"] },
+          "opening_amount": { "type": "string" },
+          "closed_by": { "type": ["string", "null"] },
+          "closed_at": { "type": ["string", "null"] },
+          "counted_amount": { "type": ["string", "null"] },
+          "expected_amount": { "type": ["string", "null"] },
+          "difference": { "type": ["string", "null"] },
+          "notes": { "type": ["string", "null"] },
+          "summary": { "$ref": "#/components/schemas/CashSessionSummary" }
+        }
+      },
+      "CashSessionCurrent": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/CashSessionDetail" },
+              { "type": "null" }
+            ]
+          }
         }
       },
       "OverviewResponse": {
