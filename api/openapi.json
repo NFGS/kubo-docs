@@ -47,6 +47,99 @@
         }
       }
     },
+    "/auth/totp/verify": {
+      "post": {
+        "summary": "Segundo paso del acceso: desafio + codigo TOTP (P-30)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["challengeToken", "code"],
+                "properties": {
+                  "challengeToken": { "type": "string" },
+                  "code": { "type": "string", "pattern": "^\\d{6}$" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesion emitida",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Desafio o codigo invalidos",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/auth/totp/setup": {
+      "post": {
+        "summary": "Genera el secreto del segundo factor (pendiente de confirmar)",
+        "responses": {
+          "200": {
+            "description": "Secreto y URI otpauth",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TotpSetup" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/totp/enable": {
+      "post": {
+        "summary": "Activa el segundo factor con el primer codigo valido",
+        "responses": {
+          "200": {
+            "description": "Perfil actualizado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "401": {
+            "description": "Codigo invalido",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/auth/totp/disable": {
+      "post": {
+        "summary": "Desactiva el segundo factor con un codigo vigente",
+        "responses": {
+          "200": {
+            "description": "Perfil actualizado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "401": {
+            "description": "Codigo invalido",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
     "/products": {
       "get": {
         "summary": "Catalogo paginado",
@@ -449,6 +542,22 @@
           "vertical": { "type": "string", "enum": ["retail", "servicios", "restaurantes", "agro"] }
         }
       },
+      "TotpChallengeResponse": {
+        "type": "object",
+        "required": ["totpRequired", "challengeToken"],
+        "properties": {
+          "totpRequired": { "type": "boolean" },
+          "challengeToken": { "type": "string" }
+        }
+      },
+      "TotpSetup": {
+        "type": "object",
+        "required": ["secret", "otpauthUri"],
+        "properties": {
+          "secret": { "type": "string" },
+          "otpauthUri": { "type": "string" }
+        }
+      },
       "Invoice": {
         "type": "object",
         "required": ["id", "sale_id", "number", "cufe", "qr_url", "provider", "status", "issued_at", "xml"],
@@ -504,7 +613,8 @@
           "role": { "type": "string" },
           "status": { "type": ["string", "null"] },
           "tenantId": { "type": "string" },
-          "tenantName": { "type": "string" }
+          "tenantName": { "type": "string" },
+          "totpEnabled": { "type": "boolean" }
         }
       },
       "UsersPage": {

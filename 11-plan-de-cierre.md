@@ -266,6 +266,18 @@ transferencia entre dos bodegas con kardex en ambas.
   **125/125**, contratos **16/16** (esquema `InvoiceItem` contra la API viva).
   Pendiente declarado: notas crédito, firma XAdES y registro del NIT y la clave
   técnica ante la DIAN (trámite externo).
+- **F4.5 Segundo factor TOTP del propietario (P-30): completado.** El secreto se
+  cifra en reposo (AES-256-GCM con `KUBO_TOTP_ENCRYPTION_KEY`; sin llave el
+  servicio no arranca), la implementación es propia y verificada contra los
+  vectores del RFC 6238, y el acceso se parte en dos: `login` responde un
+  desafío firmado con `typ=totp` (el gateway solo acepta `typ=access`) y
+  `POST /auth/totp/verify` lo cambia por la sesión. `setup` deja el secreto
+  pendiente, `enable` lo confirma con el primer código y `disable` exige un
+  código vigente; todo queda auditado. La PWA pide el código en el ingreso y la
+  pantalla de Configuración permite configurarlo. Evidencia: IAM **46 pruebas**
+  (vectores RFC, cifrado, desafío y ciclo completo), gateway **9/9**, humo
+  **130/130** con un código real calculado en Python (implementación
+  independiente), E2E 4/4, `make ci` 10/10.
 
 ### Fase 5 — Escala (backlog declarado)
 

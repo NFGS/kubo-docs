@@ -207,6 +207,7 @@ Cada decisión relevante está registrada como ADR:
 | [0012](adr/ADR-0012-zona-horaria-por-negocio.md) | Zona horaria por negocio |
 | [0013](adr/ADR-0013-vertical-packs.md) | Vertical Packs: el vertical como dato del negocio |
 | [0014](adr/ADR-0014-puerto-facturacion-dian.md) | Facturación electrónica DIAN como puerto enchufable |
+| [0015](adr/ADR-0015-segundo-factor-totp.md) | Segundo factor TOTP del propietario |
 
 ## 7. Estructura del workspace
 
