@@ -37,6 +37,7 @@ la primera vez y para consultarse por secciones después.
 | [0011](adr/ADR-0011-bff-capa-formal.md) | BFF como capa formal del gateway |
 | [0012](adr/ADR-0012-zona-horaria-por-negocio.md) | Zona horaria por negocio |
 | [0013](adr/ADR-0013-vertical-packs.md) | Vertical Packs: el vertical como dato del negocio |
+| [0014](adr/ADR-0014-puerto-facturacion-dian.md) | Facturación electrónica DIAN como puerto enchufable |
 
 Las siguientes ADR se registran al abrir cada paso de la Fase 4. Ver
 [`11-plan-de-cierre.md`](11-plan-de-cierre.md).

@@ -256,6 +256,16 @@ transferencia entre dos bodegas con kardex en ambas.
   - **Criterio de aceptación de F4.1 cubierto**: dos verticales activables sin
     tocar el núcleo (probado con `retail` y `restaurantes` en el humo), con
     terminología, valores por defecto y comportamiento distintos.
+- **F4.2 Facturación electrónica DIAN (P-18): puerto implementado.** El núcleo
+  no conoce al proveedor: `KuboErp.Billing` es el contrato y el adaptador
+  `Sandbox` genera UBL 2.1 con el CUFE del algoritmo DIAN (SHA-384, 96
+  hexadecimales), el QR del catálogo y el escapado XML. La factura se persiste
+  inmutable (`invoices`, con RLS), emitir es idempotente, una venta anulada no
+  se factura (409 `SALE_VOIDED`) y el nombre del emisor llega por
+  `x-tenant-name`. Evidencia: ERP puras **20/20** y integración **9/9**, humo
+  **125/125**, contratos **16/16** (esquema `InvoiceItem` contra la API viva).
+  Pendiente declarado: notas crédito, firma XAdES y registro del NIT y la clave
+  técnica ante la DIAN (trámite externo).
 
 ### Fase 5 — Escala (backlog declarado)
 

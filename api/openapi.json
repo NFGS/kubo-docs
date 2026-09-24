@@ -275,6 +275,59 @@
         }
       }
     },
+    "/sales/{id}/invoice": {
+      "post": {
+        "summary": "Emite la factura electronica de la venta (idempotente)",
+        "description": "Puerto de facturacion (ADR-0014): si la venta ya tiene factura devuelve la existente. Una venta anulada responde 409 SALE_VOIDED.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "201": {
+            "description": "Factura emitida (o la existente)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InvoiceItem" }
+              }
+            }
+          },
+          "404": {
+            "description": "La venta no existe",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "409": {
+            "description": "La venta esta anulada",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Factura emitida de la venta",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Factura emitida",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InvoiceItem" }
+              }
+            }
+          },
+          "404": {
+            "description": "La venta no tiene factura emitida",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
     "/packs/apply": {
       "post": {
         "summary": "Siembra el catalogo de arranque del paquete activo (idempotente)",
@@ -395,6 +448,26 @@
           "timezone": { "type": "string" },
           "vertical": { "type": "string", "enum": ["retail", "servicios", "restaurantes", "agro"] }
         }
+      },
+      "Invoice": {
+        "type": "object",
+        "required": ["id", "sale_id", "number", "cufe", "qr_url", "provider", "status", "issued_at", "xml"],
+        "properties": {
+          "id": { "type": "string" },
+          "sale_id": { "type": "string" },
+          "number": { "type": "string" },
+          "cufe": { "type": "string", "minLength": 96, "maxLength": 96 },
+          "qr_url": { "type": "string" },
+          "provider": { "type": "string" },
+          "status": { "type": "string" },
+          "issued_at": { "type": "string" },
+          "xml": { "type": "string" }
+        }
+      },
+      "InvoiceItem": {
+        "type": "object",
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Invoice" } }
       },
       "PackList": {
         "type": "object",
