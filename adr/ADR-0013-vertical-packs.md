@@ -50,9 +50,9 @@ declarativo:
   deja de estar cableada en la interfaz.
 - **Negativas**: la lista de verticales se conoce en dos servicios (IAM valida,
   ERP aplica) y debe mantenerse en sincronía; se acepta porque cambia muy poco y
-  el desajuste degrada a etiquetas, no a datos. Los paquetes aún no traen
-  catálogos ni categorías por defecto: el siguiente paso de P-17 es que un
-  paquete pueda **sembrar** datos iniciales.
+  el desajuste degrada a etiquetas, no a datos. La siembra de arranque crea
+  productos de ejemplo: un negocio real deberá editarlos o borrarlos, y por eso
+  es una acción explícita del usuario (nunca automática al registrar).
 
 ## Verificación
 
@@ -62,9 +62,10 @@ declarativo:
   token, nunca con el del cliente.
 - `kubo-erp`: prueba pura del catálogo (cuatro verticales con etiquetas propias
   y respaldo ante un vertical desconocido).
-- `make smoke` (**117/117**): el catálogo ofrece los cuatro verticales, la demo
+- `make smoke` (**120/120**): el catálogo ofrece los cuatro verticales, la demo
   arranca en `retail`, un vertical desconocido responde `INVALID_VERTICAL`, el
   cambio a `restaurantes` se refleja en el token nuevo (`Platillo`) y el
   comportamiento también cambia: un producto con `tracks_stock: false` se vende
-  sin existencias, no deja kardex y la venta guarda la mesa.
+  sin existencias, no deja kardex, la venta guarda la mesa y `POST /packs/apply`
+  siembra el catálogo de arranque sin duplicar al repetirse.
 - `make e2e`: la pantalla de configuración pasa la auditoría de accesibilidad.

@@ -246,8 +246,16 @@ transferencia entre dos bodegas con kardex en ambas.
     el flujo `pos_flow: "table"` muestra el campo de mesa en el POS, lo guarda
     en la venta y lo imprime en el comprobante. Evidencia: ERP integración
     **6/6** (servicio sin kardex y venta con mesa), humo **117/117**, E2E 4/4.
-  - **Siguiente incremento**: que el paquete **siembre** datos iniciales al
-    registrar el negocio (categorías y productos de arranque por vertical).
+  - **Siembra del catálogo de arranque**: `POST /packs/apply` crea los
+    productos de arranque del paquete activo (tres por vertical, con la
+    terminología, el IVA y la bandera de inventario del paquete) y es
+    **idempotente**: los SKU existentes se omiten, así que aplicarlo dos veces
+    no duplica nada. La pantalla de Configuración lo ofrece con un botón y el
+    resultado se informa al usuario. Evidencia: ERP integración **7/7**,
+    humo **120/120** (siembra, no duplica y omite existentes).
+  - **Criterio de aceptación de F4.1 cubierto**: dos verticales activables sin
+    tocar el núcleo (probado con `retail` y `restaurantes` en el humo), con
+    terminología, valores por defecto y comportamiento distintos.
 
 ### Fase 5 — Escala (backlog declarado)
 

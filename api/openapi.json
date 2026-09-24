@@ -275,6 +275,36 @@
         }
       }
     },
+    "/packs/apply": {
+      "post": {
+        "summary": "Siembra el catalogo de arranque del paquete activo (idempotente)",
+        "description": "Crea los productos de arranque del vertical; los SKU que ya existen se omiten.",
+        "responses": {
+          "200": {
+            "description": "Resumen de la siembra",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data"],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "required": ["created", "skipped", "pack"],
+                      "properties": {
+                        "created": { "type": "integer", "minimum": 0 },
+                        "skipped": { "type": "integer", "minimum": 0 },
+                        "pack": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tenants/me": {
       "get": {
         "summary": "Perfil del negocio (zona horaria y vertical)",
