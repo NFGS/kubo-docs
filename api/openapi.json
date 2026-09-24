@@ -243,10 +243,146 @@
           }
         }
       }
+    },
+    "/packs": {
+      "get": {
+        "summary": "Paquetes de configuracion por vertical (P-17)",
+        "responses": {
+          "200": {
+            "description": "Catalogo de paquetes que el ERP sabe aplicar",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PackList" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/packs/current": {
+      "get": {
+        "summary": "Paquete activo del negocio",
+        "description": "El vertical llega en el token y el gateway lo propaga como x-tenant-vertical; un vertical desconocido cae al paquete por defecto.",
+        "responses": {
+          "200": {
+            "description": "Paquete activo (retail por defecto)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PackItem" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/me": {
+      "get": {
+        "summary": "Perfil del negocio (zona horaria y vertical)",
+        "responses": {
+          "200": {
+            "description": "Perfil del negocio del actor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TenantItem" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Cambia la zona horaria y/o el vertical. Solo propietario o administrador",
+        "description": "Los valores viajan en el token: aplican al siguiente refresco de sesion.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateTenantRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil actualizado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TenantItem" }
+              }
+            }
+          },
+          "400": {
+            "description": "Zona horaria o vertical invalidos",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "Pack": {
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "description",
+          "product_label",
+          "product_label_plural",
+          "default_tax_rate",
+          "tracks_stock",
+          "pos_flow"
+        ],
+        "properties": {
+          "key": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "product_label": { "type": "string" },
+          "product_label_plural": { "type": "string" },
+          "default_tax_rate": { "type": "string" },
+          "tracks_stock": { "type": "boolean" },
+          "pos_flow": { "type": "string" }
+        }
+      },
+      "Tenant": {
+        "type": "object",
+        "required": ["id", "name", "slug", "plan", "timezone", "vertical"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "slug": { "type": "string" },
+          "plan": { "type": "string" },
+          "timezone": { "type": "string" },
+          "vertical": { "type": "string" }
+        }
+      },
+      "UpdateTenantRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "timezone": { "type": "string" },
+          "vertical": { "type": "string", "enum": ["retail", "servicios", "restaurantes", "agro"] }
+        }
+      },
+      "PackList": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Pack" } }
+        }
+      },
+      "PackItem": {
+        "type": "object",
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Pack" } }
+      },
+      "TenantItem": {
+        "type": "object",
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Tenant" } }
+      },
       "Error": {
         "type": "object",
         "required": ["code", "message"],

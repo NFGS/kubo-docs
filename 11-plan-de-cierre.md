@@ -218,6 +218,30 @@ transferencia entre dos bodegas con kardex en ambas.
   configurado. Evidencia: IAM 35 pruebas (claim), gateway 8/8 (cabecera),
   ERP 5/5 de integración (precedencia), humo **109/109** (zona del negocio,
   zona distinta honrada y zona inválida rechazada).
+- **F4.1 Vertical Packs (P-17): en curso.** El vertical es un dato del negocio
+  (ADR-0013), no una bifurcación del producto:
+  - **Catálogo** en el ERP (`KuboErp.Packs`): cuatro verticales —retail,
+    servicios, restaurantes y agro— con terminología, IVA por defecto, si
+    lleva inventario y flujo de punto de venta; `GET /packs` y
+    `GET /packs/current`; un vertical desconocido cae al paquete por defecto
+    con aviso (solo afecta etiquetas, no datos).
+  - **Negocio**: `tenants.vertical` en IAM (migración `V6`), claim
+    `tenant_vertical`, cabecera `x-tenant-vertical` propagada por el gateway y
+    `GET/PATCH /tenants/me` (solo propietario o administrador) para activar un
+    paquete; el cambio aplica al refrescar la sesión, que la propia interfaz
+    dispara al guardar.
+  - **PWA**: contexto `usePack` que adapta la terminología (una tienda ve
+    «Productos» y un restaurante «Platillos») y pantalla **Configuración** con
+    el selector de vertical y la zona horaria.
+  - **Evidencia**: IAM **36 pruebas** (claim y validación `INVALID_VERTICAL`),
+    gateway **9/9** (cabecera y rutas), ERP puras **16/16** y 5/5 de
+    integración, humo **114/114** (catálogo, demo en retail, vertical inválido
+    rechazado y cambio reflejado en el token nuevo), E2E **4/4** con la
+    pantalla nueva auditada.
+  - **Siguiente incremento**: que el paquete siembre datos iniciales al
+    registrar el negocio (categorías/valores por defecto), que el POS honre
+    `pos_flow: "table"` (mesas) y que `tracks_stock: false` omita el kardex en
+    servicios.
 
 ### Fase 5 — Escala (backlog declarado)
 
