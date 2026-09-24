@@ -238,10 +238,16 @@ transferencia entre dos bodegas con kardex en ambas.
     integración, humo **114/114** (catálogo, demo en retail, vertical inválido
     rechazado y cambio reflejado en el token nuevo), E2E **4/4** con la
     pantalla nueva auditada.
-  - **Siguiente incremento**: que el paquete siembre datos iniciales al
-    registrar el negocio (categorías/valores por defecto), que el POS honre
-    `pos_flow: "table"` (mesas) y que `tracks_stock: false` omita el kardex en
-    servicios.
+  - **Incremento aplicado**: el paquete ya cambia el comportamiento, no solo
+    las etiquetas. `products.tracks_stock` (migración `20260923000010`): un
+    servicio se vende sin existencias, no mueve kardex al vender y no lo
+    devuelve al anular; el POS no bloquea la venta ni avisa de stock, y el
+    formulario de productos lo propone según el paquete. `sales.table_number`:
+    el flujo `pos_flow: "table"` muestra el campo de mesa en el POS, lo guarda
+    en la venta y lo imprime en el comprobante. Evidencia: ERP integración
+    **6/6** (servicio sin kardex y venta con mesa), humo **117/117**, E2E 4/4.
+  - **Siguiente incremento**: que el paquete **siembre** datos iniciales al
+    registrar el negocio (categorías y productos de arranque por vertical).
 
 ### Fase 5 — Escala (backlog declarado)
 

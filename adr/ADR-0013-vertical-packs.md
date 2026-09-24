@@ -62,7 +62,9 @@ declarativo:
   token, nunca con el del cliente.
 - `kubo-erp`: prueba pura del catálogo (cuatro verticales con etiquetas propias
   y respaldo ante un vertical desconocido).
-- `make smoke` (**114/114**): el catálogo ofrece los cuatro verticales, la demo
-  arranca en `retail`, un vertical desconocido responde `INVALID_VERTICAL` y el
-  cambio a `restaurantes` se refleja en el token nuevo (`Platillo`).
+- `make smoke` (**117/117**): el catálogo ofrece los cuatro verticales, la demo
+  arranca en `retail`, un vertical desconocido responde `INVALID_VERTICAL`, el
+  cambio a `restaurantes` se refleja en el token nuevo (`Platillo`) y el
+  comportamiento también cambia: un producto con `tracks_stock: false` se vende
+  sin existencias, no deja kardex y la venta guarda la mesa.
 - `make e2e`: la pantalla de configuración pasa la auditoría de accesibilidad.
