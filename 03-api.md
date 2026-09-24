@@ -149,6 +149,31 @@ curl -X POST http://localhost:9080/api/v1/customers \
 | GET | `/sales/{id}` | Detalle |
 | POST | `/sales/{id}/void` | Anular venta (devuelve inventario) |
 | GET | `/sales/stats` | Totales del día |
+| GET | `/suppliers?q=&active=` | Proveedores (paginado) |
+| POST | `/suppliers` | Crear proveedor |
+| PATCH | `/suppliers/{id}` | Actualizar proveedor |
+| DELETE | `/suppliers/{id}` | Borrado lógico |
+| GET | `/purchases?status=&supplier_id=` | Compras (paginadas) |
+| POST | `/purchases` | Registrar compra (suma inventario) |
+| GET | `/purchases/{id}` | Detalle de compra |
+| POST | `/purchases/{id}/void` | Anular compra (revierte inventario) |
+| GET | `/purchases/stats` | Totales de compras y proveedores |
+
+### Registrar una compra
+
+```bash
+curl -X POST http://localhost:9080/api/v1/purchases \
+  -H "Authorization: Bearer ${TOKEN}" -H 'Content-Type: application/json' \
+  -d '{
+    "supplier_id": "…",
+    "items": [{"product_id": "…", "quantity": 5, "unit_cost": 5000}]
+  }'
+```
+
+La compra **suma** el inventario, deja el movimiento en el kardex
+(`reference_type = PURCHASE`) y actualiza `products.cost` con el valor **sin
+IVA** (el costo unitario se interpreta con IVA incluido, igual que el precio de
+venta). `POST /purchases/{id}/void` la anula y revierte el stock.
 
 ### Registrar una venta
 

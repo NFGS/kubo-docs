@@ -269,7 +269,11 @@ como pendiente P-23.
 > imágenes) y P-26 (axe en CI, con tres defectos de accesibilidad corregidos).
 > Cobertura de dominio: IAM 85.5 % y analítica 91 %, con gates en CI.
 > **P-08 queda parcial**: Testcontainers en IAM; falta replicarlo en analítica y
-> los demás servicios. `make smoke` 78/78, ADR-0011.
+> los demás servicios. `make smoke` 87/87, ADR-0011.
+>
+> **Fase 3 en curso (2026-09-24).** P-15 (compras y proveedores) implementado:
+> dominio, API, RLS, evento `purchase.received`, 9 comprobaciones en el humo y
+> pantalla en la PWA. Siguen P-16 (caja), P-20, P-24 y P-21.
 
 ### 5.1 Bloqueantes para un negocio real
 

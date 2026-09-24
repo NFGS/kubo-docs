@@ -9,8 +9,8 @@ servicio, una prueba de humo end-to-end y verificaciones manuales de operación.
 make smoke
 ```
 
-Ejecuta **78 comprobaciones** contra el sistema en ejecución, usando el API
-Gateway como un cliente real. Resultado esperado: `78 pruebas exitosas, 0 fallidas`.
+Ejecuta **87 comprobaciones** contra el sistema en ejecución, usando el API
+Gateway como un cliente real. Resultado esperado: `87 pruebas exitosas, 0 fallidas`.
 
 | Bloque | Qué verifica | Comprobaciones |
 | --- | --- | --- |
@@ -23,9 +23,10 @@ Gateway como un cliente real. Resultado esperado: `78 pruebas exitosas, 0 fallid
 | 7. Anulación | La venta queda `VOIDED`; el inventario vuelve a 10 | 2 |
 | 8. Aislamiento | Un segundo negocio no ve clientes ni catálogo; **RLS en IAM** (0 filas sin contexto) | 4 |
 | 9. Recuperación de contraseña | Solicitud 204; enlace en el buzón; consumo 204; **la cuenta se desbloquea con la clave nueva**; el enlace **no se reutiliza**; sin enumeración de usuarios | 6 |
-| 10. Tasa, TLS y trazas | **Límite por usuario** activo; HTTPS 200; HTTP → HTTPS (308); HSTS; **collector de trazas arriba y recibiendo spans** | 6 |
+| 10. Compras y proveedores | Proveedor creado; compra por `25000.00`; IVA `3991.60`; **suma 5 unidades**; **el costo se actualiza sin IVA**; kardex `PURCHASE`; **anulación revierte el stock**; **RLS en compras** (0 filas sin contexto) | 9 |
+| 11. Tasa, TLS y trazas | **Límite por usuario** activo; HTTPS 200; HTTP → HTTPS (308); HSTS; **collector de trazas arriba y recibiendo spans** | 6 |
 
-Además del humo, la Fase 2 agregó: **8 contratos OpenAPI** (`make contracts`),
+Además del humo, la Fase 2 agregó: **10 contratos OpenAPI** (`make contracts`),
 **4 pruebas de navegador con axe** (`make e2e`), la **carga a 50 cajas**
 (`make load`, p95 < 300 ms), los simulacros de bus y restauración, y el gate
 `make ci` que los reúne.
@@ -57,15 +58,15 @@ docker run --rm -m 3g -e MIX_ENV=test \
 cd kubo-analytics && pip install -r requirements-dev.txt && pytest -q
 ```
 
-**Total: 55 pruebas** (unitarias y de integración) más 78 comprobaciones
-end-to-end, 8 contratos y 4 pruebas de navegador. La cobertura de dominio se
+**Total: 55 pruebas** (unitarias y de integración) más 87 comprobaciones
+end-to-end, 10 contratos y 4 pruebas de navegador. La cobertura de dominio se
 vigila en CI: IAM ≥ 80 % (JaCoCo) y analítica ≥ 80 % en su módulo de
 procesamiento (pytest-cov).
 
 ### Cómo ejecutar cada suite
 
 ```bash
-make smoke                                    # 78 comprobaciones end-to-end
+make smoke                                    # 87 comprobaciones end-to-end
 make bus-drill                                # 4 comprobaciones: caida del bus
 make restore-drill                            # 14 comprobaciones: restauracion
 

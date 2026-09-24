@@ -37,6 +37,7 @@ requisito no tiene evidencia verificable, aparece marcado como pendiente.
 | RF-08 | Tablero de indicadores del negocio | `kubo-analytics` sobre MongoDB | `make smoke` bloque 6 |
 | RF-09 | Operar sin conexión | Cola IndexedDB + sincronización | Verificación manual `07-pruebas.md` §3 |
 | RF-10 | Auditar las acciones sensibles | `audit_logs` con cadena de hash | `GET /api/v1/audit` |
+| RF-11 | Gestionar proveedores y compras (Fase 3) | `kubo-erp`: compra suma inventario, kardex `PURCHASE` y costo sin IVA | `make smoke` bloque 10 · `make contracts` |
 
 ## 3. Requisitos no funcionales
 

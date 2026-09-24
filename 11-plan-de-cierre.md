@@ -114,7 +114,7 @@ merge · p95 del POS por debajo de 300 ms con 50 cajas · cobertura de dominio �
   `make observability` para el stack visual (Tempo + Grafana). El humo verifica
   que el collector recibe trazas.
 - **P-09 contratos**: `kubo-docs/api/openapi.json` + `make contracts` →
-  **8/8 contratos** validados con Ajv contra la API viva.
+  **10/10 contratos** validados con Ajv contra la API viva.
 - **P-10 carga y E2E**: `make load` (50 cajas) → **100 % de ventas exitosas,
   p95 = 149.76 ms**; Playwright + axe → **4/4**, con tres defectos reales de
   accesibilidad corregidos (contraste y un `select` sin nombre accesible).
@@ -144,6 +144,19 @@ real, y la cobertura de listados que reportaba el tamaño de página como total.
 
 **Criterio de aceptación**: un negocio carga su catálogo desde Excel, abre caja,
 vende, imprime el comprobante y cierra el turno con arqueo cuadrado.
+
+**Estado: en curso (2026-09-24).** Completado el primer paso aprobado:
+
+- **P-15 Compras y proveedores**: dominio completo en el ERP (proveedores con
+  borrado lógico, compras con detalle, numeración atómica `C-000001`, RLS en las
+  tres tablas nuevas), la compra suma inventario, deja el kardex (`PURCHASE`),
+  actualiza el costo del producto **sin IVA** y emite `purchase.received` por la
+  bandeja de salida; la anulación revierte el stock (`PURCHASE_VOID`).
+- API expuesta por el gateway, 9 comprobaciones nuevas en el humo (87 en total),
+  2 contratos OpenAPI nuevos (10 en total) y pantalla **Compras** en la PWA
+  (proveedores, registro con líneas y anulación), auditada con axe.
+- Pendiente de la fase: **P-16 sesiones de caja**, P-20 usuarios y roles en la
+  interfaz, P-24 importación de datos y P-21 reportes y comprobante.
 
 ### Fase 4 — Diferenciadores (5–6 semanas)
 

@@ -219,6 +219,43 @@ erDiagram
     numeric tax_amount
     numeric total
   }
+  SUPPLIERS {
+    uuid id PK
+    uuid tenant_id
+    varchar name
+    varchar tax_id "NIT único por negocio"
+    varchar contact_name
+    varchar phone
+    varchar email
+    boolean active
+    timestamptz deleted_at
+  }
+  PURCHASES {
+    uuid id PK
+    uuid tenant_id
+    varchar number "C-000001, único por negocio"
+    uuid supplier_id FK
+    varchar supplier_name "copia histórica"
+    varchar status "RECEIVED|VOIDED"
+    numeric subtotal
+    numeric tax
+    numeric total
+    uuid received_by
+    timestamptz received_at
+    timestamptz voided_at
+  }
+  PURCHASE_ITEMS {
+    uuid id PK
+    uuid purchase_id FK
+    uuid tenant_id "denormalizado para RLS"
+    uuid product_id FK
+    varchar product_name "copia histórica"
+    integer quantity "> 0"
+    numeric unit_cost "con IVA incluido"
+    numeric tax_rate
+    numeric tax_amount
+    numeric total
+  }
 ```
 
 **Reglas de integridad en el motor**
@@ -243,12 +280,20 @@ misma transacción de la venta (`status PENDING`), con `event_id` único, el
 barrido lo marca `PUBLISHED` (o `FAILED` tras 10 intentos). Queda fuera de RLS a
 propósito: se lee cruzando negocios para entregar los eventos (ADR-0009).
 
-**Numeración atómica (`tenant_counters`)**: el consecutivo de venta se obtiene
-con un UPSERT (`ON CONFLICT DO UPDATE … RETURNING`), sin leer el máximo ni
-reintentar; dos cajas nunca reciben el mismo número. La tabla no lleva RLS: es
-numeración operativa, sin datos de negocio. `sale_items.tenant_id` se denormaliza
-desde la venta para que su política de RLS sea una comparación por índice (la
-subconsulta anterior fallaba de forma intermitente bajo concurrencia).
+**Numeración atómica (`tenant_counters`)**: los consecutivos de venta
+(`sale_seq`) y de compra (`purchase_seq`) se obtienen con un UPSERT
+(`ON CONFLICT DO UPDATE … RETURNING`), sin leer el máximo ni reintentar; dos
+cajas nunca reciben el mismo número. La tabla no lleva RLS: es numeración
+operativa, sin datos de negocio. `sale_items.tenant_id` y
+`purchase_items.tenant_id` se denormalizan desde su documento para que las
+políticas de RLS sean comparaciones por índice (la subconsulta anterior fallaba
+de forma intermitente bajo concurrencia).
+
+**Compras y proveedores (Fase 3)**: `suppliers` guarda el proveedor con su NIT
+(único por negocio y borrado lógico); `purchases` la cabecera (número `C-000001`,
+proveedor con copia del nombre, totales y estado `RECEIVED|VOIDED`) y
+`purchase_items` el detalle con el costo unitario. La compra suma inventario,
+actualiza el costo del producto sin IVA y emite `purchase.received`.
 
 ## 5. `kubo_analytics` — modelo de lectura en MongoDB
 

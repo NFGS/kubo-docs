@@ -116,6 +116,36 @@
         }
       }
     },
+    "/suppliers": {
+      "get": {
+        "summary": "Proveedores paginados",
+        "responses": {
+          "200": {
+            "description": "Pagina de proveedores con el total real",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SupplierList" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchases": {
+      "get": {
+        "summary": "Compras paginadas",
+        "responses": {
+          "200": {
+            "description": "Pagina de compras con el total real",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PurchaseList" }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dashboard/overview": {
       "get": {
         "summary": "Vista compuesta del tablero (BFF)",
@@ -270,6 +300,76 @@
         "required": ["data", "total", "limit", "offset"],
         "properties": {
           "data": { "type": "array", "items": { "$ref": "#/components/schemas/Sale" } },
+          "total": { "type": "integer", "minimum": 0 },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 200 },
+          "offset": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "Supplier": {
+        "type": "object",
+        "required": ["id", "name", "active", "created_at", "updated_at"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "tax_id": { "type": ["string", "null"] },
+          "contact_name": { "type": ["string", "null"] },
+          "phone": { "type": ["string", "null"] },
+          "email": { "type": ["string", "null"] },
+          "address": { "type": ["string", "null"] },
+          "notes": { "type": ["string", "null"] },
+          "active": { "type": "boolean" },
+          "created_at": { "type": ["string", "null"] },
+          "updated_at": { "type": ["string", "null"] }
+        }
+      },
+      "SupplierList": {
+        "type": "object",
+        "required": ["data", "total", "limit", "offset"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Supplier" } },
+          "total": { "type": "integer", "minimum": 0 },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 200 },
+          "offset": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "PurchaseItem": {
+        "type": "object",
+        "required": ["id", "product_id", "product_name", "quantity", "unit_cost", "tax_rate", "tax_amount", "total"],
+        "properties": {
+          "id": { "type": "string" },
+          "product_id": { "type": "string" },
+          "product_name": { "type": "string" },
+          "quantity": { "type": "integer", "minimum": 1 },
+          "unit_cost": { "type": "string" },
+          "tax_rate": { "type": "string" },
+          "tax_amount": { "type": "string" },
+          "total": { "type": "string" }
+        }
+      },
+      "Purchase": {
+        "type": "object",
+        "required": ["id", "number", "status", "supplier_id", "supplier_name", "subtotal", "tax", "total", "items"],
+        "properties": {
+          "id": { "type": "string" },
+          "number": { "type": "string" },
+          "status": { "enum": ["RECEIVED", "VOIDED"] },
+          "supplier_id": { "type": "string" },
+          "supplier_name": { "type": "string" },
+          "subtotal": { "type": "string" },
+          "tax": { "type": "string" },
+          "total": { "type": "string" },
+          "notes": { "type": ["string", "null"] },
+          "received_by": { "type": ["string", "null"] },
+          "received_at": { "type": ["string", "null"] },
+          "voided_at": { "type": ["string", "null"] },
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/PurchaseItem" } }
+        }
+      },
+      "PurchaseList": {
+        "type": "object",
+        "required": ["data", "total", "limit", "offset"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Purchase" } },
           "total": { "type": "integer", "minimum": 0 },
           "limit": { "type": "integer", "minimum": 1, "maximum": 200 },
           "offset": { "type": "integer", "minimum": 0 }
