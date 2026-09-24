@@ -9,8 +9,8 @@ servicio, una prueba de humo end-to-end y verificaciones manuales de operación.
 make smoke
 ```
 
-Ejecuta **73 comprobaciones** contra el sistema en ejecución, usando el API
-Gateway como un cliente real. Resultado esperado: `73 pruebas exitosas, 0 fallidas`.
+Ejecuta **78 comprobaciones** contra el sistema en ejecución, usando el API
+Gateway como un cliente real. Resultado esperado: `78 pruebas exitosas, 0 fallidas`.
 
 | Bloque | Qué verifica | Comprobaciones |
 | --- | --- | --- |
@@ -18,12 +18,17 @@ Gateway como un cliente real. Resultado esperado: `73 pruebas exitosas, 0 fallid
 | 2. Autenticación y cookie | Login; **RS256**; negocio en el token; **JWKS**; el refresh **no viaja en el cuerpo**; la cookie es **httpOnly + SameSite=Strict**; rotación; el token refrescado autentica; **reuso → `401`**; **el reuso revoca la familia completa**; logout 204 y borra la cookie | 14 |
 | 3. Acceso, auditoría y bloqueo | Sin token → `401`; token falsificado → `401`; cabecera inyectada → **ignorada**; **5 intentos fallidos bloquean la cuenta**; **cadena intacta**; entradas verificadas; **versión vigente del hash**; `LOGIN_FAILED`, `ACCOUNT_LOCKED` y `REFRESH_REUSE_DETECTED` en la bitácora | 11 |
 | 4. Clientes, cifrado y RLS | Crear cliente; detalle completo; listado **enmascarado**; texto **cifrado**; índice ciego; **búsqueda por documento**; **RLS: sin contexto 0 filas, con contexto > 0** | 8 |
-| 5. Inventario, venta y outbox | Producto; entrada de 10; venta por `35700.00`; IVA `5700.00`; stock 7; kardex 2; sobreventa → `409`; **el evento queda en la bandeja**; **se publica**; **RLS en ERP** (0 y > 0) | 12 |
+| 5. Inventario, venta y outbox | Producto; entrada de 10; venta por `35700.00`; IVA `5700.00`; stock 7; kardex 2; sobreventa → `409`; **el evento queda en la bandeja**; **se publica**; **RLS en ERP** (0 y > 0); **paginación con total real y tope de página** | 14 |
 | 6. Evento y tablero | Proyección en analítica; evento en MongoDB; tablero; **vista compuesta con las 7 vistas**; sin vistas caídas; zona horaria; **outbox sin fallidos** | 7 |
 | 7. Anulación | La venta queda `VOIDED`; el inventario vuelve a 10 | 2 |
 | 8. Aislamiento | Un segundo negocio no ve clientes ni catálogo; **RLS en IAM** (0 filas sin contexto) | 4 |
 | 9. Recuperación de contraseña | Solicitud 204; enlace en el buzón; consumo 204; **la cuenta se desbloquea con la clave nueva**; el enlace **no se reutiliza**; sin enumeración de usuarios | 6 |
-| 10. Límite de tasa y TLS | **Límite por usuario** activo; HTTPS 200; HTTP → HTTPS (308); HSTS | 4 |
+| 10. Tasa, TLS y trazas | **Límite por usuario** activo; HTTPS 200; HTTP → HTTPS (308); HSTS; **collector de trazas arriba y recibiendo spans** | 6 |
+
+Además del humo, la Fase 2 agregó: **8 contratos OpenAPI** (`make contracts`),
+**4 pruebas de navegador con axe** (`make e2e`), la **carga a 50 cajas**
+(`make load`, p95 < 300 ms), los simulacros de bus y restauración, y el gate
+`make ci` que los reúne.
 
 La prueba es **idempotente**: crea sus propios datos con marcas de tiempo y puede
 ejecutarse tantas veces como haga falta.
@@ -31,8 +36,9 @@ ejecutarse tantas veces como haga falta.
 ## 2. Pruebas unitarias por servicio
 
 ```bash
-# kubo-iam — tokens, JWKS y hash de auditoría versionado (7 pruebas)
-cd kubo-iam && mvn test
+# kubo-iam — tokens, reglas de identidad y integración real (31 pruebas)
+# Incluye Testcontainers: PostgreSQL real, migraciones Flyway y RLS.
+cd kubo-iam && mvn verify
 
 # kubo-gateway — tabla de rutas y rutas públicas (3 pruebas)
 cd kubo-gateway && npm test
@@ -51,12 +57,15 @@ docker run --rm -m 3g -e MIX_ENV=test \
 cd kubo-analytics && pip install -r requirements-dev.txt && pytest -q
 ```
 
-**Total: 31 pruebas unitarias** más 73 comprobaciones end-to-end.
+**Total: 55 pruebas** (unitarias y de integración) más 78 comprobaciones
+end-to-end, 8 contratos y 4 pruebas de navegador. La cobertura de dominio se
+vigila en CI: IAM ≥ 80 % (JaCoCo) y analítica ≥ 80 % en su módulo de
+procesamiento (pytest-cov).
 
 ### Cómo ejecutar cada suite
 
 ```bash
-make smoke                                    # 73 comprobaciones end-to-end
+make smoke                                    # 78 comprobaciones end-to-end
 make bus-drill                                # 4 comprobaciones: caida del bus
 make restore-drill                            # 14 comprobaciones: restauracion
 
@@ -145,7 +154,7 @@ El detalle de las mediciones, los planes de ejecución y su análisis están en
 
 | Prueba | ID · Fase | Por qué falta |
 | --- | --- | --- |
-| Integración con base de datos real por servicio | P-08 · Fase 2 | Requiere Testcontainers por lenguaje |
+| Integración con base de datos real por servicio | P-08 · Fase 2 | IAM ya la tiene (Testcontainers + RLS); falta replicarla en analítica y los demás servicios |
 | Contratos (Pact/OpenAPI) automatizados | P-09 · Fase 2 | Hoy el contrato se verifica en la prueba de humo |
 | Carga (k6): 50 cajas simultáneas | P-10 · Fase 2 | Falta escenario de estrés |
 | E2E de navegador (Playwright) | P-10 · Fase 2 | Hoy la interfaz se verifica manualmente |

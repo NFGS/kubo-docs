@@ -51,6 +51,7 @@ DOCUMENTOS=(
   "adr/ADR-0008-alcance-mvp.md"
   "adr/ADR-0009-outbox-transaccional.md"
   "adr/ADR-0010-rls-activo.md"
+  "adr/ADR-0011-bff-capa-formal.md"
 )
 
 # ---------------------------------------------------------------------------

@@ -18,7 +18,7 @@ la primera vez y para consultarse por secciones después.
 | [09 — Guion de demostración](09-demo-guion.md) | Presentación | Guion del video de 6 minutos |
 | [10 — Auditoría técnica](10-auditoria.md) | Arquitectura · Calidad | Hallazgos, mediciones, correcciones aplicadas y catálogo de pendientes |
 | [11 — Plan de cierre](11-plan-de-cierre.md) | Gestión · Arquitectura | ¿Qué falta, en qué orden y con qué criterio se cierra cada fase? |
-| [ADRs](adr/) | Arquitectura | Las diez decisiones que definen el sistema |
+| [ADRs](adr/) | Arquitectura | Las once decisiones que definen el sistema |
 
 ## Decisiones de arquitectura (ADR)
 
@@ -34,9 +34,10 @@ la primera vez y para consultarse por secciones después.
 | [0008](adr/ADR-0008-alcance-mvp.md) | Alcance declarado del MVP y recortes conscientes |
 | [0009](adr/ADR-0009-outbox-transaccional.md) | Outbox transaccional para la entrega de eventos |
 | [0010](adr/ADR-0010-rls-activo.md) | RLS activo con interceptor de transacción |
+| [0011](adr/ADR-0011-bff-capa-formal.md) | BFF como capa formal del gateway |
 
-ADR planificadas: **0011** BFF como capa formal (Fase 2) y **0012** zona horaria
-por negocio (Fase 4). Ver [`11-plan-de-cierre.md`](11-plan-de-cierre.md).
+ADR planificadas: **0012** zona horaria por negocio (Fase 4). Ver
+[`11-plan-de-cierre.md`](11-plan-de-cierre.md).
 
 ## Documentación por servicio
 

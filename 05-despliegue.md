@@ -32,7 +32,7 @@ openssl rand -base64 48 # KUBO_ERP_SECRET_KEY_BASE
 Levantar:
 
 ```bash
-make up      # construye y arranca los 11 contenedores
+make up      # construye y arranca los 12 contenedores
 make seed    # datos de demostración (omitir en producción)
 make smoke   # verificación end-to-end
 ```
@@ -45,6 +45,8 @@ Abrir `http://<ip-del-servidor>:3000` e ingresar con el administrador creado.
 | --- | --- | --- |
 | PWA | 3000 | 80 |
 | **TLS (Caddy): HTTPS · HTTP** | **3443 · 3080** | 443 · 80 |
+| **OTel collector: gRPC · HTTP** | **4317 · 4318** | 4317 · 4318 |
+| Grafana (perfil `observability`) | 3001 | 3000 |
 | API Gateway | 9080 | 8080 |
 | IAM · CRM · ERP · Analítica | 9081–9084 | 8081–8084 |
 | PostgreSQL · MongoDB | 5433 · 27018 | 5432 · 27017 |
@@ -61,7 +63,7 @@ servicios que ya corran en la máquina del negocio.
 - [ ] TLS: `KUBO_TLS_DOMAIN` con el dominio del negocio (ver abajo). El servicio `kubo-tls` ya está en el compose.
 - [ ] `KUBO_COOKIE_SECURE=true` cuando el acceso sea siempre por HTTPS.
 - [ ] Correo real: `KUBO_MAIL_TRANSPORT=smtp` con `KUBO_SMTP_HOST` y credenciales (si se deja `log`, el enlace de recuperación queda en el buzón de demostración).
-- [ ] **No publicar** los puertos 9081–9084 en producción: los servicios de negocio solo deben ser alcanzables por el gateway dentro de la red de contenedores.
+- [ ] **No publicar** los puertos 9080–9084 en producción: la PWA llega al gateway por la red interna de contenedores (nginx proxea `/api`), y los servicios de negocio solo deben ser alcanzables por el gateway. Publicar el 9080 permitiría inyectar `X-Forwarded-For` y saltarse el límite de autenticación.
 - [ ] `KUBO_SEED_ENABLED=false` (no sembrar datos de demostración).
 - [ ] Respaldos programados (sección 5) y un simulacro de restauración ejecutado.
 - [ ] Monitoreo de las sondas `/api/v1/health` de los cinco servicios.
@@ -81,6 +83,20 @@ El servicio `kubo-tls` (Caddy) termina HTTPS en el local y redirige HTTP a HTTPS
 La PWA ya proxea `/api` al gateway, así que un único dominio con HTTPS cubre todo
 el sistema. La cabecera `Strict-Transport-Security` se envía en todas las
 respuestas.
+
+### Trazas (OpenTelemetry)
+
+El collector `kubo-otel` recibe trazas OTLP de los cinco servicios y las escribe
+en su log: `docker logs kubo-otel` es la comprobación básica (el humo la verifica).
+Para el stack visual:
+
+```bash
+make observability   # agrega Tempo y Grafana; Grafana en http://localhost:3001
+```
+
+No forma parte de la instalación por defecto: un local de barrio no necesita el
+stack visual y así el consumo se mantiene bajo. En producción, fije la versión de
+las imágenes de observabilidad (hoy usan etiquetas).
 
 ## 4. Operación diaria
 
@@ -162,11 +178,11 @@ El sistema está diseñado para crecer sin reescribir:
 
 | Pendiente | ID · Fase | Impacto |
 | --- | --- | --- |
-| CI/CD y escaneos automatizados | P-06 · Fase 2 | Las verificaciones son manuales (`make smoke`) |
-| Monitoreo centralizado (OpenTelemetry) | P-07 · Fase 2 | Solo hay sondas de salud y logs locales |
-| Pruebas de integración y contrato | P-08 · P-09 · Fase 2 | Sin cobertura de repositorios ni contrato ejecutable |
-| E2E y carga | P-10 · Fase 2 | La interfaz y la concurrencia se verifican a mano |
+| Testcontainers en los servicios restantes | P-08 · Fase 2 | IAM y analítica ya la tienen; faltan CRM, ERP y gateway |
+| Compras y proveedores · sesiones de caja | P-15 · P-16 · Fase 3 | El inventario solo entra por ajuste manual y no hay control de efectivo por turno |
+| Usuarios y roles en la interfaz · importación de datos | P-20 · P-24 · Fase 3 | El dueño no puede crear vendedores ni cargar su catálogo sin ayuda técnica |
+| Facturación electrónica DIAN | P-18 · Fase 4 | Requisito legal para facturar |
 | mTLS entre servicios | P-28 · Fase 5 | Movimiento lateral dentro del clúster |
 
-> La Fase 1 (outbox, RLS, cookie `httpOnly`, recuperación de contraseña, respaldos
-> y TLS) está cerrada y verificada; ver [`11-plan-de-cierre.md`](11-plan-de-cierre.md).
+> Las fases 1 y 2 (confiabilidad y calidad) están cerradas y verificadas; ver
+> [`11-plan-de-cierre.md`](11-plan-de-cierre.md).

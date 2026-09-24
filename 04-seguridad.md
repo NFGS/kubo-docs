@@ -168,10 +168,11 @@ La prueba de humo comprueba, entre otras cosas:
 
 | Pendiente | ID · Fase | Riesgo que cierra |
 | --- | --- | --- |
-| Análisis SAST/SCA automatizado en CI y escaneo de secretos | P-06 · Fase 2 | Dependencias vulnerables y credenciales filtradas |
 | Segundo factor (TOTP) para el propietario | P-30 · Fase 4 | Robo de credenciales |
 | mTLS entre gateway y servicios | P-28 · Fase 5 | Movimiento lateral dentro del clúster |
 | Rotación de claves de cifrado de campo | P-29 · Fase 5 | Compromiso de una clave a largo plazo |
 
-> **Resueltos en la Fase 1**: cookie `httpOnly` (P-03), RLS activo (P-02) y
-> límite de tasa por usuario (P-31). Ver [`11-plan-de-cierre.md`](11-plan-de-cierre.md).
+> **Resueltos**: en la Fase 1, cookie `httpOnly` (P-03), RLS activo (P-02) y
+> límite de tasa por usuario (P-31); en la Fase 2, SAST/escaneo de secretos y
+> dependencias en CI (P-06) y contratos ejecutables (P-09). Ver
+> [`11-plan-de-cierre.md`](11-plan-de-cierre.md).

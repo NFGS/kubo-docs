@@ -8,7 +8,7 @@ requisito no tiene evidencia verificable, aparece marcado como pendiente.
 | # | Requisito | Implementación | Evidencia | Estado |
 | --- | --- | --- | --- | --- |
 | R1 | ERP + CRM para PYMES sin acceso a tecnología, sin pagar SaaS | Instalación de un comando en el local, licencia MIT, sin dependencias de nube | `README.md` · `05-despliegue.md` · `make up` | Cumplido |
-| R2 | Mínimo 4 microservicios | 5 servicios: IAM, CRM, ERP, Analítica y Documentos/Notificaciones (Fase 4, P-19 y P-25) | `docker compose ps` (11 contenedores) · `01-arquitectura.md` | Cumplido (4 desplegados) |
+| R2 | Mínimo 4 microservicios | 5 servicios: IAM, CRM, ERP, Analítica y Documentos/Notificaciones (Fase 4, P-19 y P-25) | `docker compose ps` (12 contenedores) · `01-arquitectura.md` | Cumplido (4 desplegados) |
 | R3 | Mínimo 3 tecnologías distintas | Java, Ruby, Elixir, Python, TypeScript (5) | `01-arquitectura.md` · ADR-0004 | Cumplido |
 | R4 | Front dinámico y actual, nivel senior | React 19 + Vite 8 + Tailwind 4, design system con tokens, TanStack Query, gráficas, accesibilidad | `kubo-web/` · `kubo-web/src/components/ui.tsx` | Cumplido |
 | R5 | Conexión con PostgreSQL y MongoDB | PostgreSQL 17 (IAM, CRM, ERP) + MongoDB 8 (analítica) | `docker compose ps` · `02-modelo-datos.md` | Cumplido |
@@ -16,7 +16,7 @@ requisito no tiene evidencia verificable, aparece marcado como pendiente.
 | R7 | API Gateway | `kubo-gateway` (NestJS): validación JWT, límites de tasa, correlación, enrutamiento | `kubo-gateway/README.md` · `make smoke` bloque 3 | Cumplido |
 | R8 | Cada microservicio con su base de datos | `database-per-service`: `kubo_iam`, `kubo_crm`, `kubo_erp` con roles aislados; `kubo_analytics` en MongoDB | `kubo-infra/scripts/init-db.sh` · ADR-0003 | Cumplido |
 | R9 | Repositorio separado por parte del software | 9 repositorios: 5 componentes + infra + docs + web + raíz | `ls -d kubo-*/` · ADR-0002 | Cumplido |
-| R10 | Documentación detallada del funcionamiento | 11 documentos + 10 ADRs + README por servicio + OpenAPI + guion de video | `kubo-docs/` · `Kubo-Documentacion.pdf` | Cumplido |
+| R10 | Documentación detallada del funcionamiento | 11 documentos + 11 ADRs + README por servicio + OpenAPI ejecutable + guion de video | `kubo-docs/` · `Kubo-Documentacion.pdf` | Cumplido |
 | R11 | Encriptado de datos | AES-256-GCM campo a campo + índice ciego HMAC + BCrypt + SHA-256 de refresh tokens + auditoría con cadena de hash versionada + RLS en las tres bases + outbox transaccional | `make smoke` bloques 3, 4 y 5 · `04-seguridad.md` | Cumplido |
 | R12 | PWA | Service worker, manifest, instalable, cola offline en IndexedDB, sincronización automática | `curl localhost:3000/manifest.webmanifest` · `kubo-web/vite.config.ts` | Cumplido |
 | R13 | JWT | RS256 con JWKS, access 15 min, refresh rotativo con detección de reuso y **cookie `httpOnly`** (BFF) | `make smoke` bloque 2 · ADR-0007 · ADR-0009 (outbox) | Cumplido |
@@ -67,19 +67,21 @@ requisito no tiene evidencia verificable, aparece marcado como pendiente.
 | 0008 | Alcance declarado del MVP y recortes conscientes | Aceptada |
 | 0009 | Outbox transaccional para la entrega de eventos | Aceptada (Fase 1) |
 | 0010 | RLS activo con interceptor de transacción | Aceptada (Fase 1) |
+| 0011 | BFF como capa formal del gateway | Aceptada (Fase 2) |
 
-ADR planificadas: **0011** BFF como capa formal (Fase 2) y **0012** zona horaria
-por negocio (Fase 4). Ver [`11-plan-de-cierre.md`](11-plan-de-cierre.md).
+ADR planificadas: **0012** zona horaria por negocio (Fase 4). Ver
+[`11-plan-de-cierre.md`](11-plan-de-cierre.md).
 
 ## 5. Requisitos no cubiertos (declarados)
 
-> Los recortes de la Fase 1 (*outbox*, RLS, cookie `httpOnly`, recuperación de
-> contraseña y TLS) quedaron **implementados y verificados**; ver
+> Los recortes de las fases 1 y 2 (*outbox*, RLS, cookie `httpOnly`,
+> recuperación de contraseña, TLS, CI, observabilidad, contratos, carga, E2E y
+> accesibilidad) quedaron **implementados y verificados**; ver
 > [`11-plan-de-cierre.md`](11-plan-de-cierre.md). Los que siguen:
 
 | Requisito | Motivo | Ruta |
 | --- | --- | --- |
-| CI automatizado | Las verificaciones son manuales | Fase 2 (P-06) |
+| Testcontainers en CRM, ERP y gateway | IAM y analítica ya los tienen | Fase 2 (P-08, parcial) |
 | Importación de datos (Excel/CSV, ruta Dolibarr) | El MVP no la incluye: el catálogo se carga por API | Fase 3 (P-24) |
 | Facturación electrónica DIAN (UBL 2.1, CUFE, QR) | Requiere ser Proveedor Tecnológico autorizado | Fase 4 (P-18) |
 | Multi-rubro (Vertical Packs) | El MVP demuestra un vertical completo | Fase 4 (P-17) |

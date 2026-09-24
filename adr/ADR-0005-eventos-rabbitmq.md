@@ -3,7 +3,7 @@
 | Campo | Valor |
 | --- | --- |
 | Fecha | 2026-09-23 |
-| Estado | Aceptada (outbox diferido a la Fase 1, P-01) |
+| Estado | Aceptada (outbox implementado en la Fase 1; ver ADR-0009) |
 
 ## Contexto
 

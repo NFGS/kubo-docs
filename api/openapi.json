@@ -1,0 +1,301 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Kubo API",
+    "version": "0.2.0",
+    "description": "Contrato del API Gateway de Kubo. Los esquemas de components.schemas se validan contra las respuestas reales con `make contracts` (kubo-gateway/scripts/contracts.mjs)."
+  },
+  "servers": [
+    { "url": "http://localhost:9080/api/v1", "description": "Gateway local" }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "Inicia sesion",
+        "responses": {
+          "200": {
+            "description": "Sesion creada. El refresh token viaja en cookie httpOnly, no en el cuerpo.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales invalidas o cuenta bloqueada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Perfil del usuario autenticado",
+        "responses": {
+          "200": {
+            "description": "Perfil",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "summary": "Catalogo paginado",
+        "parameters": [
+          { "name": "q", "in": "query", "schema": { "type": "string" } },
+          { "name": "low_stock", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "maximum": 200 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pagina del catalogo con el total real",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductList" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "summary": "Detalle de producto",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Producto",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductItem" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers": {
+      "get": {
+        "summary": "Clientes (documento y telefono enmascarados)",
+        "responses": {
+          "200": {
+            "description": "Listado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CustomerList" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sales": {
+      "get": {
+        "summary": "Ventas paginadas",
+        "responses": {
+          "200": {
+            "description": "Pagina de ventas con el total real",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SaleList" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/overview": {
+      "get": {
+        "summary": "Vista compuesta del tablero (BFF)",
+        "responses": {
+          "200": {
+            "description": "Vistas del tablero en una sola respuesta",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OverviewResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": ["id", "email", "fullName", "role", "tenantId", "tenantName"],
+        "properties": {
+          "id": { "type": "string" },
+          "email": { "type": "string" },
+          "fullName": { "type": "string" },
+          "role": { "type": "string" },
+          "tenantId": { "type": "string" },
+          "tenantName": { "type": "string" }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["accessToken", "tokenType", "expiresInSeconds", "user"],
+        "properties": {
+          "accessToken": { "type": "string", "minLength": 20 },
+          "tokenType": { "const": "Bearer" },
+          "expiresInSeconds": { "type": "integer", "minimum": 60 },
+          "user": { "$ref": "#/components/schemas/User" }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "required": [
+          "id", "sku", "name", "unit", "price", "cost", "tax_rate",
+          "stock", "min_stock", "low_stock", "active", "created_at", "updated_at"
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "sku": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": ["string", "null"] },
+          "unit": { "type": "string" },
+          "price": { "type": "string" },
+          "cost": { "type": "string" },
+          "tax_rate": { "type": "string" },
+          "stock": { "type": "integer" },
+          "min_stock": { "type": "integer" },
+          "low_stock": { "type": "boolean" },
+          "active": { "type": "boolean" },
+          "created_at": { "type": ["string", "null"] },
+          "updated_at": { "type": ["string", "null"] }
+        }
+      },
+      "ProductList": {
+        "type": "object",
+        "required": ["data", "total", "limit", "offset"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } },
+          "total": { "type": "integer", "minimum": 0 },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 200 },
+          "offset": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "ProductItem": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": { "$ref": "#/components/schemas/Product" }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "required": ["id", "name", "stage", "credit_limit", "created_at", "updated_at"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": ["string", "null"] },
+          "document_number": { "type": ["string", "null"] },
+          "phone": { "type": ["string", "null"] },
+          "city": { "type": ["string", "null"] },
+          "address": { "type": ["string", "null"] },
+          "stage": { "enum": ["LEAD", "PROSPECT", "CUSTOMER"] },
+          "notes": { "type": ["string", "null"] },
+          "credit_limit": { "type": "number" },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        }
+      },
+      "CustomerList": {
+        "type": "object",
+        "required": ["data", "total"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Customer" } },
+          "total": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "SaleItem": {
+        "type": "object",
+        "required": ["id", "product_id", "product_name", "quantity", "unit_price", "tax_rate", "tax_amount", "total"],
+        "properties": {
+          "id": { "type": "string" },
+          "product_id": { "type": "string" },
+          "product_name": { "type": "string" },
+          "quantity": { "type": "integer", "minimum": 1 },
+          "unit_price": { "type": "string" },
+          "tax_rate": { "type": "string" },
+          "tax_amount": { "type": "string" },
+          "total": { "type": "string" }
+        }
+      },
+      "Sale": {
+        "type": "object",
+        "required": ["id", "number", "status", "payment_method", "subtotal", "tax", "total", "items"],
+        "properties": {
+          "id": { "type": "string" },
+          "number": { "type": "string" },
+          "status": { "enum": ["COMPLETED", "VOIDED"] },
+          "customer_id": { "type": ["string", "null"] },
+          "customer_name": { "type": ["string", "null"] },
+          "payment_method": { "type": "string" },
+          "subtotal": { "type": "string" },
+          "tax": { "type": "string" },
+          "total": { "type": "string" },
+          "notes": { "type": ["string", "null"] },
+          "sold_by": { "type": ["string", "null"] },
+          "voided_at": { "type": ["string", "null"] },
+          "created_at": { "type": ["string", "null"] },
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/SaleItem" } }
+        }
+      },
+      "SaleList": {
+        "type": "object",
+        "required": ["data", "total", "limit", "offset"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Sale" } },
+          "total": { "type": "integer", "minimum": 0 },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 200 },
+          "offset": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "OverviewResponse": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": ["summary"],
+            "properties": {
+              "summary": {
+                "type": "object",
+                "required": ["sales_count", "revenue"],
+                "properties": {
+                  "sales_count": { "type": "integer", "minimum": 0 },
+                  "revenue": { "type": "number" }
+                }
+              }
+            }
+          },
+          "unavailable": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

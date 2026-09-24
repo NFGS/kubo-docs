@@ -6,7 +6,7 @@
 | Objetivo | Producto comercializable en la región (Fases 0–4); la Fase 5 queda como backlog declarado |
 | Punto de partida | 44/44 comprobaciones en verde · 10 contenedores sanos · 9 repositorios limpios |
 | Dedicación | ~30 h/semana (≈ 3.75 jornadas de 8 h) |
-| Estado | Fases 0 y 1 completadas · Fases 2–4 planificadas · Fase 5 declarada |
+| Estado | Fases 0–2 completadas (P-08 parcial) · Fase 3 en curso · Fases 4–5 planificadas |
 
 Este documento ordena los 31 pendientes de [`10-auditoria.md`](10-auditoria.md) en
 fases con criterio de cierre medible. No sustituye a la auditoría: la usa como
@@ -103,6 +103,34 @@ Dos defectos reales aparecieron al integrar la fase y quedaron corregidos:
 
 **Criterio de aceptación**: una regresión de seguridad o de contrato bloquea el
 merge · p95 del POS por debajo de 300 ms con 50 cajas · cobertura de dominio ≥ 80 %.
+
+**Estado: completada (2026-09-24), con P-08 parcial.** Evidencia:
+
+- **P-06 CI**: `.gitlab-ci.yml` en los ocho repositorios (pruebas, SAST, secretos,
+  dependencias) y gate local `make ci` → **9/9 en verde** (secretos, suites,
+  contratos, humo, E2E).
+- **P-07 OpenTelemetry**: collector OTLP propio (`kubo-otel`) y los **cinco
+  servicios exportando trazas** (gateway, IAM, CRM, ERP y analítica), con
+  `make observability` para el stack visual (Tempo + Grafana). El humo verifica
+  que el collector recibe trazas.
+- **P-09 contratos**: `kubo-docs/api/openapi.json` + `make contracts` →
+  **8/8 contratos** validados con Ajv contra la API viva.
+- **P-10 carga y E2E**: `make load` (50 cajas) → **100 % de ventas exitosas,
+  p95 = 149.76 ms**; Playwright + axe → **4/4**, con tres defectos reales de
+  accesibilidad corregidos (contraste y un `select` sin nombre accesible).
+- **P-12 · P-13 · P-14 · P-26**: caché por sesión, paginación real con totales
+  (los listados mentían en `total`), digests de imágenes y axe en CI.
+- **Cobertura**: IAM **85.5 %** de dominio (gate JaCoCo ≥ 80 % en `mvn verify`)
+  y analítica **91 %** en su módulo de dominio (gate `--cov-fail-under=80`).
+- **P-08 parcial**: integración con Testcontainers en IAM (RLS + cadena de
+  auditoría contra PostgreSQL real, 2 pruebas). Queda pendiente replicarlo en
+  analítica y los demás servicios.
+
+Defectos reales corregidos durante la fase (además de los de implementación):
+numeración de ventas con `ON CONFLICT` que devolvía un id inexistente, RLS con
+subconsulta inestable bajo concurrencia (denormalizado `tenant_id` en
+`sale_items`), interceptor de tenant con `Repo.rollback` fuera de transacción
+real, y la cobertura de listados que reportaba el tamaño de página como total.
 
 ### Fase 3 — Núcleo comercial (5–7 semanas) — orden aprobado: Compras + Caja
 

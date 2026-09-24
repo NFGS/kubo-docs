@@ -36,7 +36,7 @@ se documenta lo que queda fuera, con su ruta de implementación.
 | Recuperación de contraseña por correo | Requiere proveedor de correo y plantillas | Fase 1 (P-04) |
 | Facturación electrónica DIAN (UBL 2.1, CUFE, QR) | Requiere ser Proveedor Tecnológico autorizado; el puerto de facturación queda preparado | Fase 4 (P-18) |
 | Multi-rubro (Vertical Packs) | El MVP demuestra un vertical (retail) completo | Fase 4 (P-17) |
-| Kubernetes, Terraform, observabilidad completa | El despliegue objetivo es un local con Docker Compose | Fase 5 |
+| Kubernetes y Terraform | El despliegue objetivo es un local con Docker Compose | Fase 5 |
 
 ## Consecuencias
 

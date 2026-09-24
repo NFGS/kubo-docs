@@ -260,6 +260,16 @@ como pendiente P-23.
 > de cuenta), P-23 (hash de auditoría versionado), P-27 (TLS en la instalación) y
 > P-31 (límite de tasa por usuario). Evidencia: `make smoke` 73/73,
 > `make bus-drill` 4/4, `make restore-drill` 14/14, ADR-0009 y ADR-0010.
+>
+> **Fase 2 aplicada (2026-09-24).** Resueltos y verificados: P-06 (CI por
+> repositorio + gate local `make ci`), P-07 (OpenTelemetry en los cinco
+> servicios con collector propio), P-09 (contratos OpenAPI ejecutables, 8/8),
+> P-10 (carga a 50 cajas con p95 149.76 ms y E2E con Playwright), P-12 (caché por
+> sesión), P-13 (paginación real en productos, ventas y kardex), P-14 (digests de
+> imágenes) y P-26 (axe en CI, con tres defectos de accesibilidad corregidos).
+> Cobertura de dominio: IAM 85.5 % y analítica 91 %, con gates en CI.
+> **P-08 queda parcial**: Testcontainers en IAM; falta replicarlo en analítica y
+> los demás servicios. `make smoke` 78/78, ADR-0011.
 
 ### 5.1 Bloqueantes para un negocio real
 

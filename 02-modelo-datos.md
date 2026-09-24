@@ -26,6 +26,7 @@ flowchart LR
       SALES["sales"]
       ITEMS["sale_items"]
       OUTBOX["outbox_events"]
+      COUNTERS["tenant_counters"]
     end
   end
 
@@ -209,6 +210,7 @@ erDiagram
   SALE_ITEMS {
     uuid id PK
     uuid sale_id FK
+    uuid tenant_id "denormalizado para RLS"
     uuid product_id FK
     varchar product_name "copia histórica"
     integer quantity "> 0"
@@ -240,6 +242,13 @@ misma transacción de la venta (`status PENDING`), con `event_id` único, el
 `payload` completo y `attempts`/`available_at` para reintentos. El publicador de
 barrido lo marca `PUBLISHED` (o `FAILED` tras 10 intentos). Queda fuera de RLS a
 propósito: se lee cruzando negocios para entregar los eventos (ADR-0009).
+
+**Numeración atómica (`tenant_counters`)**: el consecutivo de venta se obtiene
+con un UPSERT (`ON CONFLICT DO UPDATE … RETURNING`), sin leer el máximo ni
+reintentar; dos cajas nunca reciben el mismo número. La tabla no lleva RLS: es
+numeración operativa, sin datos de negocio. `sale_items.tenant_id` se denormaliza
+desde la venta para que su política de RLS sea una comparación por índice (la
+subconsulta anterior fallaba de forma intermitente bajo concurrencia).
 
 ## 5. `kubo_analytics` — modelo de lectura en MongoDB
 

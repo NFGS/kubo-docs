@@ -39,6 +39,7 @@ flowchart TB
     MG[("MongoDB 8<br/>kubo_analytics")]
     MQ[["RabbitMQ 4<br/>kubo.events"]]
     RD[("Redis 7<br/>límites de tasa")]
+    OTEL["kubo-otel<br/>collector OTLP"]
   end
 
   PWA -->|"HTTPS 3443"| TLS
@@ -71,6 +72,7 @@ flowchart TB
 | `kubo-analytics` | Modelo de lectura de ventas, indicadores del tablero | `kubo_analytics` (MongoDB) |
 | `kubo-web` | Interfaz PWA; sirve los activos y proxea `/api` al gateway | — |
 | `kubo-tls` | Terminación TLS (Caddy): HTTPS, redirección de HTTP y HSTS | — |
+| `kubo-otel` | Collector OpenTelemetry: recibe las trazas OTLP de los cinco servicios (opcional: Tempo + Grafana) | — |
 
 ## 3. Vista de componentes (C4 nivel 3, ejemplo: `kubo-erp`)
 
@@ -183,7 +185,7 @@ sequenceDiagram
 | **Mantenibilidad** | Un lenguaje por contexto con su ecosistema natural; arquitectura limpia dentro de cada servicio; contratos explícitos entre repos. |
 | **Portabilidad** | Todo corre en Docker Compose: el mismo artefacto sirve para el mini-PC del local y para un servidor en la nube. |
 | **Observabilidad** | Sonda `/health` en cada servicio con estado de sus dependencias, `correlation-id` propagado por el gateway y logs JSON estructurados. |
-| **Costo** | Consumo en reposo cercano a 900 MB de RAM y 11 contenedores; cabe en un VPS de USD 6–12 al mes o en un equipo modesto del local. |
+| **Costo** | Consumo en reposo cercano a 1 GB de RAM y 12 contenedores; cabe en un VPS de USD 6–12 al mes o en un equipo modesto del local. El stack visual de trazas (Tempo + Grafana) es opcional. |
 
 ## 6. Decisiones arquitectónicas
 
@@ -201,6 +203,7 @@ Cada decisión relevante está registrada como ADR:
 | [0008](adr/ADR-0008-alcance-mvp.md) | Alcance declarado del MVP y recortes conscientes |
 | [0009](adr/ADR-0009-outbox-transaccional.md) | Outbox transaccional para la entrega de eventos |
 | [0010](adr/ADR-0010-rls-activo.md) | RLS activo con interceptor de transacción |
+| [0011](adr/ADR-0011-bff-capa-formal.md) | BFF como capa formal del gateway |
 
 ## 7. Estructura del workspace
 
