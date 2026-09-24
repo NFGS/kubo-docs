@@ -211,6 +211,7 @@ Cada decisión relevante está registrada como ADR:
 | [0016](adr/ADR-0016-stock-por-bodega.md) | Stock por bodega y transferencias |
 | [0017](adr/ADR-0017-puerto-notificaciones.md) | Puerto de notificaciones y buzón del negocio |
 | [0018](adr/ADR-0018-documentos.md) | Documentos en el ERP con puerto de almacenamiento |
+| [0019](adr/ADR-0019-rotacion-de-claves.md) | Rotación de claves de cifrado de campo (KEK/DEK) |
 
 ## 7. Estructura del workspace
 

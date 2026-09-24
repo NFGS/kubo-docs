@@ -309,10 +309,19 @@ transferencia entre dos bodegas con kardex en ambas.
 
 ### Fase 5 — Escala (backlog declarado)
 
+**P-29 · rotación de claves: completado (ADR-0019).** Envelope encryption con
+anillo de llaves y formato versionado (`v1:<key_id>:…`): la llave nueva entra al
+frente, las viejas siguen descifrando y la rotación es una tarea de sistema por
+lotes, idempotente y que **nunca destruye un dato ilegible** (lo cuenta). El
+índice ciego se recalcula en el mismo guardado. Evidencia: CRM puras **12/12** e
+integración **3/3** con PostgreSQL real. Operación: `rake kubo:rotate_field_keys`
+(agregar la llave nueva a `KUBO_FIELD_ENCRYPTION_KEYS`, correr la tarea, retirar
+las viejas cuando el resumen diga 0 rotadas).
+
 | ID | Línea de trabajo |
 | --- | --- |
 | P-28 | mTLS entre gateway y servicios |
-| P-29 | Rotación de claves de cifrado de campo (KEK/DEK) |
+| P-29 | Rotación de claves de cifrado de campo (KEK/DEK) — **completado** |
 | — | Instalación remota (Terraform/Ansible) |
 | — | Multi-tenant SaaS (onboarding y zona horaria por negocio) |
 | — | App móvil nativa y operador de respaldos |
