@@ -337,6 +337,44 @@
         }
       }
     },
+    "/documents": {
+      "get": {
+        "summary": "Documentos del negocio (P-25, ADR-0018)",
+        "responses": {
+          "200": {
+            "description": "Metadatos de los ultimos documentos, sin los bytes",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DocumentList" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/{id}": {
+      "get": {
+        "summary": "Descarga el contenido de un documento",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contenido del documento con su tipo MIME",
+            "content": {
+              "application/xml": { "schema": { "type": "string" } },
+              "application/pdf": { "schema": { "type": "string", "format": "binary" } }
+            }
+          },
+          "404": {
+            "description": "El documento no existe o su contenido no esta disponible",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
     "/notifications": {
       "get": {
         "summary": "Buzon de notificaciones del negocio (P-19)",
@@ -723,6 +761,28 @@
         "properties": {
           "timezone": { "type": "string" },
           "vertical": { "type": "string", "enum": ["retail", "servicios", "restaurantes", "agro"] }
+        }
+      },
+      "Document": {
+        "type": "object",
+        "required": ["id", "kind", "filename", "content_type", "size", "sha256"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "type": "string" },
+          "filename": { "type": "string" },
+          "content_type": { "type": "string" },
+          "size": { "type": "integer" },
+          "sha256": { "type": "string", "minLength": 64, "maxLength": 64 },
+          "reference_type": { "type": ["string", "null"] },
+          "reference_id": { "type": ["string", "null"] },
+          "created_at": { "type": ["string", "null"] }
+        }
+      },
+      "DocumentList": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Document" } }
         }
       },
       "Notification": {

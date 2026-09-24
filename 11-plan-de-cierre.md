@@ -302,8 +302,10 @@ transferencia entre dos bodegas con kardex en ambas.
   bodega por defecto) y **contratos 18/18** (`WarehouseList`, `TransferList`).
   El backfill de la migración resultó invisible para RLS (las tablas ya tenían
   `FORCE`): se suspende `FORCE` durante el backfill y se restaura al terminar,
-  con backfill idempotente. Pendiente del paso: pantalla de
-  bodegas/transferencias en la PWA y elección de bodega en el POS.
+  con backfill idempotente. **Completado con la PWA de bodegas/transferencias y
+  la elección de bodega en el POS**: la venta despacha desde la bodega elegida
+  (el ERP la valida y descuenta su nivel; una bodega ajena responde 404), con
+  humo **146/146** e integración **12/12**.
 
 ### Fase 5 — Escala (backlog declarado)
 

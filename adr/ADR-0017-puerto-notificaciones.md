@@ -28,14 +28,20 @@ recordar mirar.
 2. **El buzón es una tabla de negocio**: `notifications` (tenant, tipo, canal,
    destinatario, asunto, cuerpo, estado, referencia, fecha de envío) con RLS
    `FORCE`, como el resto. La PWA puede leerlo (`GET /notifications`).
-3. **La notificación viaja en la transacción que la provoca**: si la venta se
-   revierte, el aviso desaparece con ella. Nunca se avisa de algo que no pasó.
+3. **El aviso se encola en la transacción que lo provoca** (`PENDING`): es una
+   escritura local y rápida, así que un canal lento o caído no puede frenar ni
+   revertir una venta. Si la operación se revierte, el aviso desaparece con ella.
+   El **entregador** (`Notifications.Deliverer`) barre pendientes cada 5 s como
+   proceso de sistema (marca `app.system`), entrega por el adaptador y anota el
+   resultado: estado, intentos y último error. Tras 5 intentos queda `FAILED`
+   para que un humano lo revise.
 4. **Aviso de stock bajo con histéresis**: se notifica cuando el producto
    **cruza** el mínimo (`antes > mínimo` y `después <= mínimo`), no en cada venta
    por debajo. Sin esa regla, un producto agotado genera un aviso por venta y el
    buzón se vuelve ruido que nadie lee.
-5. **Configurable**: `KUBO_NOTIFICATIONS_ADAPTER` (por defecto, el buzón). Un
-   adaptador de WhatsApp o de correo implementa el mismo contrato.
+5. **Configurable**: `KUBO_NOTIFICATIONS_ADAPTER` (`log` por defecto, `smtp`
+   para correo real con Swoosh y la familia `KUBO_SMTP_*` de IAM). Un adaptador
+   de WhatsApp implementa el mismo contrato.
 
 ## Consecuencias
 
@@ -43,19 +49,22 @@ recordar mirar.
   disponibilidad; el buzón deja rastro auditable y es aislado por negocio;
   añadir un canal es escribir un adaptador.
 - **Negativas**: el adaptador por defecto **no entrega nada fuera del
-  sistema** —es una demostración, no un canal real— y el plan lo declara. Los
-  envíos reales necesitarán reintentos y una cola: hoy la notificación se
-  escribe en la transacción, así que un proveedor lento bloquearía la venta;
-  cuando se enchufe uno real, el camino correcto es encolar el aviso (la
-  bandeja de salida ya existe, ADR-0009) y entregarlo en segundo plano.
+  sistema** —es una demostración, no un canal real— y el plan lo declara. La
+  entrega es de al-menos-una-vez: si el entregador muere tras enviar y antes de
+  marcar, el aviso se reenvía (aceptable para un correo interno; un canal con
+  costo por mensaje necesitaría idempotencia en el proveedor).
 
 ## Verificación
 
-- `make smoke` (**139/139**): una venta que cruza el mínimo deja un aviso
-  `LOW_STOCK` en el buzón con las unidades restantes en el cuerpo.
+- `make smoke` (**146/146**): una venta que cruza el mínimo deja un aviso
+  `LOW_STOCK` con las unidades restantes y el entregador lo marca **`SENT`** en
+  segundo plano.
+- `kubo-erp` integración **12/12**: el aviso nace `PENDING` y el barrido de
+  sistema lo entrega; el adaptador SMTP se valida construyendo el correo (sin
+  enviarlo).
+- Buzón en la PWA con filtro por stock bajo; auditoría axe del E2E en verde.
 - `kubo-erp` integración: la notificación se escribe en la misma transacción que
   la venta y respeta RLS.
 - `make contracts` (**19/19**): `NotificationList` validado contra la API viva.
-- **Pendiente del paso**: adaptador real de WhatsApp/SMTP, notificaciones de
-  compra y de resumen diario, buzón en la PWA y el servicio de Documentos
-  (P-25).
+- **Pendiente del paso**: adaptador de WhatsApp, notificaciones de compra y de
+  resumen diario, y soportes de compra como documentos (P-25).
