@@ -278,6 +278,16 @@ transferencia entre dos bodegas con kardex en ambas.
   (vectores RFC, cifrado, desafío y ciclo completo), gateway **9/9**, humo
   **130/130** con un código real calculado en Python (implementación
   independiente), E2E 4/4, `make ci` 10/10.
+- **F4.3 Notificaciones (P-19): corte implementado.** El aviso es un **puerto**
+  (`KuboErp.Notifications`, ADR-0017): el núcleo dice qué pasó y el adaptador
+  decide cómo se entrega; el de por defecto escribe en el **buzón del negocio**
+  (`notifications`, con RLS), que sirve de demostración, auditoría y base para un
+  proveedor real. La notificación viaja en la transacción que la provoca y el
+  aviso de stock bajo usa histéresis (avisa al **cruzar** el mínimo, no en cada
+  venta). Evidencia: humo **139/139** con el aviso `LOW_STOCK` y las unidades
+  restantes. Pendiente del paso: adaptador real de WhatsApp/SMTP con entrega en
+  segundo plano, buzón en la PWA, notificaciones de compra/resumen y el servicio
+  de Documentos (P-25).
 - **F4.4 Multi-bodega y transferencias (P-22): modelo implementado.** El stock
   por bodega es real (`warehouses`, `stock_levels` como fuente de verdad,
   `products.stock` como total denormalizado mantenido en la misma transacción),

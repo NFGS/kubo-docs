@@ -337,6 +337,21 @@
         }
       }
     },
+    "/notifications": {
+      "get": {
+        "summary": "Buzon de notificaciones del negocio (P-19)",
+        "responses": {
+          "200": {
+            "description": "Ultimos avisos, del mas reciente al mas antiguo",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NotificationList" }
+              }
+            }
+          }
+        }
+      }
+    },
     "/warehouses": {
       "get": {
         "summary": "Bodegas del negocio (P-22)",
@@ -708,6 +723,29 @@
         "properties": {
           "timezone": { "type": "string" },
           "vertical": { "type": "string", "enum": ["retail", "servicios", "restaurantes", "agro"] }
+        }
+      },
+      "Notification": {
+        "type": "object",
+        "required": ["id", "kind", "channel", "subject", "body", "status"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "type": "string" },
+          "channel": { "type": "string" },
+          "subject": { "type": "string" },
+          "body": { "type": "string" },
+          "status": { "type": "string" },
+          "reference_type": { "type": ["string", "null"] },
+          "reference_id": { "type": ["string", "null"] },
+          "sent_at": { "type": ["string", "null"] },
+          "created_at": { "type": ["string", "null"] }
+        }
+      },
+      "NotificationList": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Notification" } }
         }
       },
       "Warehouse": {
