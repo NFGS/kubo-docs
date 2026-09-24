@@ -337,6 +337,174 @@
         }
       }
     },
+    "/warehouses": {
+      "get": {
+        "summary": "Bodegas del negocio (P-22)",
+        "responses": {
+          "200": {
+            "description": "Bodegas activas, la por defecto primero",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WarehouseList" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crea una bodega",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "address": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Bodega creada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WarehouseItem" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/warehouses/{id}": {
+      "get": {
+        "summary": "Bodega por id",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bodega",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WarehouseItem" }
+              }
+            }
+          },
+          "404": {
+            "description": "No existe",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Borra una bodega (logico). 409 si es la por defecto o tiene existencia",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "204": { "description": "Borrada" },
+          "409": {
+            "description": "Bodega por defecto o con existencia",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/transfers": {
+      "get": {
+        "summary": "Transferencias entre bodegas (P-22)",
+        "responses": {
+          "200": {
+            "description": "Ultimas transferencias con sus lineas",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TransferList" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Transfiere existencias entre dos bodegas (atomico)",
+        "description": "Descuenta el origen y suma el destino en una sola transaccion; sin existencia suficiente no mueve nada (409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["from_warehouse_id", "to_warehouse_id", "items"],
+                "properties": {
+                  "from_warehouse_id": { "type": "string" },
+                  "to_warehouse_id": { "type": "string" },
+                  "notes": { "type": "string" },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["product_id", "quantity"],
+                      "properties": {
+                        "product_id": { "type": "string" },
+                        "quantity": { "type": "integer", "minimum": 1 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Transferencia completada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TransferItem" }
+              }
+            }
+          },
+          "409": {
+            "description": "Existencia insuficiente en el origen",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/transfers/{id}": {
+      "get": {
+        "summary": "Transferencia por id",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transferencia con sus lineas",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TransferItem" }
+              }
+            }
+          },
+          "404": {
+            "description": "No existe",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
     "/packs": {
       "get": {
         "summary": "Paquetes de configuracion por vertical (P-17)",
@@ -541,6 +709,66 @@
           "timezone": { "type": "string" },
           "vertical": { "type": "string", "enum": ["retail", "servicios", "restaurantes", "agro"] }
         }
+      },
+      "Warehouse": {
+        "type": "object",
+        "required": ["id", "name", "is_default", "active"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "address": { "type": ["string", "null"] },
+          "is_default": { "type": "boolean" },
+          "active": { "type": "boolean" },
+          "created_at": { "type": ["string", "null"] }
+        }
+      },
+      "WarehouseList": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Warehouse" } }
+        }
+      },
+      "WarehouseItem": {
+        "type": "object",
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Warehouse" } }
+      },
+      "Transfer": {
+        "type": "object",
+        "required": ["id", "from_warehouse_id", "to_warehouse_id", "status", "items"],
+        "properties": {
+          "id": { "type": "string" },
+          "from_warehouse_id": { "type": "string" },
+          "to_warehouse_id": { "type": "string" },
+          "status": { "type": "string" },
+          "notes": { "type": ["string", "null"] },
+          "completed_at": { "type": ["string", "null"] },
+          "created_at": { "type": ["string", "null"] },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["product_id", "quantity"],
+              "properties": {
+                "product_id": { "type": "string" },
+                "quantity": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      "TransferList": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Transfer" } }
+        }
+      },
+      "TransferItem": {
+        "type": "object",
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Transfer" } }
       },
       "TotpChallengeResponse": {
         "type": "object",

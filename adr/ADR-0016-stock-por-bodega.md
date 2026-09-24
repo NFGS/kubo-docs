@@ -70,12 +70,23 @@ lecturas es la restricción de diseño.
   el total del producto no cambia con la transferencia y sigue siendo la suma
   de las bodegas; la venta, la compra y el ajuste descuentan de la bodega por
   defecto.
+- `make smoke` (**137/137**): la bodega por defecto existe, la transferencia
+  mueve el producto, **el total no cambia**, el kardex deja los dos movimientos,
+  transferir más de lo disponible responde 409 y la bodega por defecto no se
+  puede borrar.
+- `make contracts` (**18/18**): `WarehouseList` y `TransferList` validados contra
+  la API viva.
 - **Defectos reales corregidos durante la implementación**: el esquema del
   kardex no conocía `warehouse_id` (los movimientos fallaban con
-  `not_null_violation`), el runner de pruebas montaba `lib/` y `config/` pero no
-  `priv/` (las migraciones nuevas no se aplicaban) y la segunda pata de la
-  transferencia usaba el producto **obsoleto**, inflando el total (10 → 14).
-- **Siguiente incremento de P-22**: exponer bodegas y transferencias por el API
-  (gateway + contrato), pantalla de bodegas/transferencias en la PWA, checks de
-  humo y elección de bodega en el POS. La migración y el dominio ya quedaron
-  cubiertos por las pruebas de integración.
+  `not_null_violation`); el runner de pruebas montaba `lib/` y `config/` pero no
+  `priv/` (las migraciones nuevas no se aplicaban); la segunda pata de la
+  transferencia usaba el producto **obsoleto**, inflando el total (10 → 14); la
+  lista de transferencias no precargaba las líneas (`NotLoaded`, 500); y —el más
+  serio— **el backfill de la migración era invisible para RLS**: `products` y
+  `stock_movements` ya tenían `FORCE ROW LEVEL SECURITY`, así que el `SELECT`
+  del backfill devolvía cero filas y el `SET NOT NULL` fallaba en bucle de
+  arranque. La migración suspende `FORCE` mientras corre (el dueño de la tabla
+  puede) y lo restaura al terminar; el backfill es **idempotente**
+  (`WHERE warehouse_id IS NULL`, `ON CONFLICT DO NOTHING`).
+- **Siguiente incremento de P-22**: pantalla de bodegas/transferencias en la PWA
+  y elección de bodega en el POS.

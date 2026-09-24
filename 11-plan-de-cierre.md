@@ -287,8 +287,13 @@ transferencia entre dos bodegas con kardex en ambas.
   suficiente). La migración hace el backfill de bodega, niveles y kardex
   histórico **antes** de activar RLS, y crea la bodega por defecto de cada
   negocio (las nuevas se crean de forma perezosa). Evidencia: ERP integración
-  **10/10** con PostgreSQL real. Pendiente del paso: API, PWA y humo de
-  bodegas/transferencias, y elección de bodega en el POS.
+  **10/10** con PostgreSQL real, **humo 137/137** (transferencia, total
+  invariante, kardex en ambas bodegas, 409 por existencia y 409 al borrar la
+  bodega por defecto) y **contratos 18/18** (`WarehouseList`, `TransferList`).
+  El backfill de la migración resultó invisible para RLS (las tablas ya tenían
+  `FORCE`): se suspende `FORCE` durante el backfill y se restaura al terminar,
+  con backfill idempotente. Pendiente del paso: pantalla de
+  bodegas/transferencias en la PWA y elección de bodega en el POS.
 
 ### Fase 5 — Escala (backlog declarado)
 
