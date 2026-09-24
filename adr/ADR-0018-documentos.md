@@ -62,9 +62,12 @@ Los hechos que enmarcan la decisión:
 - `kubo-erp` integración **12/12**: emitir una factura deja un documento
   `INVOICE_XML` con el hash de su contenido, y el contenido leído coincide con
   el XML emitido.
-- `make smoke` (**146/146**): la factura de la venta de prueba produce un
-  documento descargable, y el **SHA-256 del archivo descargado coincide** con el
-  registrado.
+- `make smoke` (**149/149**): la factura de la venta de prueba produce un
+  documento descargable con su **SHA-256** verificado, y la compra acepta un
+  soporte adjunto (rechazando un formato no soportado).
 - `make contracts` (**20/20**): `DocumentList` validado contra la API viva.
-- **Pendiente declarado**: soportes de compra (subida manual), PDF del
-  comprobante en servidor y el adaptador de almacenamiento de objetos.
+- **Soportes de compra**: `POST /purchases/:id/documents` acepta el archivo
+  (multipart, hasta 5 MB, formatos de documento e imagen) y lo liga a la compra;
+  un formato no soportado responde `INVALID_EXTENSION`.
+- **Pendiente declarado**: PDF del comprobante en servidor (el navegador ya
+  imprime) y el adaptador de almacenamiento de objetos.
