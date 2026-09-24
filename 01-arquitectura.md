@@ -208,6 +208,7 @@ Cada decisión relevante está registrada como ADR:
 | [0013](adr/ADR-0013-vertical-packs.md) | Vertical Packs: el vertical como dato del negocio |
 | [0014](adr/ADR-0014-puerto-facturacion-dian.md) | Facturación electrónica DIAN como puerto enchufable |
 | [0015](adr/ADR-0015-segundo-factor-totp.md) | Segundo factor TOTP del propietario |
+| [0016](adr/ADR-0016-stock-por-bodega.md) | Stock por bodega y transferencias |
 
 ## 7. Estructura del workspace
 

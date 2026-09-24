@@ -278,6 +278,17 @@ transferencia entre dos bodegas con kardex en ambas.
   (vectores RFC, cifrado, desafío y ciclo completo), gateway **9/9**, humo
   **130/130** con un código real calculado en Python (implementación
   independiente), E2E 4/4, `make ci` 10/10.
+- **F4.4 Multi-bodega y transferencias (P-22): modelo implementado.** El stock
+  por bodega es real (`warehouses`, `stock_levels` como fuente de verdad,
+  `products.stock` como total denormalizado mantenido en la misma transacción),
+  el kardex gana `warehouse_id` con índice de idempotencia por bodega y la
+  transferencia es un **par de movimientos atómicos** con las reglas del ADR-0016
+  (origen ≠ destino, cantidades positivas, producto con inventario, existencia
+  suficiente). La migración hace el backfill de bodega, niveles y kardex
+  histórico **antes** de activar RLS, y crea la bodega por defecto de cada
+  negocio (las nuevas se crean de forma perezosa). Evidencia: ERP integración
+  **10/10** con PostgreSQL real. Pendiente del paso: API, PWA y humo de
+  bodegas/transferencias, y elección de bodega en el POS.
 
 ### Fase 5 — Escala (backlog declarado)
 
