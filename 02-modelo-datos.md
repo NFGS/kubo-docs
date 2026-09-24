@@ -13,6 +13,8 @@ flowchart LR
       TENANTS["tenants"]
       USERS["users"]
       REFRESH["refresh_tokens"]
+      RESET["password_reset_tokens"]
+      MAIL["mail_outbox"]
       AUDIT["audit_logs"]
     end
     subgraph CRMDB["kubo_crm"]
@@ -23,6 +25,7 @@ flowchart LR
       MOVEMENTS["stock_movements"]
       SALES["sales"]
       ITEMS["sale_items"]
+      OUTBOX["outbox_events"]
     end
   end
 
@@ -33,13 +36,15 @@ flowchart LR
 
   USERS -->|"tenant_id"| TENANTS
   REFRESH -->|"user_id"| USERS
+  RESET -->|"user_id"| USERS
   CUSTOMERS -.->|"tenant_id (lógico)"| TENANTS
   PRODUCTS -.->|"tenant_id (lógico)"| TENANTS
   SALES -->|"sale_id"| ITEMS
   ITEMS -->|"product_id"| PRODUCTS
   MOVEMENTS -->|"product_id"| PRODUCTS
   SALES -.->|"customer_id (lógico, sin FK)"| CUSTOMERS
-  SALES -.->|"evento sale.created"| EVENTS
+  SALES -.->|"sale.created (misma tx)"| OUTBOX
+  OUTBOX -.->|"publicador de barrido"| EVENTS
   EVENTS -.->|"proyección"| PROJ
 ```
 
@@ -49,6 +54,7 @@ flowchart LR
 erDiagram
   TENANTS ||--o{ USERS : "tiene"
   USERS ||--o{ REFRESH_TOKENS : "emite"
+  USERS ||--o{ PASSWORD_RESET_TOKENS : "recupera"
 
   TENANTS {
     uuid id PK
@@ -66,6 +72,8 @@ erDiagram
     varchar role "OWNER|ADMIN|SELLER|ACCOUNTANT|VIEWER"
     varchar status "ACTIVE|DISABLED"
     timestamptz last_login_at
+    integer failed_login_attempts "bloqueo por intentos"
+    timestamptz locked_until "temporal"
   }
   REFRESH_TOKENS {
     uuid id PK
@@ -74,6 +82,21 @@ erDiagram
     timestamptz expires_at
     timestamptz revoked_at
     uuid replaced_by "rotación"
+  }
+  PASSWORD_RESET_TOKENS {
+    uuid id PK
+    uuid user_id FK
+    varchar token_hash UK "SHA-256, un solo uso"
+    timestamptz expires_at "30 minutos"
+    timestamptz used_at
+  }
+  MAIL_OUTBOX {
+    uuid id PK
+    varchar recipient
+    varchar subject
+    text body "solo transporte log"
+    varchar transport "log|smtp"
+    timestamptz created_at
   }
   AUDIT_LOGS {
     uuid id PK
@@ -84,6 +107,7 @@ erDiagram
     varchar entity_id
     varchar prev_hash
     varchar hash "cadena SHA-256"
+    smallint hash_version "2 = vigente"
     timestamptz created_at
   }
 ```
@@ -97,6 +121,14 @@ erDiagram
 - `audit_logs.prev_hash` + `hash`: cada registro encadena el anterior; alterar un
   registro intermedio rompe la cadena y es detectable.
 - `users.email` es único **por negocio**, no global.
+- `password_reset_tokens`: solo el SHA-256 del enlace, con expiración y uso único;
+  al consumirse se revocan todas las sesiones del usuario.
+- `users.failed_login_attempts` + `locked_until`: el bloqueo por intentos vive en
+  la misma fila y se levanta con un acceso correcto o una recuperación.
+- `mail_outbox`: buzón de demostración (transporte `log`); con `smtp` el cuerpo no
+  se persiste.
+- `audit_logs.hash_version`: cada fila declara con qué algoritmo se calculó su
+  hash; las de la versión 1 solo se verifican por enlace.
 
 ## 3. `kubo_crm` — clientes con datos personales cifrados
 
@@ -203,6 +235,12 @@ la misma transacción** que inserta el movimiento, con el producto bloqueado
 (`SELECT ... FOR UPDATE`). Ante cualquier duda se puede reconstruir el saldo
 sumando el kardex y compararlo con la proyección.
 
+**Bandeja de salida (`outbox_events`)**: el evento `sale.created` se guarda en la
+misma transacción de la venta (`status PENDING`), con `event_id` único, el
+`payload` completo y `attempts`/`available_at` para reintentos. El publicador de
+barrido lo marca `PUBLISHED` (o `FAILED` tras 10 intentos). Queda fuera de RLS a
+propósito: se lee cruzando negocios para entregar los eventos (ADR-0009).
+
 ## 5. `kubo_analytics` — modelo de lectura en MongoDB
 
 ```
@@ -244,5 +282,5 @@ tablero es para decidir, la factura es para cobrar.
 | Fechas | `timestamptz` en PostgreSQL, almacenadas en UTC; la interfaz muestra `America/Bogota` |
 | Dinero | `numeric(14,2)` y aritmética decimal en el ERP; nunca coma flotante |
 | Borrado | Lógico (`deleted_at`), nunca físico: la historia comercial se conserva |
-| Aislamiento | `tenant_id` en toda tabla de negocio + política RLS escrita y lista para activar |
+| Aislamiento | `tenant_id` en toda tabla de negocio + **RLS activo con `FORCE`** en las tres bases (ADR-0010) |
 | Migraciones | Versionadas y **inmutables** una vez aplicadas; nunca se edita una migración ya ejecutada |

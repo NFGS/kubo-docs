@@ -16,7 +16,9 @@ técnica seria no se conforma con que funcione: busca dónde se romperá al crec
 dónde miente un indicador y qué falta para ser un producto y no una demostración.
 
 Se encontraron **17 hallazgos**, todos corregidos y medidos en esta misma sesión, y
-**31 pendientes** priorizados con su plan.
+**31 pendientes** priorizados con su plan. De ellos, **9 quedaron resueltos y
+verificados en la Fase 1** (P-01, P-02, P-03, P-04, P-05, P-11, P-23, P-27 y P-31;
+ver [`11-plan-de-cierre.md`](11-plan-de-cierre.md)).
 
 Los dos más graves no eran de rendimiento:
 
@@ -251,6 +253,13 @@ demostración, la bitácora se reinició para partir de una cadena verificable. 
 como pendiente P-23.
 
 ## 5. Pendientes priorizados
+
+> **Fase 1 aplicada (2026-09-24).** Resueltos y verificados: P-01 (outbox
+> transaccional), P-02 (RLS activo en las tres bases), P-03 (cookie `httpOnly`),
+> P-04 (recuperación de contraseña), P-05 (respaldos + simulacro), P-11 (bloqueo
+> de cuenta), P-23 (hash de auditoría versionado), P-27 (TLS en la instalación) y
+> P-31 (límite de tasa por usuario). Evidencia: `make smoke` 73/73,
+> `make bus-drill` 4/4, `make restore-drill` 14/14, ADR-0009 y ADR-0010.
 
 ### 5.1 Bloqueantes para un negocio real
 

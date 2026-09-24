@@ -23,11 +23,13 @@ flowchart LR
 ```mermaid
 flowchart TB
   subgraph NAVEGADOR["Navegador del negocio"]
-    PWA["kubo-web<br/>React 19 + Vite · PWA<br/>cola offline en IndexedDB"]
+    PWA["PWA instalada<br/>React 19 + Vite<br/>cola offline en IndexedDB"]
   end
 
   subgraph SERVIDOR["Servidor del negocio (Docker Compose)"]
-    GW["kubo-gateway<br/>NestJS · API Gateway<br/>JWT RS256 · límites de tasa"]
+    TLS["kubo-tls<br/>Caddy · HTTPS"]
+    WEB["kubo-web<br/>nginx · activos + proxy /api"]
+    GW["kubo-gateway<br/>NestJS · API Gateway<br/>JWT RS256 · límites · BFF"]
     IAM["kubo-iam<br/>Java 21 · Spring Boot 4"]
     CRM["kubo-crm<br/>Ruby 3.4 · Rails 8"]
     ERP["kubo-erp<br/>Elixir 1.17 · Phoenix 1.8"]
@@ -39,7 +41,9 @@ flowchart TB
     RD[("Redis 7<br/>límites de tasa")]
   end
 
-  PWA -->|"HTTPS /api/v1"| GW
+  PWA -->|"HTTPS 3443"| TLS
+  TLS --> WEB
+  WEB -->|"/api/v1"| GW
   GW -->|"verifica JWKS"| IAM
   GW --> IAM
   GW --> CRM
@@ -52,7 +56,7 @@ flowchart TB
   ERP --> PG
   ANA --> MG
 
-  ERP -.->|"sale.created"| MQ
+  ERP -.->|"outbox: sale.created"| MQ
   MQ -.-> ANA
 ```
 
@@ -63,9 +67,10 @@ flowchart TB
 | `kubo-gateway` | Único punto de entrada: valida el JWT contra el JWKS, aplica límites de tasa, propaga la identidad y la trazabilidad, enruta | Redis (límites) |
 | `kubo-iam` | Negocios, usuarios, roles, tokens, auditoría | `kubo_iam` |
 | `kubo-crm` | Clientes, cifrado de datos personales, cartera | `kubo_crm` |
-| `kubo-erp` | Catálogo, inventario (kardex), ventas, anulación | `kubo_erp` |
+| `kubo-erp` | Catálogo, inventario (kardex), ventas, anulación y **outbox** de eventos | `kubo_erp` |
 | `kubo-analytics` | Modelo de lectura de ventas, indicadores del tablero | `kubo_analytics` (MongoDB) |
 | `kubo-web` | Interfaz PWA; sirve los activos y proxea `/api` al gateway | — |
+| `kubo-tls` | Terminación TLS (Caddy): HTTPS, redirección de HTTP y HSTS | — |
 
 ## 3. Vista de componentes (C4 nivel 3, ejemplo: `kubo-erp`)
 
@@ -134,14 +139,20 @@ sequenceDiagram
   E->>P: INSERT sale, sale_items
   E->>P: UPDATE products.stock
   E->>P: INSERT stock_movements (kardex)
+  E->>P: INSERT outbox_events (sale.created)
   E->>P: COMMIT
   E-->>G: 201 Created (venta)
   G-->>V: 201 Created
-  E-)M: publica sale.created (asíncrono)
+  Note over E,P: La venta y su evento se confirman juntos (outbox)
+  E-)M: el publicador de barrido entrega sale.created
   M-)A: entrega del evento
   A->>N: deduplica por event_id y proyecta la venta
   Note over V,A: El tablero refleja la venta en menos de un segundo,<br/>sin que la caja espere a analítica.
 ```
+
+> Si el bus está caído, el evento **espera en la bandeja de salida**
+> (`outbox_events`) y se entrega al volver; la venta ya está confirmada y el
+> negocio sigue vendiendo. `make bus-drill` lo verifica (ver ADR-0009).
 
 ### Si no hay internet en el local
 
@@ -172,7 +183,7 @@ sequenceDiagram
 | **Mantenibilidad** | Un lenguaje por contexto con su ecosistema natural; arquitectura limpia dentro de cada servicio; contratos explícitos entre repos. |
 | **Portabilidad** | Todo corre en Docker Compose: el mismo artefacto sirve para el mini-PC del local y para un servidor en la nube. |
 | **Observabilidad** | Sonda `/health` en cada servicio con estado de sus dependencias, `correlation-id` propagado por el gateway y logs JSON estructurados. |
-| **Costo** | Consumo en reposo cercano a 1.5 GB de RAM y 10 contenedores; cabe en un VPS de USD 6–12 al mes o en un equipo modesto del local. |
+| **Costo** | Consumo en reposo cercano a 900 MB de RAM y 11 contenedores; cabe en un VPS de USD 6–12 al mes o en un equipo modesto del local. |
 
 ## 6. Decisiones arquitectónicas
 
@@ -182,12 +193,14 @@ Cada decisión relevante está registrada como ADR:
 | --- | --- |
 | [0001](adr/ADR-0001-microservicios-monolito-modular.md) | Microservicios con monolito modular interno |
 | [0002](adr/ADR-0002-polyrepo-contratos.md) | Polyrepo con contratos como fuente de verdad |
-| [0003](adr/ADR-0003-multitenancy-hibrido.md) | Multi-tenancy híbrido (`tenant_id` hoy, RLS lista) |
+| [0003](adr/ADR-0003-multitenancy-hibrido.md) | Multi-tenancy híbrido (`tenant_id` + RLS activo) |
 | [0004](adr/ADR-0004-poliglotismo.md) | Poliglotismo deliberado: un lenguaje por contexto |
 | [0005](adr/ADR-0005-eventos-rabbitmq.md) | Eventos con RabbitMQ y publicador tolerante a fallos |
 | [0006](adr/ADR-0006-cifrado-campos.md) | Cifrado de campos personales con AES-256-GCM |
 | [0007](adr/ADR-0007-jwt-rs256-jwks.md) | JWT RS256 con JWKS en el gateway |
 | [0008](adr/ADR-0008-alcance-mvp.md) | Alcance declarado del MVP y recortes conscientes |
+| [0009](adr/ADR-0009-outbox-transaccional.md) | Outbox transaccional para la entrega de eventos |
+| [0010](adr/ADR-0010-rls-activo.md) | RLS activo con interceptor de transacción |
 
 ## 7. Estructura del workspace
 

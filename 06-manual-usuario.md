@@ -128,8 +128,10 @@ la anulación (no se borra la historia).
 Sí, si escribe el código como texto. Escribe o escanea en el buscador del POS.
 
 **Olvidé mi contraseña.**
-Pídele al administrador que la restablezca (la recuperación por correo llega en
-la siguiente versión).
+En la pantalla de ingreso pulsa **«¿Olvidaste tu contraseña?»** y escribe tu
+correo: recibirás un enlace para crear una nueva. El enlace vence en 30 minutos y
+solo sirve una vez. Si el correo del servidor aún no está configurado, pídele al
+administrador que la restablezca.
 
 ## 7. Buenas prácticas
 

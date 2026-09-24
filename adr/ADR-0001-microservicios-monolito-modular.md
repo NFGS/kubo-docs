@@ -35,7 +35,7 @@ arquitectura limpia en capas (`domain`, `application`, `infrastructure`,
 ## Consecuencias
 
 - **Positivas**: se cumple el requisito, el consumo de memoria es acotado
-  (~1.5 GB para todo el sistema), y el dominio queda listo para escalar
+  (~900 MB para todo el sistema), y el dominio queda listo para escalar
   horizontalmente el servicio que lo necesite.
 - **Negativas**: no hay transacciones distribuidas; la consistencia entre
   servicios es eventual y se resuelve con eventos (ver ADR-0005).

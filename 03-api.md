@@ -16,8 +16,10 @@ servicio correspondiente. Ningún servicio de negocio está expuesto directament
 | `GET /api/v1/health` | Público (lo atiende el gateway) |
 | `POST /api/v1/auth/login` | Público |
 | `POST /api/v1/auth/register` | Público |
-| `POST /api/v1/auth/refresh` | Público |
-| `POST /api/v1/auth/logout` | Público |
+| `POST /api/v1/auth/refresh` | Público (cookie de refresco) |
+| `POST /api/v1/auth/logout` | Público (cookie de refresco) |
+| `POST /api/v1/auth/forgot-password` | Público |
+| `POST /api/v1/auth/reset-password` | Público |
 | `GET /api/v1/auth/.well-known/jwks.json` | Público |
 | Todo lo demás | Requiere `Bearer` válido |
 
@@ -60,7 +62,6 @@ Respuesta:
 ```json
 {
   "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6...",
-  "refreshToken": "3lP2...",
   "tokenType": "Bearer",
   "expiresInSeconds": 900,
   "user": {
@@ -72,7 +73,34 @@ Respuesta:
 
 El **access token** dura 15 minutos y se firma con RS256. El **refresh token**
 dura 7 días, se guarda hasheado y **rota en cada uso**; reutilizar uno revocado
-invalida toda la familia de tokens del usuario.
+invalida toda la familia de tokens del usuario. El gateway (BFF) lo entrega en una
+**cookie `httpOnly` + `SameSite=Strict`** (`Path=/api/v1/auth`) y **nunca** aparece
+en el cuerpo de la respuesta: un XSS no puede robarlo.
+
+### `POST /auth/forgot-password`
+
+Solicita el enlace de recuperación. Responde siempre `204`, exista o no la cuenta
+(no permite enumerar usuarios).
+
+```bash
+curl -X POST http://localhost:9080/api/v1/auth/forgot-password \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"admin@kubo.local"}'
+```
+
+Con `KUBO_MAIL_TRANSPORT=log` (demostración) el correo queda en la tabla
+`mail_outbox`; con `smtp` sale por el servidor configurado.
+
+### `POST /auth/reset-password`
+
+Consume el token del enlace (un solo uso, vence en 30 minutos) y cambia la
+contraseña; además revoca todas las sesiones y levanta el bloqueo por intentos.
+
+```bash
+curl -X POST http://localhost:9080/api/v1/auth/reset-password \
+  -H 'Content-Type: application/json' \
+  -d '{"token":"<token del enlace>","newPassword":"NuevaClave123!"}'
+```
 
 ### `GET /auth/me`
 

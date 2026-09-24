@@ -37,6 +37,9 @@ flowchart LR
 | Rotación | Cada refresh emite uno nuevo y revoca el anterior |
 | Detección de reuso | Si se usa un token ya rotado, se **invalida toda la familia** del usuario y se audita `REFRESH_REUSE_DETECTED` |
 | Cierre de sesión | Revoca el refresh token en el servidor, no solo en el navegador |
+| Almacenamiento del refresh | **Cookie `httpOnly` + `SameSite=Strict`** emitida por el gateway (BFF); el cuerpo de la respuesta nunca lo incluye |
+| Bloqueo de cuenta | Tras 5 intentos fallidos la cuenta se bloquea 15 minutos; el acceso correcto o la recuperación lo levantan |
+| Recuperación de contraseña | Enlace de un solo uso, hasheado en base, vence en 30 minutos; al usarse revoca todas las sesiones |
 
 **Por qué asimétrico**: con un secreto compartido, comprometer cualquier servicio
 permitiría *emitir* tokens válidos para cualquier usuario. Con RS256, la llave
@@ -46,12 +49,12 @@ privada vive solo en `kubo-iam`.
 
 | Ámbito | Mecanismo | Dónde se verifica |
 | --- | --- | --- |
-| En tránsito (externo) | TLS 1.3 terminado en el proxy inverso | Configuración de despliegue |
+| En tránsito (externo) | TLS terminado en Caddy (`kubo-tls`, puertos 3080/3443) con HSTS y redirección de HTTP | `make smoke` bloque 10 · `05-despliegue.md` §3 |
 | En tránsito (interno) | Red privada de contenedores; mTLS previsto para clúster | — |
 | **Datos personales** | **AES-256-GCM** campo a campo (documento, teléfono) | `make smoke` inspecciona el texto cifrado en PostgreSQL |
 | Búsqueda sobre cifrado | **Índice ciego** HMAC-SHA256 normalizado | `make smoke` verifica que el índice no contiene el valor |
 | Contraseñas | BCrypt con sal por usuario | — |
-| Respaldos | Cifrado con `age` antes de salir del servidor | Fase 1 (P-05) |
+| Respaldos | Cifrado con `age` antes de salir del servidor | Implementado: `make backup` / `make restore-drill` |
 
 Formato almacenado: `base64(iv ‖ tag ‖ ciphertext)`. El **tag de GCM** hace que
 cualquier manipulación del texto cifrado sea detectable: el descifrado falla y el
@@ -79,11 +82,14 @@ servicio devuelve `null` en lugar de un valor corrupto.
 1. Toda tabla de negocio lleva `tenant_id` y toda consulta lo filtra.
 2. El `tenant_id` **nunca** viene del cuerpo ni de un parámetro: se toma del
    claim del JWT, que el gateway propaga como cabecera.
-3. La política de *row level security* está escrita y versionada en `kubo-iam`
-   (`db/rls/enable-rls.sql`), lista para activarse como segunda barrera; CRM y ERP
-   la reciben en la Fase 1 (P-02), junto con el interceptor de transacción.
-4. **Verificación automática**: `make smoke` registra un segundo negocio y
-   comprueba que no ve ni un cliente ni un producto del primero.
+3. **RLS activo con `FORCE` en las tres bases** (P-02, ADR-0010). Cada petición
+   abre una transacción y fija `app.tenant_id` con `set_config(..., true)`; sin
+   contexto, una consulta devuelve **cero filas**. Las operaciones que cruzan
+   negocios por diseño (autenticación por correo, cadena de auditoría, semilla,
+   respuesta a incidentes) usan la marca `app.system`, deliberada y acotada.
+4. **Verificación automática**: `make smoke` comprueba que sin contexto no hay
+   filas y con contexto sí, en IAM, CRM y ERP, además de registrar un segundo
+   negocio y comprobar que no ve ni un cliente ni un producto del primero.
 
 ## 5. Autorización
 
@@ -126,12 +132,13 @@ personales: Rails filtra `document_number`, `phone` y `email` en sus logs.
 
 ### Sobre el almacenamiento del refresh token
 
-El refresh token se guarda en `localStorage` del navegador. Es una decisión
-consciente y **documentada como riesgo**: un XSS exitoso podría robarlo. Las
-mitigaciones aplicadas son: el access token vive solo en memoria, el refresh
-**rota en cada uso** y el reuso se detecta invalidando la familia completa. La
-solución definitiva (cookie `httpOnly` + `SameSite=Strict` con BFF) está prevista
-para la Fase 1 (P-03).
+El refresh token **no toca el navegador**: el gateway (BFF) lo recibe del IAM y lo
+deja en una cookie `httpOnly` + `SameSite=Strict` con `Path=/api/v1/auth`, y lo
+elimina del cuerpo de la respuesta (P-03, verificado en el humo). El access token
+(15 minutos) vive solo en memoria. El refresh rota en cada uso y el reuso se
+detecta invalidando la familia completa: el humo comprueba que, tras un reuso, ni
+la cookie rotada sigue sirviendo. En producción con HTTPS, `KUBO_COOKIE_SECURE=true`
+marca además la cookie como `Secure`.
 
 ## 8. Cumplimiento normativo
 
@@ -161,10 +168,10 @@ La prueba de humo comprueba, entre otras cosas:
 
 | Pendiente | ID · Fase | Riesgo que cierra |
 | --- | --- | --- |
-| Refresh token en cookie `httpOnly` + `SameSite` | P-03 · Fase 1 | Robo de token por XSS |
-| Activación de RLS con interceptor de transacción | P-02 · Fase 1 | Error humano en un filtro de consulta |
-| Rate limiting por usuario (no solo por negocio) | P-31 · Fase 1 | Abuso desde una cuenta comprometida |
 | Análisis SAST/SCA automatizado en CI y escaneo de secretos | P-06 · Fase 2 | Dependencias vulnerables y credenciales filtradas |
 | Segundo factor (TOTP) para el propietario | P-30 · Fase 4 | Robo de credenciales |
 | mTLS entre gateway y servicios | P-28 · Fase 5 | Movimiento lateral dentro del clúster |
 | Rotación de claves de cifrado de campo | P-29 · Fase 5 | Compromiso de una clave a largo plazo |
+
+> **Resueltos en la Fase 1**: cookie `httpOnly` (P-03), RLS activo (P-02) y
+> límite de tasa por usuario (P-31). Ver [`11-plan-de-cierre.md`](11-plan-de-cierre.md).

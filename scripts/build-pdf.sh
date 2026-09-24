@@ -49,6 +49,8 @@ DOCUMENTOS=(
   "adr/ADR-0006-cifrado-campos.md"
   "adr/ADR-0007-jwt-rs256-jwks.md"
   "adr/ADR-0008-alcance-mvp.md"
+  "adr/ADR-0009-outbox-transaccional.md"
+  "adr/ADR-0010-rls-activo.md"
 )
 
 # ---------------------------------------------------------------------------

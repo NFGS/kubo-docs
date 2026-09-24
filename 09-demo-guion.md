@@ -8,9 +8,9 @@ sola toma, sin edición, con el sistema ya levantado.
 ```bash
 cd "Documents/Proyectos de Programación/Kubo"
 make foreign-stop        # libera RAM (detiene Dolibarr, Guacamole, Open Notebook)
-make up                  # levanta los 10 contenedores
+make up                  # levanta los 11 contenedores
 make seed                # carga catálogo, clientes y ventas de ejemplo
-make smoke               # verifica 44 comprobaciones end-to-end
+make smoke               # verifica 73 comprobaciones end-to-end
 ```
 
 Deja abiertas estas ventanas:
@@ -63,7 +63,8 @@ ls -d kubo-*/
 ```
 
 > "Nueve repositorios: uno por cada parte del software, más la infraestructura y
-> la documentación."
+> la documentación. El acceso por HTTPS lo termina Caddy, y el token de sesión
+> vive en una cookie que el navegador no puede leer."
 
 ---
 
@@ -161,7 +162,7 @@ ls kubo-docs/
 
 > "La documentación incluye arquitectura con diagramas C4, modelo de datos,
 > contrato de la API, seguridad, despliegue, plan de pruebas, matriz de
-> trazabilidad y ocho decisiones de arquitectura registradas como ADR.
+> trazabilidad y diez decisiones de arquitectura registradas como ADR.
 >
 > Kubo se instala con un comando, corre en menos de 2 GB de memoria y está
 > pensado para que un negocio de barrio digitalice sus ventas sin pagar
@@ -176,7 +177,7 @@ ls kubo-docs/
 | Un contenedor no responde | "Reviso la sonda de salud del servicio…" y ejecuta `make ps` |
 | El tablero tarda | "La consistencia es eventual: el evento viaja por RabbitMQ" |
 | Falla el modo offline | Muestra la cola en `IndexedDB` desde las herramientas del navegador |
-| Falla la demo por completo | Ejecuta `make smoke` y muestra las 44 comprobaciones en verde |
+| Falla la demo por completo | Ejecuta `make smoke` y muestra las 73 comprobaciones en verde |
 
 ## Evidencia complementaria
 

@@ -32,7 +32,7 @@ openssl rand -base64 48 # KUBO_ERP_SECRET_KEY_BASE
 Levantar:
 
 ```bash
-make up      # construye y arranca los 10 contenedores
+make up      # construye y arranca los 11 contenedores
 make seed    # datos de demostración (omitir en producción)
 make smoke   # verificación end-to-end
 ```
@@ -44,6 +44,7 @@ Abrir `http://<ip-del-servidor>:3000` e ingresar con el administrador creado.
 | Servicio | Host | Contenedor |
 | --- | --- | --- |
 | PWA | 3000 | 80 |
+| **TLS (Caddy): HTTPS · HTTP** | **3443 · 3080** | 443 · 80 |
 | API Gateway | 9080 | 8080 |
 | IAM · CRM · ERP · Analítica | 9081–9084 | 8081–8084 |
 | PostgreSQL · MongoDB | 5433 · 27018 | 5432 · 27017 |
@@ -57,22 +58,29 @@ servicios que ya corran en la máquina del negocio.
 
 - [ ] `kubo-infra/.env` con todas las claves cambiadas y el archivo **fuera del control de versiones**.
 - [ ] `KUBO_JWT_PRIVATE_KEY` con una llave RSA real (si queda vacía, el servicio genera una efímera y los tokens se invalidan al reiniciar).
-- [ ] TLS terminado en un proxy inverso (Caddy, Traefik o nginx) con certificado válido.
+- [ ] TLS: `KUBO_TLS_DOMAIN` con el dominio del negocio (ver abajo). El servicio `kubo-tls` ya está en el compose.
+- [ ] `KUBO_COOKIE_SECURE=true` cuando el acceso sea siempre por HTTPS.
+- [ ] Correo real: `KUBO_MAIL_TRANSPORT=smtp` con `KUBO_SMTP_HOST` y credenciales (si se deja `log`, el enlace de recuperación queda en el buzón de demostración).
 - [ ] **No publicar** los puertos 9081–9084 en producción: los servicios de negocio solo deben ser alcanzables por el gateway dentro de la red de contenedores.
 - [ ] `KUBO_SEED_ENABLED=false` (no sembrar datos de demostración).
-- [ ] Respaldos programados (sección 5).
+- [ ] Respaldos programados (sección 5) y un simulacro de restauración ejecutado.
 - [ ] Monitoreo de las sondas `/api/v1/health` de los cinco servicios.
 
-### TLS con Caddy (ejemplo)
+### TLS con Caddy (incluido)
 
-```
-kubo.minegocio.co {
-    reverse_proxy localhost:3000
-}
-```
+El servicio `kubo-tls` (Caddy) termina HTTPS en el local y redirige HTTP a HTTPS:
 
-La PWA sirve los activos y proxea `/api` al gateway, así que un único dominio
-con HTTPS cubre todo el sistema.
+- `https://<dominio>:3443` sirve la PWA; `http://<dominio>:3080` redirige.
+- Con `KUBO_TLS_DOMAIN=localhost` (por defecto) Caddy usa su CA interna
+  (`tls internal`): válido para la red del local, el navegador pedirá aceptar el
+  certificado una vez.
+- Para un **dominio público**: ponga `KUBO_TLS_DOMAIN=kubo.minegocio.co` en el
+  `.env`, quite `tls internal` de `kubo-infra/caddy/Caddyfile` y Caddy gestionará
+  el certificado Let's Encrypt automáticamente.
+
+La PWA ya proxea `/api` al gateway, así que un único dominio con HTTPS cubre todo
+el sistema. La cabecera `Strict-Transport-Security` se envía en todas las
+respuestas.
 
 ## 4. Operación diaria
 
@@ -100,27 +108,32 @@ nueva.
 
 ## 5. Respaldos
 
+Automatizados con `make backup` (`kubo-infra/scripts/backup.sh`):
+
 | Qué | Cómo | Frecuencia |
 | --- | --- | --- |
-| PostgreSQL | `pg_dump` por base (`kubo_iam`, `kubo_crm`, `kubo_erp`) | Diaria |
-| MongoDB | `mongodump` de `kubo_analytics` | Diaria |
-| Configuración | `kubo-infra/.env` (cifrado con `age`) | En cada cambio |
-| Volúmenes Docker | `docker run --rm -v kubo_pgdata:/data ...` | Semanal |
+| PostgreSQL | `pg_dump -Fc` por base (`kubo_iam`, `kubo_crm`, `kubo_erp`) | Diaria |
+| MongoDB | `mongodump --archive` de `kubo_analytics` | Diaria |
+| Configuración | `kubo-infra/.env` cifrado con `age` (si hay destinatario) o `chmod 600` | Diaria |
+| Retención | `KUBO_BACKUP_RETENTION_DAYS` (14 por defecto) | Automática |
 
 ```bash
-# Respaldo completo
-docker exec kubo-postgres pg_dump -U kubo_root -d kubo_iam > respaldo_iam.sql
-docker exec kubo-postgres pg_dump -U kubo_root -d kubo_crm > respaldo_crm.sql
-docker exec kubo-postgres pg_dump -U kubo_root -d kubo_erp > respaldo_erp.sql
-docker exec kubo-mongo mongodump --db kubo_analytics --archive > respaldo_analytics.archive
-
-# Restauración
-docker exec -i kubo-postgres psql -U kubo_root -d kubo_erp < respaldo_erp.sql
-docker exec -i kubo-mongo mongorestore --archive --drop < respaldo_analytics.archive
+make backup          # deja un directorio con fecha en kubo-infra/backups/
+make restore-drill   # restaura en bases kubo_drill_* y compara filas
 ```
 
-**Objetivos**: RPO 24 h · RTO 4 h. Un respaldo que nunca se restauró no es un
-respaldo: haz un simulacro mensual contra un entorno de prueba.
+Programación diaria con systemd (copiar a `/etc/systemd/system/`):
+
+```bash
+sudo cp kubo-infra/systemd/kubo-backup.{service,timer} /etc/systemd/system/
+sudo systemctl enable --now kubo-backup.timer   # 03:30 con retraso aleatorio
+```
+
+**Objetivos**: RPO 24 h · RTO 4 h. **Un respaldo que nunca se restauró no es un
+respaldo**: `make restore-drill` toma un respaldo nuevo, lo restaura en bases de
+prueba, compara el número de filas de las tablas clave y mide el tiempo (en este
+equipo: 14/14 en 6 segundos). Ejecútalo mensualmente y tras cada cambio de
+esquema.
 
 **Importante**: MongoDB guarda una **proyección** reconstruible desde los eventos
 del ERP. PostgreSQL es la fuente de verdad y es lo que no puede perderse.
@@ -149,10 +162,11 @@ El sistema está diseñado para crecer sin reescribir:
 
 | Pendiente | ID · Fase | Impacto |
 | --- | --- | --- |
-| *Transactional outbox* | P-01 · Fase 1 | Un evento puede perderse si el proceso muere justo tras el `commit` |
-| Activación de RLS | P-02 · Fase 1 | El aislamiento depende hoy de la disciplina del código |
-| Refresh token en cookie `httpOnly` | P-03 · Fase 1 | Un XSS podría robar el token de refresco |
-| Recuperación de contraseña | P-04 · Fase 1 | Hoy la cambia un administrador desde la base |
-| TLS/HTTPS verificado en la instalación | P-27 · Fase 1 | Las credenciales viajan en claro por la red del local |
 | CI/CD y escaneos automatizados | P-06 · Fase 2 | Las verificaciones son manuales (`make smoke`) |
-| Monitoreo centralizado | P-07 · Fase 2 | Solo hay sondas de salud y logs locales |
+| Monitoreo centralizado (OpenTelemetry) | P-07 · Fase 2 | Solo hay sondas de salud y logs locales |
+| Pruebas de integración y contrato | P-08 · P-09 · Fase 2 | Sin cobertura de repositorios ni contrato ejecutable |
+| E2E y carga | P-10 · Fase 2 | La interfaz y la concurrencia se verifican a mano |
+| mTLS entre servicios | P-28 · Fase 5 | Movimiento lateral dentro del clúster |
+
+> La Fase 1 (outbox, RLS, cookie `httpOnly`, recuperación de contraseña, respaldos
+> y TLS) está cerrada y verificada; ver [`11-plan-de-cierre.md`](11-plan-de-cierre.md).

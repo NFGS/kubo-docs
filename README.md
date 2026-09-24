@@ -18,7 +18,7 @@ la primera vez y para consultarse por secciones después.
 | [09 — Guion de demostración](09-demo-guion.md) | Presentación | Guion del video de 6 minutos |
 | [10 — Auditoría técnica](10-auditoria.md) | Arquitectura · Calidad | Hallazgos, mediciones, correcciones aplicadas y catálogo de pendientes |
 | [11 — Plan de cierre](11-plan-de-cierre.md) | Gestión · Arquitectura | ¿Qué falta, en qué orden y con qué criterio se cierra cada fase? |
-| [ADRs](adr/) | Arquitectura | Las ocho decisiones que definen el sistema |
+| [ADRs](adr/) | Arquitectura | Las diez decisiones que definen el sistema |
 
 ## Decisiones de arquitectura (ADR)
 
@@ -26,16 +26,17 @@ la primera vez y para consultarse por secciones después.
 | --- | --- |
 | [0001](adr/ADR-0001-microservicios-monolito-modular.md) | Microservicios con monolito modular interno |
 | [0002](adr/ADR-0002-polyrepo-contratos.md) | Polyrepo con contratos como fuente de verdad |
-| [0003](adr/ADR-0003-multitenancy-hibrido.md) | Multi-tenancy híbrido: `tenant_id` hoy, RLS lista |
+| [0003](adr/ADR-0003-multitenancy-hibrido.md) | Multi-tenancy híbrido: `tenant_id` + RLS activo |
 | [0004](adr/ADR-0004-poliglotismo.md) | Poliglotismo deliberado: un lenguaje por contexto |
 | [0005](adr/ADR-0005-eventos-rabbitmq.md) | Eventos con RabbitMQ y publicador tolerante a fallos |
 | [0006](adr/ADR-0006-cifrado-campos.md) | Cifrado de campos personales con AES-256-GCM |
 | [0007](adr/ADR-0007-jwt-rs256-jwks.md) | JWT RS256 con JWKS: la llave privada no sale del IAM |
 | [0008](adr/ADR-0008-alcance-mvp.md) | Alcance declarado del MVP y recortes conscientes |
+| [0009](adr/ADR-0009-outbox-transaccional.md) | Outbox transaccional para la entrega de eventos |
+| [0010](adr/ADR-0010-rls-activo.md) | RLS activo con interceptor de transacción |
 
-ADR planificadas: **0009** outbox transaccional (Fase 1), **0010** RLS activo
-(Fase 1), **0011** BFF como capa formal (Fase 2) y **0012** zona horaria por
-negocio (Fase 4). Ver [`11-plan-de-cierre.md`](11-plan-de-cierre.md).
+ADR planificadas: **0011** BFF como capa formal (Fase 2) y **0012** zona horaria
+por negocio (Fase 4). Ver [`11-plan-de-cierre.md`](11-plan-de-cierre.md).
 
 ## Documentación por servicio
 

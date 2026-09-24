@@ -9,19 +9,21 @@ servicio, una prueba de humo end-to-end y verificaciones manuales de operación.
 make smoke
 ```
 
-Ejecuta **44 comprobaciones** contra el sistema en ejecución, usando el API
-Gateway como un cliente real. Resultado esperado: `44 pruebas exitosas, 0 fallidas`.
+Ejecuta **73 comprobaciones** contra el sistema en ejecución, usando el API
+Gateway como un cliente real. Resultado esperado: `73 pruebas exitosas, 0 fallidas`.
 
 | Bloque | Qué verifica | Comprobaciones |
 | --- | --- | --- |
 | 1. Salud | Los cinco servicios de aplicación responden `UP` | 5 |
-| 2. Autenticación | Login devuelve token; el token es **RS256**; trae el negocio; el **JWKS** publica la llave; el refresco emite uno nuevo; el token refrescado autentica; **reutilizar un token rotado → `401`** | 7 |
-| 3. Control de acceso y auditoría | Sin token → `401`; token falsificado → `401`; cabecera `X-User-Id` inyectada → **ignorada**; **cadena de auditoría intacta**; entradas verificadas; **el intento fallido queda en la bitácora**; **el reuso de token queda en la bitácora** | 7 |
-| 4. Clientes y cifrado | Crear cliente; detalle con documento completo; listado **enmascarado**; texto **cifrado** en PostgreSQL; índice ciego correcto; **búsqueda por documento** | 6 |
-| 5. Inventario y venta | Crear producto; entrada deja 10 unidades; venta por `35700.00`; IVA desagregado `5700.00`; stock baja a 7; **kardex** con 2 movimientos; sobreventa → `409` | 8 |
-| 6. Evento y tablero | La venta llega al modelo de lectura; MongoDB guarda el evento; el tablero la reporta; **la vista compuesta trae las 7 vistas en una petición**; sin vistas caídas; **la zona horaria del negocio viaja en la respuesta** | 6 |
+| 2. Autenticación y cookie | Login; **RS256**; negocio en el token; **JWKS**; el refresh **no viaja en el cuerpo**; la cookie es **httpOnly + SameSite=Strict**; rotación; el token refrescado autentica; **reuso → `401`**; **el reuso revoca la familia completa**; logout 204 y borra la cookie | 14 |
+| 3. Acceso, auditoría y bloqueo | Sin token → `401`; token falsificado → `401`; cabecera inyectada → **ignorada**; **5 intentos fallidos bloquean la cuenta**; **cadena intacta**; entradas verificadas; **versión vigente del hash**; `LOGIN_FAILED`, `ACCOUNT_LOCKED` y `REFRESH_REUSE_DETECTED` en la bitácora | 11 |
+| 4. Clientes, cifrado y RLS | Crear cliente; detalle completo; listado **enmascarado**; texto **cifrado**; índice ciego; **búsqueda por documento**; **RLS: sin contexto 0 filas, con contexto > 0** | 8 |
+| 5. Inventario, venta y outbox | Producto; entrada de 10; venta por `35700.00`; IVA `5700.00`; stock 7; kardex 2; sobreventa → `409`; **el evento queda en la bandeja**; **se publica**; **RLS en ERP** (0 y > 0) | 12 |
+| 6. Evento y tablero | Proyección en analítica; evento en MongoDB; tablero; **vista compuesta con las 7 vistas**; sin vistas caídas; zona horaria; **outbox sin fallidos** | 7 |
 | 7. Anulación | La venta queda `VOIDED`; el inventario vuelve a 10 | 2 |
-| 8. Aislamiento | Un segundo negocio no ve clientes ni catálogo del primero | 3 |
+| 8. Aislamiento | Un segundo negocio no ve clientes ni catálogo; **RLS en IAM** (0 filas sin contexto) | 4 |
+| 9. Recuperación de contraseña | Solicitud 204; enlace en el buzón; consumo 204; **la cuenta se desbloquea con la clave nueva**; el enlace **no se reutiliza**; sin enumeración de usuarios | 6 |
+| 10. Límite de tasa y TLS | **Límite por usuario** activo; HTTPS 200; HTTP → HTTPS (308); HSTS | 4 |
 
 La prueba es **idempotente**: crea sus propios datos con marcas de tiempo y puede
 ejecutarse tantas veces como haga falta.
@@ -29,7 +31,7 @@ ejecutarse tantas veces como haga falta.
 ## 2. Pruebas unitarias por servicio
 
 ```bash
-# kubo-iam — firma de tokens y JWKS (3 pruebas)
+# kubo-iam — tokens, JWKS y hash de auditoría versionado (7 pruebas)
 cd kubo-iam && mvn test
 
 # kubo-gateway — tabla de rutas y rutas públicas (3 pruebas)
@@ -38,36 +40,37 @@ cd kubo-gateway && npm test
 # kubo-crm — cifrado de campos (8 pruebas, sin base de datos)
 cd kubo-crm && ruby test/field_cipher_test.rb
 
-# kubo-erp — aritmética de dinero (4 pruebas, sin base de datos)
-cd kubo-erp && mix test test/kubo_erp/sales_totals_test.exs
+# kubo-erp — aritmética de dinero y outbox (7 pruebas, sin base de datos)
+docker run --rm -m 3g -e MIX_ENV=test \
+  -v "$PWD/kubo-erp/test:/app/test:ro" --entrypoint bash kubo-kubo-erp \
+  -c "cd /app && mix compile >/dev/null 2>&1 && ERL_LIBS=/app/_build/test/lib \
+      elixir -e 'ExUnit.start(); Code.require_file(\"test/kubo_erp/sales_totals_test.exs\"); \
+      Code.require_file(\"test/kubo_erp/outbox_test.exs\")'"
 
 # kubo-analytics — conversión de eventos (6 pruebas, sin MongoDB)
 cd kubo-analytics && pip install -r requirements-dev.txt && pytest -q
 ```
 
-**Total: 24 pruebas unitarias** más 44 comprobaciones end-to-end.
+**Total: 31 pruebas unitarias** más 73 comprobaciones end-to-end.
 
 ### Cómo ejecutar cada suite
 
 ```bash
-make smoke                                    # 44 comprobaciones end-to-end
+make smoke                                    # 73 comprobaciones end-to-end
+make bus-drill                                # 4 comprobaciones: caida del bus
+make restore-drill                            # 14 comprobaciones: restauracion
 
-cd kubo-iam        && mvn test                # 3 pruebas
+cd kubo-iam        && mvn test                # 7 pruebas
 cd kubo-gateway    && npm test                # 3 pruebas
 cd kubo-crm        && ruby test/field_cipher_test.rb   # 8 pruebas
 cd kubo-analytics  && pytest -q               # 6 pruebas
 ```
 
-Las 4 pruebas de `kubo-erp` son puras (aritmética decimal) y **no pueden ejecutarse
-dentro del contenedor de producción**: al compilar el entorno de pruebas el
-contenedor se queda sin memoria (límite de 512 MB). Se ejecutan en un contenedor
-con más memoria o en CI:
-
-```bash
-docker run --rm -m 3g -v "$PWD/kubo-erp:/app" -w /app -e MIX_ENV=test elixir:1.17-slim \
-  bash -c "mix local.hex --force && mix local.rebar --force && mix deps.get && mix compile &&
-           ERL_LIBS=/app/_build/test/lib elixir -e 'ExUnit.start(); Code.require_file(\"test/kubo_erp/sales_totals_test.exs\")'"
-```
+Las 7 pruebas de `kubo-erp` son puras (aritmética decimal y outbox) y **no pueden
+ejecutarse dentro del contenedor de producción**: al compilar el entorno de
+pruebas el contenedor se queda sin memoria (límite de 512 MB), y además la imagen
+de ejecución no incluye `test/`. Se ejecutan con más memoria y el directorio de
+pruebas montado (comando completo arriba), o en CI con 3 GB.
 
 ### Qué cubren las pruebas unitarias
 
@@ -92,6 +95,7 @@ docker run --rm -m 3g -v "$PWD/kubo-erp:/app" -w /app -e MIX_ENV=test elixir:1.1
 | 7 | Abrir un cliente | Documento completo; en el listado, enmascarado |
 | 8 | Registrar una entrada de inventario | El stock sube y el movimiento queda en el kardex |
 | 9 | Intentar vender más unidades que el stock | Mensaje «Stock insuficiente» con la cantidad disponible |
+| 10 | En el ingreso, «¿Olvidaste tu contraseña?» → pedir el enlace | El correo queda en el buzón de demostración (`mail_outbox`) y el enlace de `/recuperar?token=…` permite elegir una contraseña nueva |
 
 ## 4. Verificación de seguridad
 
@@ -141,7 +145,6 @@ El detalle de las mediciones, los planes de ejecución y su análisis están en
 
 | Prueba | ID · Fase | Por qué falta |
 | --- | --- | --- |
-| Simulacro de restauración de respaldo | P-05 · Fase 1 | Documentado, no ejecutado |
 | Integración con base de datos real por servicio | P-08 · Fase 2 | Requiere Testcontainers por lenguaje |
 | Contratos (Pact/OpenAPI) automatizados | P-09 · Fase 2 | Hoy el contrato se verifica en la prueba de humo |
 | Carga (k6): 50 cajas simultáneas | P-10 · Fase 2 | Falta escenario de estrés |

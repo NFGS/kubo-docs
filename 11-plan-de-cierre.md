@@ -6,7 +6,7 @@
 | Objetivo | Producto comercializable en la región (Fases 0–4); la Fase 5 queda como backlog declarado |
 | Punto de partida | 44/44 comprobaciones en verde · 10 contenedores sanos · 9 repositorios limpios |
 | Dedicación | ~30 h/semana (≈ 3.75 jornadas de 8 h) |
-| Estado | Fase 0 completada · Fases 1–4 planificadas · Fase 5 declarada |
+| Estado | Fases 0 y 1 completadas · Fases 2–4 planificadas · Fase 5 declarada |
 
 Este documento ordena los 31 pendientes de [`10-auditoria.md`](10-auditoria.md) en
 fases con criterio de cierre medible. No sustituye a la auditoría: la usa como
@@ -69,6 +69,25 @@ navegable desde el índice.
 **Criterio de aceptación**: prueba de caída del bus sin pérdida de eventos · una
 consulta sin filtro de tenant devuelve cero filas · restauración completa
 cronometrada por debajo de 4 h · `make smoke` con ≥ 55 comprobaciones en verde.
+
+**Estado: completada (2026-09-24).** Evidencia: `make smoke` **73/73** ·
+`make bus-drill` **4/4** (venta con el bus caído, evento `PENDING`, publicación al
+volver) · `make restore-drill` **14/14** con RTO de 6 s · consulta sin contexto =
+**0 filas** en IAM, CRM y ERP · ADR-0009 y ADR-0010 aceptados.
+
+Dos defectos reales aparecieron al integrar la fase y quedaron corregidos:
+
+1. **RLS en transacciones `REQUIRES_NEW`**: el contador de intentos fallidos y la
+   revocación de la familia de tokens corrían en otra conexión sin contexto y
+   actualizaban cero filas en silencio (el sistema detectaba el robo y no cerraba
+   nada). `SecurityIncidentService` ahora fija su propia marca de sistema, y el
+   humo comprueba la revocación completa de la familia.
+2. **Transacciones anidadas de Ecto sin savepoint**: un `Repo.rollback` de negocio
+   (stock insuficiente) abortaba la transacción externa del interceptor y tumbaba
+   la petición después de responder. `Repo.scoped_transaction/1` usa savepoints.
+   En el mismo paso se corrigió un contrato roto del ERP: `Catalog.adjust_stock`
+   devolvía `{:ok, {product, movement}}` y el controlador esperaba
+   `{:ok, product, movement}` (el ajuste de inventario respondía 500).
 
 ### Fase 2 — Calidad y observabilidad (≈4 semanas)
 
@@ -134,14 +153,17 @@ flowchart LR
   F4 --> F5["Fase 5 · Escala<br/>backlog declarado"]
 ```
 
-| Hito | Duración | Semanas acumuladas |
-| --- | --- | --- |
-| Fase 0 | 2–3 h | día 1 |
-| Fase 1 | ≈3 semanas | 1–3 |
-| Fase 2 | ≈4 semanas | 4–7 |
-| Fase 3 | 5–7 semanas | 8–14 |
-| Fase 4 | 5–6 semanas | 15–20 |
-| **Producto comercializable** | **≈17–20 semanas** | **~4–5 meses a 30 h/semana** |
+| Hito | Duración | Semanas acumuladas | Estado |
+| --- | --- | --- | --- |
+| Fase 0 | 2–3 h | día 1 | Completada |
+| Fase 1 | ≈3 semanas | 1–3 | Completada |
+| Fase 2 | ≈4 semanas | 4–7 | Siguiente |
+| Fase 3 | 5–7 semanas | 8–14 | Planificada |
+| Fase 4 | 5–6 semanas | 15–20 | Planificada |
+| **Producto comercializable** | **≈17–20 semanas** | **~4–5 meses a 30 h/semana** | — |
+
+Con las fases 0 y 1 cerradas, el camino restante a producto comercializable es de
+**≈14–17 semanas** a 30 h/semana (fases 2 a 4).
 
 ## 5. Definición de «proyecto terminado»
 
