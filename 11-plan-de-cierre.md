@@ -338,10 +338,41 @@ tras un reinicio. Solo necesita `ansible-core` (sin colecciones) y se verifica
 con `--syntax-check`. La operación —respaldar, actualizar, rotar la CA
 (`make rotate-ca`)— queda en el README del playbook.
 
+**Multi-tenant SaaS: ADR-0021 y primer corte implementado.** El SaaS es un
+**modo de despliegue** del mismo producto (no un fork). El plan es un dato del
+negocio que viaja en el token (`tenant_plan`) y **cada servicio aplica los cupos
+de los recursos que posee**: IAM limita los usuarios activos del plan (5 en
+`community`, 25 en `pro`; los deshabilitados no ocupan asiento) y el ERP limita
+las bodegas (2 y 10). Un negocio **suspendido** no inicia sesión
+(`TENANT_SUSPENDED`) pero conserva sus datos intactos y exportables, y hay
+catálogo de planes (`GET /tenants/plans`). Evidencia: IAM **48 pruebas**
+(cupo y suspensión), ERP puras con `Plans`, humo **157/157** (cupo de usuarios en
+el negocio aislado y cupo de bodegas en la demo). Pendiente declarado: medir uso
+agregado, pasarela de pago automática y panel del operador.
+
+**Operador de respaldos: ADR-0022 e implementado.** Contenedor `kubo-backup`
+(perfil `backup`) que corre el ciclo **respaldo → retención → verificación →
+manifiesto** sin socket de Docker: habla con Postgres y Mongo por la red del
+compose, **incluye el volumen de documentos** (el hueco real: los XML de facturas
+y comprobantes no estaban en el respaldo), **restaura en bases de usar y tirar y
+compara conteos** con el origen, y deja un manifiesto con el resultado y el
+**SHA-256** de cada archivo. Retención por días conservando un mínimo, copia
+fuera del sitio opcional y `make backup-operator` / `make backup-operator-loop`.
+Evidencia: ciclo real con `verificacion=ok` y conteos coincidentes
+(`users 185/185`, `customers 118/118`, `products 276/276`, `sales 310/310`).
+
+**App móvil: ADR-0023 (decisión).** La PWA es la interfaz mientras el navegador
+alcance; cuando el negocio pida cámara/código de barras, push, biometría o
+impresión térmica, se **envuelve con Capacitor** en lugar de reescribir, con el
+mismo API y contrato. No se escribe nativo hoy.
+
 | ID | Línea de trabajo |
 | --- | --- |
 | P-28 | mTLS entre gateway y servicios — **completado** |
 | — | Instalación remota (Ansible) — **completado** |
+| — | Multi-tenant SaaS (ADR-0021) — **primer corte implementado** |
+| — | Operador de respaldos (ADR-0022) — **completado** |
+| — | App móvil (ADR-0023) — **decisión tomada; sin trabajo hasta que el negocio lo pida** |
 | P-29 | Rotación de claves de cifrado de campo (KEK/DEK) — **completado** |
 | — | Instalación remota (Terraform/Ansible) |
 | — | Multi-tenant SaaS (onboarding y zona horaria por negocio) |
