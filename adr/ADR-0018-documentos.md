@@ -54,8 +54,14 @@ Los hechos que enmarcan la decisión:
   documenta en el runbook; el `backup.sh` deberá incluir el volumen); si algún día
   los documentos crecen a millones de objetos o varios servicios necesitan
   consumirlos, este ADR se revisa —la migración es barata porque los metadatos y
-  la clave ya están separados—. El PDF del comprobante sigue generándose en el
-  navegador (impresión), no en el servidor: no se introduce un motor de PDF.
+  la clave ya están separados—.
+- **Enmienda (misma fecha)**: el comprobante **también se genera en el servidor**
+  con un **escritor mínimo** (`ReceiptPdf`: objetos PDF, `xref` con
+  desplazamientos reales y Courier con WinAnsi para los acentos), sin introducir
+  un motor de PDF —sin tipografías, imágenes ni varias páginas—. Así el
+  comprobante queda como documento descargable y archivado, y el navegador sigue
+  pudiendo imprimirlo. El **adaptador de almacenamiento de objetos** (Cloudinary,
+  firma SHA-1 y URL determinista) cierra el puerto por el otro extremo.
 
 ## Verificación
 
@@ -66,8 +72,11 @@ Los hechos que enmarcan la decisión:
   documento descargable con su **SHA-256** verificado, y la compra acepta un
   soporte adjunto (rechazando un formato no soportado).
 - `make contracts` (**20/20**): `DocumentList` validado contra la API viva.
+- `make smoke` (**154/154**): la venta deja su **comprobante en PDF** (cabecera
+  `%PDF-1.4`, número de la venta dentro del archivo) además del XML de la
+  factura; la CA de la malla se verifica con 30 días de vigencia.
 - **Soportes de compra**: `POST /purchases/:id/documents` acepta el archivo
   (multipart, hasta 5 MB, formatos de documento e imagen) y lo liga a la compra;
   un formato no soportado responde `INVALID_EXTENSION`.
-- **Pendiente declarado**: PDF del comprobante en servidor (el navegador ya
-  imprime) y el adaptador de almacenamiento de objetos.
+- **Sin pendientes en este ADR**: el comprobante en servidor y el adaptador de
+  objetos quedaron implementados; los soportes de compra adjuntos también.

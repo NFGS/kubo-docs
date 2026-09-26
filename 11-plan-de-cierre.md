@@ -329,9 +329,19 @@ humo **150/150** (incluye la comprobación negativa: sin certificado no hay
 handshake), `make ci` **10/10**. Un contenedor añadido a la red ya no puede
 suplantar identidad con cabeceras.
 
+**Instalación remota: playbook de Ansible (`kubo-infra/ansible/`).** Deja el
+sistema corriendo en un servidor limpio con **secretos únicos generados en el
+host** (bases, RabbitMQ, firma, TOTP y contraseña inicial), la malla cifrada
+creada allí y el cortafuegos abriendo solo la PWA y el borde TLS; Docker queda
+habilitado, de modo que los servicios (`restart: unless-stopped`) vuelven solos
+tras un reinicio. Solo necesita `ansible-core` (sin colecciones) y se verifica
+con `--syntax-check`. La operación —respaldar, actualizar, rotar la CA
+(`make rotate-ca`)— queda en el README del playbook.
+
 | ID | Línea de trabajo |
 | --- | --- |
 | P-28 | mTLS entre gateway y servicios — **completado** |
+| — | Instalación remota (Ansible) — **completado** |
 | P-29 | Rotación de claves de cifrado de campo (KEK/DEK) — **completado** |
 | — | Instalación remota (Terraform/Ansible) |
 | — | Multi-tenant SaaS (onboarding y zona horaria por negocio) |
