@@ -318,9 +318,20 @@ integración **3/3** con PostgreSQL real. Operación: `rake kubo:rotate_field_ke
 (agregar la llave nueva a `KUBO_FIELD_ENCRYPTION_KEYS`, correr la tarea, retirar
 las viejas cuando el resumen diga 0 rotadas).
 
+**P-28 · mTLS entre gateway y servicios: completado (ADR-0020).** Una CA interna
+propia (`make certs`, no versionada) firma un certificado por servicio; cada
+servicio exige el certificado del cliente (`client-auth: need`, `verify_mode:
+peer`, `fail_if_no_peer_cert`) y el gateway es el único cliente de la malla
+(agente de `undici` con CA y certificado, compartido por el proxy, el BFF de
+autenticación, el tablero y la descarga del JWKS). Los SAN incluyen `localhost`
+para que los healthchecks también ejerzan la verificación de nombre. Evidencia:
+humo **150/150** (incluye la comprobación negativa: sin certificado no hay
+handshake), `make ci` **10/10**. Un contenedor añadido a la red ya no puede
+suplantar identidad con cabeceras.
+
 | ID | Línea de trabajo |
 | --- | --- |
-| P-28 | mTLS entre gateway y servicios |
+| P-28 | mTLS entre gateway y servicios — **completado** |
 | P-29 | Rotación de claves de cifrado de campo (KEK/DEK) — **completado** |
 | — | Instalación remota (Terraform/Ansible) |
 | — | Multi-tenant SaaS (onboarding y zona horaria por negocio) |

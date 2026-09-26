@@ -43,6 +43,7 @@ la primera vez y para consultarse por secciones después.
 | [0017](adr/ADR-0017-puerto-notificaciones.md) | Puerto de notificaciones y buzón del negocio |
 | [0018](adr/ADR-0018-documentos.md) | Documentos en el ERP con puerto de almacenamiento |
 | [0019](adr/ADR-0019-rotacion-de-claves.md) | Rotación de claves de cifrado de campo (KEK/DEK) |
+| [0020](adr/ADR-0020-mtls-interno.md) | mTLS en la malla interna |
 
 Las siguientes ADR se registran al abrir cada paso de la Fase 4. Ver
 [`11-plan-de-cierre.md`](11-plan-de-cierre.md).
