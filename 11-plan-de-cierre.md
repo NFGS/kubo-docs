@@ -401,7 +401,7 @@ cierre porque es el trabajo vivo del producto.
 | F6.1 | Medición de uso por negocio (usuarios, bodegas, productos, ventas del mes, documentos) | 2–3 d | **Completado** |
 | F6.2 | Cobro: renovación del plan (fecha) y registro manual del pago en la herramienta del operador | 1–2 d | **Completado** |
 | F6.3 | Adaptador de objeto para el destino de los respaldos (hoy disco + copia fuera del sitio) | 1 d | **Completado** |
-| F6.4 | Panel del operador (listar, suspender, renovar) — requiere el rol de plataforma (ADR-0025) | 3–5 d | Decidido (ADR-0025) |
+| F6.4 | Panel del operador (listar, suspender, renovar) — requiere el rol de plataforma (ADR-0025) | 3–5 d | **Completado** |
 | F6.5 | Métricas de producto y soporte (uso agregado, errores por negocio) | continuo | **Completado** |
 | F6.6 | Pasarela de pago automática como adaptador del puerto de cobro (ADR-0026) | 3–5 d | Decidido (ADR-0026) |
 
@@ -417,12 +417,20 @@ cierre porque es el trabajo vivo del producto.
   síntoma de un problema de soporte). Solo cuenta filas: nunca lee datos de
   negocio. Evidencia: salida real con la demo y los negocios de prueba (el
   negocio del bloqueo muestra sus 5 accesos fallidos).
-- **F6.4 y F6.6 quedan decididos antes de construirse**: **ADR-0025** (rol de
-  plataforma separado de los roles del negocio, 2FA obligatorio, reino de token
-  propio, poder mínimo sin leer datos de negocio, auditoría propia y límite de
-  tasa) y **ADR-0026** (puerto de cobro con `payment_intents`, idempotencia por
-  referencia del proveedor, webhooks firmados como fuente de verdad y la
-  suspensión siempre humana).
+- **F6.4 Panel del operador (ADR-0025): completado.** Reino de plataforma
+  separado del negocio: tabla `platform_admins` (nunca un usuario de tenant),
+  **segundo factor obligatorio** (el acceso siempre pide el código), token con
+  `platform: true` que el gateway exige para `/platform/*` y **rechaza** en el
+  API del negocio (y al revés), poder mínimo (listar, suspender, reactivar y
+  renovar —jamás leer ventas, clientes ni documentos—), **auditoría propia** en
+  `platform_audit` y el panel en `/plataforma` con su propio acceso. Evidencia:
+  IAM **54 pruebas** (incluido el flujo positivo con el secreto bajo control),
+  humo **167/167** (el acceso exige el código, un código inválido no abre sesión
+  y un token de negocio responde 403 en el panel), E2E **5/5** con la página
+  auditada.
+- **F6.6 queda decidido antes de construirse**: **ADR-0026** (puerto de cobro con
+  `payment_intents`, idempotencia por referencia del proveedor, webhooks firmados
+  como fuente de verdad y la suspensión siempre humana).
 
 **Criterio de aceptación de F6.1–F6.2: cumplido.**
 

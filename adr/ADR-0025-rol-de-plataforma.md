@@ -56,8 +56,15 @@ la forma de leer los datos de todos los clientes.
 
 ## Verificación
 
-- `make smoke`: un token de negocio contra `/platform/*` responde 403; un token
-  de plataforma contra `/products` responde 403; el panel lista negocios y
-  suspende/activa/renueva con su auditoría.
-- `kubo-iam`: pruebas del reino de token (claim ausente, claim de negocio,
-  claim de plataforma) y del segundo factor obligatorio.
+- `make smoke` (**167/167**): el acceso de plataforma **siempre** pide el código
+  (`totpRequired`), un código inválido responde `INVALID_TOTP` y un token de
+  negocio contra `/platform/tenants` responde **403**.
+- `kubo-iam` (**54 pruebas**, cobertura cumplida): el flujo positivo con el
+  secreto bajo control (acceso → código vigente → token), la contraseña
+  incorrecta auditada, la suspensión, la renovación (extiende desde la fecha
+  vigente) y el listado con la marca de sistema.
+- `make e2e` (**5/5**): la página del panel pasa la auditoría de accesibilidad.
+- **Pendiente declarado**: el uso agregado del ERP (productos, bodegas, ventas,
+  documentos) dentro del panel —hoy el operador lo ve con
+  `tenant-admin.sh usage`— requiere un endpoint de sistema en el ERP; y la
+  rotación del secreto TOTP del operador.
