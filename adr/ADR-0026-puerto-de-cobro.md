@@ -3,7 +3,7 @@
 | Campo | Valor |
 | --- | --- |
 | Fecha | 2026-09-24 |
-| Estado | Aceptada (Fase 6) |
+| Estado | Aceptada e implementada (Fase 6) |
 | Relacionada | ADR-0021 (multi-tenant SaaS) · ADR-0025 (rol de plataforma) |
 
 ## Contexto
@@ -57,5 +57,11 @@ decisión es **puerto + adaptador**, no acoplar el núcleo a un proveedor.
 - `kubo-iam`: un evento firmado válido marca el pago `PAID` y extiende la
   renovación; un evento repetido **no** la extiende otra vez; una firma inválida
   responde 401 y no toca nada.
-- `make smoke`: el camino manual sigue funcionando (el operador renueva y la
-  fecha queda) y el intento de pago queda registrado.
+- `make smoke` (F6.6 implementado): el negocio pide pagar (`POST
+  /tenants/me/payments`) y el monto sale del catálogo; el webhook sin firma
+  responde 401; el webhook firmado confirma el pago y extiende la vigencia; un
+  reintento responde igual y **no** extiende otra vez; un monto distinto al de la
+  intención se rechaza (`AMOUNT_MISMATCH`). 176/176.
+- El panel del operador lista los pagos pendientes con el negocio y registra el
+  pago manual (`POST /platform/payments/{id}/confirm`), que es el mismo camino
+  que usa un proveedor: una sola historia de pagos.

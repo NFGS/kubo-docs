@@ -6,7 +6,7 @@
 | Objetivo | Producto comercializable en la región (Fases 0–4); la Fase 5 queda como backlog declarado |
 | Punto de partida | 44/44 comprobaciones en verde · 10 contenedores sanos · 9 repositorios limpios |
 | Dedicación | ~30 h/semana (≈ 3.75 jornadas de 8 h) |
-| Estado | Fases 0–4 completadas · Fase 5 completada salvo el backlog comercial · **Fase 6 (operación y comercial) en curso** |
+| Estado | Fases 0–4 completadas · Fase 5 completada salvo el backlog comercial · **Fase 6 (operación y comercial) completada**: F6.1–F6.6 construidos y verificados; quedan las mejoras continuas (métricas, rotación del segundo factor del operador) |
 
 Este documento ordena los 31 pendientes de [`10-auditoria.md`](10-auditoria.md) en
 fases con criterio de cierre medible. No sustituye a la auditoría: la usa como
@@ -393,6 +393,7 @@ ordena en la Fase 6.
 ### Fase 6 — Operación y comercial (continuo)
 
 La Fase 5 dejó el producto listo para operarse; la Fase 6 es **operarlo**: saber
+(F6.1–F6.6 completados; las métricas de F6.5 y las mejoras de operación siguen)
 cuánto usa cada negocio, cobrar, atender y decidir con datos. No tiene fecha de
 cierre porque es el trabajo vivo del producto.
 
@@ -403,7 +404,7 @@ cierre porque es el trabajo vivo del producto.
 | F6.3 | Adaptador de objeto para el destino de los respaldos (hoy disco + copia fuera del sitio) | 1 d | **Completado** |
 | F6.4 | Panel del operador (listar, suspender, renovar) — requiere el rol de plataforma (ADR-0025) | 3–5 d | **Completado** |
 | F6.5 | Métricas de producto y soporte (uso agregado, errores por negocio) | continuo | **Completado** |
-| F6.6 | Pasarela de pago automática como adaptador del puerto de cobro (ADR-0026) | 3–5 d | Decidido (ADR-0026) |
+| F6.6 | Pasarela de pago automática como adaptador del puerto de cobro (ADR-0026) | 3–5 d | **Completado** |
 
 - **F6.3 Copia fuera del sitio como puerto**: el operador usa **rclone**, que
   acepta tanto una ruta montada (disco, NFS) como un remoto configurado (S3, B2,
@@ -428,9 +429,19 @@ cierre porque es el trabajo vivo del producto.
   humo **167/167** (el acceso exige el código, un código inválido no abre sesión
   y un token de negocio responde 403 en el panel), E2E **5/5** con la página
   auditada.
-- **F6.6 queda decidido antes de construirse**: **ADR-0026** (puerto de cobro con
-  `payment_intents`, idempotencia por referencia del proveedor, webhooks firmados
-  como fuente de verdad y la suspensión siempre humana).
+- **F6.6 Puerto de cobro (ADR-0026): completado.** Los pagos son datos
+  (`payment_intents` + `plan_prices`, migración V11): el negocio pide pagar su
+  plan desde Configuración —el monto sale del catálogo, nunca del cliente—, el
+  operador lo registra desde el panel (pagos pendientes con el nombre del
+  negocio) y un proveedor real confirma por **webhook firmado** (HMAC-SHA256 del
+  cuerpo crudo) que es la fuente de verdad. La renovación se deriva de un pago
+  pagado y es **idempotente por referencia del proveedor**: un reintento no
+  extiende dos veces el plan (índice único `(proveedor, referencia)`); un monto
+  distinto al de la intención se rechaza y la suspensión sigue siendo humana.
+  Evidencia: IAM **61 pruebas** (7 del puerto, con idempotencia y firma), humo
+  **176/176** (precio del catálogo, webhook sin firma → 401, webhook firmado
+  confirma y extiende, reintento no extiende, monto distinto → 422), contratos
+  **23/23** (`PriceList`, `PaymentItem`).
 
 **Criterio de aceptación de F6.1–F6.2: cumplido.**
 
@@ -471,7 +482,7 @@ flowchart LR
 | Fase 3 | 5–7 semanas | 8–14 | Completada |
 | Fase 4 | 5–6 semanas | 15–20 | Completada |
 | Fase 5 | backlog | — | Completada salvo el backlog comercial |
-| Fase 6 | continuo | — | **En curso** |
+| Fase 6 | continuo | — | **Completada** (F6.1–F6.6; las métricas siguen) |
 | **Producto comercializable** | **≈17–20 semanas** | **~4–5 meses a 30 h/semana** | **Alcanzado** |
 
 Con las fases 0 y 1 cerradas, el camino restante a producto comercializable es de

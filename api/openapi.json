@@ -6,7 +6,10 @@
     "description": "Contrato del API Gateway de Kubo. Los esquemas de components.schemas se validan contra las respuestas reales con `make contracts` (kubo-gateway/scripts/contracts.mjs)."
   },
   "servers": [
-    { "url": "http://localhost:9080/api/v1", "description": "Gateway local" }
+    {
+      "url": "http://localhost:9080/api/v1",
+      "description": "Gateway local"
+    }
   ],
   "paths": {
     "/auth/login": {
@@ -17,7 +20,9 @@
             "description": "Sesion creada. El refresh token viaja en cookie httpOnly, no en el cuerpo.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
               }
             }
           },
@@ -25,7 +30,9 @@
             "description": "Credenciales invalidas o cuenta bloqueada",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
@@ -40,7 +47,9 @@
             "description": "Perfil",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/User" }
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
               }
             }
           }
@@ -56,10 +65,18 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["challengeToken", "code"],
+                "required": [
+                  "challengeToken",
+                  "code"
+                ],
                 "properties": {
-                  "challengeToken": { "type": "string" },
-                  "code": { "type": "string", "pattern": "^\\d{6}$" }
+                  "challengeToken": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string",
+                    "pattern": "^\\d{6}$"
+                  }
                 }
               }
             }
@@ -70,14 +87,20 @@
             "description": "Sesion emitida",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
               }
             }
           },
           "401": {
             "description": "Desafio o codigo invalidos",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
@@ -91,7 +114,9 @@
             "description": "Secreto y URI otpauth",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/TotpSetup" }
+                "schema": {
+                  "$ref": "#/components/schemas/TotpSetup"
+                }
               }
             }
           }
@@ -106,14 +131,20 @@
             "description": "Perfil actualizado",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/User" }
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
               }
             }
           },
           "401": {
             "description": "Codigo invalido",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
@@ -127,14 +158,20 @@
             "description": "Perfil actualizado",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/User" }
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
               }
             }
           },
           "401": {
             "description": "Codigo invalido",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
@@ -144,17 +181,45 @@
       "get": {
         "summary": "Catalogo paginado",
         "parameters": [
-          { "name": "q", "in": "query", "schema": { "type": "string" } },
-          { "name": "low_stock", "in": "query", "schema": { "type": "string" } },
-          { "name": "limit", "in": "query", "schema": { "type": "integer", "maximum": 200 } },
-          { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0 } }
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "low_stock",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "Pagina del catalogo con el total real",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ProductList" }
+                "schema": {
+                  "$ref": "#/components/schemas/ProductList"
+                }
               }
             }
           }
@@ -165,14 +230,24 @@
       "get": {
         "summary": "Detalle de producto",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "Producto",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ProductItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/ProductItem"
+                }
               }
             }
           }
@@ -187,7 +262,9 @@
             "description": "Listado",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CustomerList" }
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerList"
+                }
               }
             }
           }
@@ -202,7 +279,9 @@
             "description": "Pagina de ventas con el total real",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SaleList" }
+                "schema": {
+                  "$ref": "#/components/schemas/SaleList"
+                }
               }
             }
           }
@@ -217,7 +296,9 @@
             "description": "Pagina de proveedores con el total real",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SupplierList" }
+                "schema": {
+                  "$ref": "#/components/schemas/SupplierList"
+                }
               }
             }
           }
@@ -232,7 +313,9 @@
             "description": "Pagina de compras con el total real",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PurchaseList" }
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseList"
+                }
               }
             }
           }
@@ -247,7 +330,9 @@
             "description": "Pagina de usuarios",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UsersPage" }
+                "schema": {
+                  "$ref": "#/components/schemas/UsersPage"
+                }
               }
             }
           }
@@ -262,7 +347,9 @@
             "description": "Turno abierto, con el esperado en caja, o data null si no hay caja abierta",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CashSessionCurrent" }
+                "schema": {
+                  "$ref": "#/components/schemas/CashSessionCurrent"
+                }
               }
             }
           }
@@ -277,7 +364,9 @@
             "description": "Vistas del tablero en una sola respuesta",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OverviewResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewResponse"
+                }
               }
             }
           }
@@ -293,13 +382,19 @@
             "name": "from",
             "in": "query",
             "required": false,
-            "schema": { "type": "string", "format": "date" }
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
           },
           {
             "name": "to",
             "in": "query",
             "required": false,
-            "schema": { "type": "string", "format": "date" }
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
           }
         ],
         "responses": {
@@ -307,7 +402,9 @@
             "description": "Ventas en CSV (numero, fecha, cliente, medio_pago, estado, subtotal, impuesto, total)",
             "content": {
               "text/csv": {
-                "schema": { "type": "string" }
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           },
@@ -315,7 +412,9 @@
             "description": "Rango de fechas invalido",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
@@ -330,7 +429,9 @@
             "description": "Inventario en CSV (sku, nombre, stock, stock_minimo, costo, precio, valor_inventario)",
             "content": {
               "text/csv": {
-                "schema": { "type": "string" }
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -346,7 +447,9 @@
             "description": "Uso del negocio",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UsageItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/UsageItem"
+                }
               }
             }
           }
@@ -361,7 +464,9 @@
             "description": "Metadatos de los ultimos documentos, sin los bytes",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DocumentList" }
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentList"
+                }
               }
             }
           }
@@ -372,20 +477,40 @@
       "get": {
         "summary": "Descarga el contenido de un documento",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "Contenido del documento con su tipo MIME",
             "content": {
-              "application/xml": { "schema": { "type": "string" } },
-              "application/pdf": { "schema": { "type": "string", "format": "binary" } }
+              "application/xml": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
             }
           },
           "404": {
             "description": "El documento no existe o su contenido no esta disponible",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
@@ -399,7 +524,9 @@
             "description": "Ultimos avisos, del mas reciente al mas antiguo",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/NotificationList" }
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationList"
+                }
               }
             }
           }
@@ -414,7 +541,9 @@
             "description": "Bodegas activas, la por defecto primero",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/WarehouseList" }
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseList"
+                }
               }
             }
           }
@@ -428,10 +557,16 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name"],
+                "required": [
+                  "name"
+                ],
                 "properties": {
-                  "name": { "type": "string" },
-                  "address": { "type": "string" }
+                  "name": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  }
                 }
               }
             }
@@ -442,7 +577,9 @@
             "description": "Bodega creada",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/WarehouseItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseItem"
+                }
               }
             }
           }
@@ -453,21 +590,34 @@
       "get": {
         "summary": "Bodega por id",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "Bodega",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/WarehouseItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseItem"
+                }
               }
             }
           },
           "404": {
             "description": "No existe",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
@@ -475,14 +625,27 @@
       "delete": {
         "summary": "Borra una bodega (logico). 409 si es la por defecto o tiene existencia",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
-          "204": { "description": "Borrada" },
+          "204": {
+            "description": "Borrada"
+          },
           "409": {
             "description": "Bodega por defecto o con existencia",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
@@ -496,7 +659,9 @@
             "description": "Ultimas transferencias con sus lineas",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/TransferList" }
+                "schema": {
+                  "$ref": "#/components/schemas/TransferList"
+                }
               }
             }
           }
@@ -511,19 +676,37 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["from_warehouse_id", "to_warehouse_id", "items"],
+                "required": [
+                  "from_warehouse_id",
+                  "to_warehouse_id",
+                  "items"
+                ],
                 "properties": {
-                  "from_warehouse_id": { "type": "string" },
-                  "to_warehouse_id": { "type": "string" },
-                  "notes": { "type": "string" },
+                  "from_warehouse_id": {
+                    "type": "string"
+                  },
+                  "to_warehouse_id": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
                   "items": {
                     "type": "array",
                     "items": {
                       "type": "object",
-                      "required": ["product_id", "quantity"],
+                      "required": [
+                        "product_id",
+                        "quantity"
+                      ],
                       "properties": {
-                        "product_id": { "type": "string" },
-                        "quantity": { "type": "integer", "minimum": 1 }
+                        "product_id": {
+                          "type": "string"
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
                       }
                     }
                   }
@@ -537,14 +720,20 @@
             "description": "Transferencia completada",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/TransferItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/TransferItem"
+                }
               }
             }
           },
           "409": {
             "description": "Existencia insuficiente en el origen",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
@@ -554,21 +743,34 @@
       "get": {
         "summary": "Transferencia por id",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "Transferencia con sus lineas",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/TransferItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/TransferItem"
+                }
               }
             }
           },
           "404": {
             "description": "No existe",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
@@ -582,7 +784,9 @@
             "description": "Catalogo de paquetes que el ERP sabe aplicar",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PackList" }
+                "schema": {
+                  "$ref": "#/components/schemas/PackList"
+                }
               }
             }
           }
@@ -598,7 +802,9 @@
             "description": "Paquete activo (retail por defecto)",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PackItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/PackItem"
+                }
               }
             }
           }
@@ -610,27 +816,44 @@
         "summary": "Emite la factura electronica de la venta (idempotente)",
         "description": "Puerto de facturacion (ADR-0014): si la venta ya tiene factura devuelve la existente. Una venta anulada responde 409 SALE_VOIDED.",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "201": {
             "description": "Factura emitida (o la existente)",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/InvoiceItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceItem"
+                }
               }
             }
           },
           "404": {
             "description": "La venta no existe",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           },
           "409": {
             "description": "La venta esta anulada",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
@@ -638,21 +861,34 @@
       "get": {
         "summary": "Factura emitida de la venta",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "Factura emitida",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/InvoiceItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceItem"
+                }
               }
             }
           },
           "404": {
             "description": "La venta no tiene factura emitida",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
         }
@@ -669,15 +905,29 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["data"],
+                  "required": [
+                    "data"
+                  ],
                   "properties": {
                     "data": {
                       "type": "object",
-                      "required": ["created", "skipped", "pack"],
+                      "required": [
+                        "created",
+                        "skipped",
+                        "pack"
+                      ],
                       "properties": {
-                        "created": { "type": "integer", "minimum": 0 },
-                        "skipped": { "type": "integer", "minimum": 0 },
-                        "pack": { "type": "string" }
+                        "created": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "skipped": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "pack": {
+                          "type": "string"
+                        }
                       }
                     }
                   }
@@ -696,7 +946,9 @@
             "description": "Perfil del negocio del actor",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/TenantItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/TenantItem"
+                }
               }
             }
           }
@@ -709,7 +961,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdateTenantRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTenantRequest"
+              }
             }
           }
         },
@@ -718,7 +972,9 @@
             "description": "Perfil actualizado",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/TenantItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/TenantItem"
+                }
               }
             }
           },
@@ -726,7 +982,67 @@
             "description": "Zona horaria o vertical invalidos",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/me/prices": {
+      "get": {
+        "summary": "Precios del plan del negocio",
+        "tags": [
+          "tenants"
+        ],
+        "responses": {
+          "200": {
+            "description": "Precios por ciclo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/me/payments": {
+      "get": {
+        "summary": "Historia de pagos del negocio",
+        "tags": [
+          "tenants"
+        ],
+        "responses": {
+          "200": {
+            "description": "Pagos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Solicitar el pago del plan",
+        "tags": [
+          "tenants"
+        ],
+        "responses": {
+          "200": {
+            "description": "Intencion de pago",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentItem"
+                }
               }
             }
           }
@@ -749,159 +1065,410 @@
           "pos_flow"
         ],
         "properties": {
-          "key": { "type": "string" },
-          "name": { "type": "string" },
-          "description": { "type": "string" },
-          "product_label": { "type": "string" },
-          "product_label_plural": { "type": "string" },
-          "default_tax_rate": { "type": "string" },
-          "tracks_stock": { "type": "boolean" },
-          "pos_flow": { "type": "string" }
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "product_label": {
+            "type": "string"
+          },
+          "product_label_plural": {
+            "type": "string"
+          },
+          "default_tax_rate": {
+            "type": "string"
+          },
+          "tracks_stock": {
+            "type": "boolean"
+          },
+          "pos_flow": {
+            "type": "string"
+          }
         }
       },
       "Tenant": {
         "type": "object",
-        "required": ["id", "name", "slug", "plan", "timezone", "vertical"],
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "plan",
+          "timezone",
+          "vertical"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "slug": { "type": "string" },
-          "plan": { "type": "string" },
-          "timezone": { "type": "string" },
-          "vertical": { "type": "string" },
-          "status": { "type": "string" },
-          "maxUsers": { "type": "integer" },
-          "maxWarehouses": { "type": "integer" },
-          "activeUsers": { "type": "integer" },
-          "planRenewsAt": { "type": ["string", "null"] }
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "plan": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "vertical": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "maxUsers": {
+            "type": "integer"
+          },
+          "maxWarehouses": {
+            "type": "integer"
+          },
+          "activeUsers": {
+            "type": "integer"
+          },
+          "planRenewsAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       },
       "UpdateTenantRequest": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "timezone": { "type": "string" },
-          "vertical": { "type": "string", "enum": ["retail", "servicios", "restaurantes", "agro"] }
+          "timezone": {
+            "type": "string"
+          },
+          "vertical": {
+            "type": "string",
+            "enum": [
+              "retail",
+              "servicios",
+              "restaurantes",
+              "agro"
+            ]
+          }
         }
       },
       "Usage": {
         "type": "object",
-        "required": ["warehouses", "products", "sales_month", "documents"],
+        "required": [
+          "warehouses",
+          "products",
+          "sales_month",
+          "documents"
+        ],
         "properties": {
-          "warehouses": { "type": "integer" },
-          "products": { "type": "integer" },
+          "warehouses": {
+            "type": "integer"
+          },
+          "products": {
+            "type": "integer"
+          },
           "sales_month": {
             "type": "object",
-            "required": ["month", "count", "revenue"],
+            "required": [
+              "month",
+              "count",
+              "revenue"
+            ],
             "properties": {
-              "month": { "type": "string" },
-              "count": { "type": "integer" },
-              "revenue": { "type": "string" }
+              "month": {
+                "type": "string"
+              },
+              "count": {
+                "type": "integer"
+              },
+              "revenue": {
+                "type": "string"
+              }
             }
           },
           "documents": {
             "type": "object",
-            "required": ["count", "bytes"],
+            "required": [
+              "count",
+              "bytes"
+            ],
             "properties": {
-              "count": { "type": "integer" },
-              "bytes": { "type": "integer" }
+              "count": {
+                "type": "integer"
+              },
+              "bytes": {
+                "type": "integer"
+              }
             }
           }
         }
       },
       "UsageItem": {
         "type": "object",
-        "required": ["data"],
-        "properties": { "data": { "$ref": "#/components/schemas/Usage" } }
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Usage"
+          }
+        }
       },
       "Document": {
         "type": "object",
-        "required": ["id", "kind", "filename", "content_type", "size", "sha256"],
+        "required": [
+          "id",
+          "kind",
+          "filename",
+          "content_type",
+          "size",
+          "sha256"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "kind": { "type": "string" },
-          "filename": { "type": "string" },
-          "content_type": { "type": "string" },
-          "size": { "type": "integer" },
-          "sha256": { "type": "string", "minLength": 64, "maxLength": 64 },
-          "reference_type": { "type": ["string", "null"] },
-          "reference_id": { "type": ["string", "null"] },
-          "created_at": { "type": ["string", "null"] }
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "sha256": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64
+          },
+          "reference_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reference_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       },
       "DocumentList": {
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Document" } }
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Document"
+            }
+          }
         }
       },
       "Notification": {
         "type": "object",
-        "required": ["id", "kind", "channel", "subject", "body", "status"],
+        "required": [
+          "id",
+          "kind",
+          "channel",
+          "subject",
+          "body",
+          "status"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "kind": { "type": "string" },
-          "channel": { "type": "string" },
-          "subject": { "type": "string" },
-          "body": { "type": "string" },
-          "status": { "type": "string" },
-          "reference_type": { "type": ["string", "null"] },
-          "reference_id": { "type": ["string", "null"] },
-          "sent_at": { "type": ["string", "null"] },
-          "created_at": { "type": ["string", "null"] }
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "reference_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reference_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sent_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       },
       "NotificationList": {
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Notification" } }
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            }
+          }
         }
       },
       "Warehouse": {
         "type": "object",
-        "required": ["id", "name", "is_default", "active"],
+        "required": [
+          "id",
+          "name",
+          "is_default",
+          "active"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "address": { "type": ["string", "null"] },
-          "is_default": { "type": "boolean" },
-          "active": { "type": "boolean" },
-          "created_at": { "type": ["string", "null"] }
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_default": {
+            "type": "boolean"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       },
       "WarehouseList": {
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Warehouse" } }
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Warehouse"
+            }
+          }
         }
       },
       "WarehouseItem": {
         "type": "object",
-        "required": ["data"],
-        "properties": { "data": { "$ref": "#/components/schemas/Warehouse" } }
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Warehouse"
+          }
+        }
       },
       "Transfer": {
         "type": "object",
-        "required": ["id", "from_warehouse_id", "to_warehouse_id", "status", "items"],
+        "required": [
+          "id",
+          "from_warehouse_id",
+          "to_warehouse_id",
+          "status",
+          "items"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "from_warehouse_id": { "type": "string" },
-          "to_warehouse_id": { "type": "string" },
-          "status": { "type": "string" },
-          "notes": { "type": ["string", "null"] },
-          "completed_at": { "type": ["string", "null"] },
-          "created_at": { "type": ["string", "null"] },
+          "id": {
+            "type": "string"
+          },
+          "from_warehouse_id": {
+            "type": "string"
+          },
+          "to_warehouse_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "items": {
             "type": "array",
             "items": {
               "type": "object",
-              "required": ["product_id", "quantity"],
+              "required": [
+                "product_id",
+                "quantity"
+              ],
               "properties": {
-                "product_id": { "type": "string" },
-                "quantity": { "type": "integer" }
+                "product_id": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "integer"
+                }
               }
             }
           }
@@ -909,355 +1476,1117 @@
       },
       "TransferList": {
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Transfer" } }
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transfer"
+            }
+          }
         }
       },
       "TransferItem": {
         "type": "object",
-        "required": ["data"],
-        "properties": { "data": { "$ref": "#/components/schemas/Transfer" } }
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Transfer"
+          }
+        }
       },
       "TotpChallengeResponse": {
         "type": "object",
-        "required": ["totpRequired", "challengeToken"],
+        "required": [
+          "totpRequired",
+          "challengeToken"
+        ],
         "properties": {
-          "totpRequired": { "type": "boolean" },
-          "challengeToken": { "type": "string" }
+          "totpRequired": {
+            "type": "boolean"
+          },
+          "challengeToken": {
+            "type": "string"
+          }
         }
       },
       "TotpSetup": {
         "type": "object",
-        "required": ["secret", "otpauthUri"],
+        "required": [
+          "secret",
+          "otpauthUri"
+        ],
         "properties": {
-          "secret": { "type": "string" },
-          "otpauthUri": { "type": "string" }
+          "secret": {
+            "type": "string"
+          },
+          "otpauthUri": {
+            "type": "string"
+          }
         }
       },
       "Invoice": {
         "type": "object",
-        "required": ["id", "sale_id", "number", "cufe", "qr_url", "provider", "status", "issued_at", "xml"],
+        "required": [
+          "id",
+          "sale_id",
+          "number",
+          "cufe",
+          "qr_url",
+          "provider",
+          "status",
+          "issued_at",
+          "xml"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "sale_id": { "type": "string" },
-          "number": { "type": "string" },
-          "cufe": { "type": "string", "minLength": 96, "maxLength": 96 },
-          "qr_url": { "type": "string" },
-          "provider": { "type": "string" },
-          "status": { "type": "string" },
-          "issued_at": { "type": "string" },
-          "xml": { "type": "string" }
+          "id": {
+            "type": "string"
+          },
+          "sale_id": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "cufe": {
+            "type": "string",
+            "minLength": 96,
+            "maxLength": 96
+          },
+          "qr_url": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "issued_at": {
+            "type": "string"
+          },
+          "xml": {
+            "type": "string"
+          }
         }
       },
       "InvoiceItem": {
         "type": "object",
-        "required": ["data"],
-        "properties": { "data": { "$ref": "#/components/schemas/Invoice" } }
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Invoice"
+          }
+        }
       },
       "PackList": {
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Pack" } }
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Pack"
+            }
+          }
         }
       },
       "PackItem": {
         "type": "object",
-        "required": ["data"],
-        "properties": { "data": { "$ref": "#/components/schemas/Pack" } }
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Pack"
+          }
+        }
       },
       "TenantItem": {
         "type": "object",
-        "required": ["data"],
-        "properties": { "data": { "$ref": "#/components/schemas/Tenant" } }
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Tenant"
+          }
+        }
       },
       "Error": {
         "type": "object",
-        "required": ["code", "message"],
+        "required": [
+          "code",
+          "message"
+        ],
         "properties": {
-          "code": { "type": "string" },
-          "message": { "type": "string" }
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
         }
       },
       "User": {
         "type": "object",
-        "required": ["id", "email", "fullName", "role", "tenantId", "tenantName"],
+        "required": [
+          "id",
+          "email",
+          "fullName",
+          "role",
+          "tenantId",
+          "tenantName"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "email": { "type": "string" },
-          "fullName": { "type": "string" },
-          "role": { "type": "string" },
-          "status": { "type": ["string", "null"] },
-          "tenantId": { "type": "string" },
-          "tenantName": { "type": "string" },
-          "totpEnabled": { "type": "boolean" }
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "tenantName": {
+            "type": "string"
+          },
+          "totpEnabled": {
+            "type": "boolean"
+          }
         }
       },
       "UsersPage": {
         "type": "object",
-        "required": ["content", "totalElements"],
+        "required": [
+          "content",
+          "totalElements"
+        ],
         "properties": {
-          "content": { "type": "array", "items": { "$ref": "#/components/schemas/User" } },
-          "totalElements": { "type": "integer", "minimum": 0 },
-          "totalPages": { "type": "integer" },
-          "size": { "type": "integer" },
-          "number": { "type": "integer" }
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "totalElements": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "number": {
+            "type": "integer"
+          }
         }
       },
       "LoginResponse": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["accessToken", "tokenType", "expiresInSeconds", "user"],
+        "required": [
+          "accessToken",
+          "tokenType",
+          "expiresInSeconds",
+          "user"
+        ],
         "properties": {
-          "accessToken": { "type": "string", "minLength": 20 },
-          "tokenType": { "const": "Bearer" },
-          "expiresInSeconds": { "type": "integer", "minimum": 60 },
-          "user": { "$ref": "#/components/schemas/User" }
+          "accessToken": {
+            "type": "string",
+            "minLength": 20
+          },
+          "tokenType": {
+            "const": "Bearer"
+          },
+          "expiresInSeconds": {
+            "type": "integer",
+            "minimum": 60
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
         }
       },
       "Product": {
         "type": "object",
         "required": [
-          "id", "sku", "name", "unit", "price", "cost", "tax_rate",
-          "stock", "min_stock", "low_stock", "active", "created_at", "updated_at"
+          "id",
+          "sku",
+          "name",
+          "unit",
+          "price",
+          "cost",
+          "tax_rate",
+          "stock",
+          "min_stock",
+          "low_stock",
+          "active",
+          "created_at",
+          "updated_at"
         ],
         "properties": {
-          "id": { "type": "string" },
-          "sku": { "type": "string" },
-          "name": { "type": "string" },
-          "description": { "type": ["string", "null"] },
-          "unit": { "type": "string" },
-          "price": { "type": "string" },
-          "cost": { "type": "string" },
-          "tax_rate": { "type": "string" },
-          "stock": { "type": "integer" },
-          "min_stock": { "type": "integer" },
-          "low_stock": { "type": "boolean" },
-          "active": { "type": "boolean" },
-          "created_at": { "type": ["string", "null"] },
-          "updated_at": { "type": ["string", "null"] }
+          "id": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "price": {
+            "type": "string"
+          },
+          "cost": {
+            "type": "string"
+          },
+          "tax_rate": {
+            "type": "string"
+          },
+          "stock": {
+            "type": "integer"
+          },
+          "min_stock": {
+            "type": "integer"
+          },
+          "low_stock": {
+            "type": "boolean"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       },
       "ProductList": {
         "type": "object",
-        "required": ["data", "total", "limit", "offset"],
+        "required": [
+          "data",
+          "total",
+          "limit",
+          "offset"
+        ],
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } },
-          "total": { "type": "integer", "minimum": 0 },
-          "limit": { "type": "integer", "minimum": 1, "maximum": 200 },
-          "offset": { "type": "integer", "minimum": 0 }
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Product"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          }
         }
       },
       "ProductItem": {
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "properties": {
-          "data": { "$ref": "#/components/schemas/Product" }
+          "data": {
+            "$ref": "#/components/schemas/Product"
+          }
         }
       },
       "Customer": {
         "type": "object",
-        "required": ["id", "name", "stage", "credit_limit", "created_at", "updated_at"],
+        "required": [
+          "id",
+          "name",
+          "stage",
+          "credit_limit",
+          "created_at",
+          "updated_at"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "email": { "type": ["string", "null"] },
-          "document_number": { "type": ["string", "null"] },
-          "phone": { "type": ["string", "null"] },
-          "city": { "type": ["string", "null"] },
-          "address": { "type": ["string", "null"] },
-          "stage": { "enum": ["LEAD", "PROSPECT", "CUSTOMER"] },
-          "notes": { "type": ["string", "null"] },
-          "credit_limit": { "type": "number" },
-          "created_at": { "type": "string" },
-          "updated_at": { "type": "string" }
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "document_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "address": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stage": {
+            "enum": [
+              "LEAD",
+              "PROSPECT",
+              "CUSTOMER"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "credit_limit": {
+            "type": "number"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
         }
       },
       "CustomerList": {
         "type": "object",
-        "required": ["data", "total"],
+        "required": [
+          "data",
+          "total"
+        ],
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Customer" } },
-          "total": { "type": "integer", "minimum": 0 }
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Customer"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
         }
       },
       "SaleItem": {
         "type": "object",
-        "required": ["id", "product_id", "product_name", "quantity", "unit_price", "tax_rate", "tax_amount", "total"],
+        "required": [
+          "id",
+          "product_id",
+          "product_name",
+          "quantity",
+          "unit_price",
+          "tax_rate",
+          "tax_amount",
+          "total"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "product_id": { "type": "string" },
-          "product_name": { "type": "string" },
-          "quantity": { "type": "integer", "minimum": 1 },
-          "unit_price": { "type": "string" },
-          "tax_rate": { "type": "string" },
-          "tax_amount": { "type": "string" },
-          "total": { "type": "string" }
+          "id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "unit_price": {
+            "type": "string"
+          },
+          "tax_rate": {
+            "type": "string"
+          },
+          "tax_amount": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          }
         }
       },
       "Sale": {
         "type": "object",
-        "required": ["id", "number", "status", "payment_method", "subtotal", "tax", "total", "items"],
+        "required": [
+          "id",
+          "number",
+          "status",
+          "payment_method",
+          "subtotal",
+          "tax",
+          "total",
+          "items"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "number": { "type": "string" },
-          "status": { "enum": ["COMPLETED", "VOIDED"] },
-          "customer_id": { "type": ["string", "null"] },
-          "customer_name": { "type": ["string", "null"] },
-          "payment_method": { "type": "string" },
-          "subtotal": { "type": "string" },
-          "tax": { "type": "string" },
-          "total": { "type": "string" },
-          "notes": { "type": ["string", "null"] },
-          "sold_by": { "type": ["string", "null"] },
-          "voided_at": { "type": ["string", "null"] },
-          "created_at": { "type": ["string", "null"] },
-          "items": { "type": "array", "items": { "$ref": "#/components/schemas/SaleItem" } }
+          "id": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "COMPLETED",
+              "VOIDED"
+            ]
+          },
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "customer_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "payment_method": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sold_by": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "voided_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SaleItem"
+            }
+          }
         }
       },
       "SaleList": {
         "type": "object",
-        "required": ["data", "total", "limit", "offset"],
+        "required": [
+          "data",
+          "total",
+          "limit",
+          "offset"
+        ],
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Sale" } },
-          "total": { "type": "integer", "minimum": 0 },
-          "limit": { "type": "integer", "minimum": 1, "maximum": 200 },
-          "offset": { "type": "integer", "minimum": 0 }
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sale"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          }
         }
       },
       "Supplier": {
         "type": "object",
-        "required": ["id", "name", "active", "created_at", "updated_at"],
+        "required": [
+          "id",
+          "name",
+          "active",
+          "created_at",
+          "updated_at"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "tax_id": { "type": ["string", "null"] },
-          "contact_name": { "type": ["string", "null"] },
-          "phone": { "type": ["string", "null"] },
-          "email": { "type": ["string", "null"] },
-          "address": { "type": ["string", "null"] },
-          "notes": { "type": ["string", "null"] },
-          "active": { "type": "boolean" },
-          "created_at": { "type": ["string", "null"] },
-          "updated_at": { "type": ["string", "null"] }
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "tax_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contact_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "address": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       },
       "SupplierList": {
         "type": "object",
-        "required": ["data", "total", "limit", "offset"],
+        "required": [
+          "data",
+          "total",
+          "limit",
+          "offset"
+        ],
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Supplier" } },
-          "total": { "type": "integer", "minimum": 0 },
-          "limit": { "type": "integer", "minimum": 1, "maximum": 200 },
-          "offset": { "type": "integer", "minimum": 0 }
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Supplier"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          }
         }
       },
       "PurchaseItem": {
         "type": "object",
-        "required": ["id", "product_id", "product_name", "quantity", "unit_cost", "tax_rate", "tax_amount", "total"],
+        "required": [
+          "id",
+          "product_id",
+          "product_name",
+          "quantity",
+          "unit_cost",
+          "tax_rate",
+          "tax_amount",
+          "total"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "product_id": { "type": "string" },
-          "product_name": { "type": "string" },
-          "quantity": { "type": "integer", "minimum": 1 },
-          "unit_cost": { "type": "string" },
-          "tax_rate": { "type": "string" },
-          "tax_amount": { "type": "string" },
-          "total": { "type": "string" }
+          "id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "unit_cost": {
+            "type": "string"
+          },
+          "tax_rate": {
+            "type": "string"
+          },
+          "tax_amount": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          }
         }
       },
       "Purchase": {
         "type": "object",
-        "required": ["id", "number", "status", "supplier_id", "supplier_name", "subtotal", "tax", "total", "items"],
+        "required": [
+          "id",
+          "number",
+          "status",
+          "supplier_id",
+          "supplier_name",
+          "subtotal",
+          "tax",
+          "total",
+          "items"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "number": { "type": "string" },
-          "status": { "enum": ["RECEIVED", "VOIDED"] },
-          "supplier_id": { "type": "string" },
-          "supplier_name": { "type": "string" },
-          "subtotal": { "type": "string" },
-          "tax": { "type": "string" },
-          "total": { "type": "string" },
-          "notes": { "type": ["string", "null"] },
-          "received_by": { "type": ["string", "null"] },
-          "received_at": { "type": ["string", "null"] },
-          "voided_at": { "type": ["string", "null"] },
-          "items": { "type": "array", "items": { "$ref": "#/components/schemas/PurchaseItem" } }
+          "id": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "RECEIVED",
+              "VOIDED"
+            ]
+          },
+          "supplier_id": {
+            "type": "string"
+          },
+          "supplier_name": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "received_by": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "received_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "voided_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseItem"
+            }
+          }
         }
       },
       "PurchaseList": {
         "type": "object",
-        "required": ["data", "total", "limit", "offset"],
+        "required": [
+          "data",
+          "total",
+          "limit",
+          "offset"
+        ],
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Purchase" } },
-          "total": { "type": "integer", "minimum": 0 },
-          "limit": { "type": "integer", "minimum": 1, "maximum": 200 },
-          "offset": { "type": "integer", "minimum": 0 }
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Purchase"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          }
         }
       },
       "CashSessionSummary": {
         "type": "object",
-        "required": ["sales_count", "voided_count", "total_sales", "cash_sales", "other_sales", "cash_returns", "expected_cash"],
+        "required": [
+          "sales_count",
+          "voided_count",
+          "total_sales",
+          "cash_sales",
+          "other_sales",
+          "cash_returns",
+          "expected_cash"
+        ],
         "properties": {
-          "sales_count": { "type": "integer", "minimum": 0 },
-          "voided_count": { "type": "integer", "minimum": 0 },
-          "total_sales": { "type": "string" },
-          "cash_sales": { "type": "string" },
-          "other_sales": { "type": "string" },
-          "cash_returns": { "type": "string" },
-          "expected_cash": { "type": "string" }
+          "sales_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "voided_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_sales": {
+            "type": "string"
+          },
+          "cash_sales": {
+            "type": "string"
+          },
+          "other_sales": {
+            "type": "string"
+          },
+          "cash_returns": {
+            "type": "string"
+          },
+          "expected_cash": {
+            "type": "string"
+          }
         }
       },
       "CashSessionDetail": {
         "type": "object",
-        "required": ["id", "status", "opening_amount", "summary"],
+        "required": [
+          "id",
+          "status",
+          "opening_amount",
+          "summary"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "status": { "enum": ["OPEN", "CLOSED"] },
-          "opened_by": { "type": ["string", "null"] },
-          "opened_at": { "type": ["string", "null"] },
-          "opening_amount": { "type": "string" },
-          "closed_by": { "type": ["string", "null"] },
-          "closed_at": { "type": ["string", "null"] },
-          "counted_amount": { "type": ["string", "null"] },
-          "expected_amount": { "type": ["string", "null"] },
-          "difference": { "type": ["string", "null"] },
-          "notes": { "type": ["string", "null"] },
-          "summary": { "$ref": "#/components/schemas/CashSessionSummary" }
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "OPEN",
+              "CLOSED"
+            ]
+          },
+          "opened_by": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "opened_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "opening_amount": {
+            "type": "string"
+          },
+          "closed_by": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "closed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "counted_amount": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expected_amount": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "difference": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "summary": {
+            "$ref": "#/components/schemas/CashSessionSummary"
+          }
         }
       },
       "CashSessionCurrent": {
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "properties": {
           "data": {
             "anyOf": [
-              { "$ref": "#/components/schemas/CashSessionDetail" },
-              { "type": "null" }
+              {
+                "$ref": "#/components/schemas/CashSessionDetail"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         }
       },
       "OverviewResponse": {
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "properties": {
           "data": {
             "type": "object",
-            "required": ["summary"],
+            "required": [
+              "summary"
+            ],
             "properties": {
               "summary": {
                 "type": "object",
-                "required": ["sales_count", "revenue"],
+                "required": [
+                  "sales_count",
+                  "revenue"
+                ],
                 "properties": {
-                  "sales_count": { "type": "integer", "minimum": 0 },
-                  "revenue": { "type": "number" }
+                  "sales_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "revenue": {
+                    "type": "number"
+                  }
                 }
               }
             }
           },
-          "unavailable": { "type": "array", "items": { "type": "string" } }
+          "unavailable": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PlanPrice": {
+        "type": "object",
+        "required": [
+          "plan",
+          "currency",
+          "cycleMonths",
+          "amount"
+        ],
+        "properties": {
+          "plan": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "cycleMonths": {
+            "type": "integer"
+          },
+          "amount": {
+            "type": "string"
+          }
+        }
+      },
+      "PriceList": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanPrice"
+            }
+          }
+        }
+      },
+      "PaymentItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "plan",
+          "cycleMonths",
+          "amount",
+          "currency",
+          "provider",
+          "reference",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "plan": {
+            "type": "string"
+          },
+          "cycleMonths": {
+            "type": "integer"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "FAILED",
+              "EXPIRED"
+            ]
+          },
+          "detail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "paidAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       }
     }
