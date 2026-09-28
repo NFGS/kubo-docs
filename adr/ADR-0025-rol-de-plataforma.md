@@ -59,12 +59,27 @@ la forma de leer los datos de todos los clientes.
 - `make smoke` (**167/167**): el acceso de plataforma **siempre** pide el código
   (`totpRequired`), un código inválido responde `INVALID_TOTP` y un token de
   negocio contra `/platform/tenants` responde **403**.
-- `kubo-iam` (**54 pruebas**, cobertura cumplida): el flujo positivo con el
+- `kubo-iam` (**69 pruebas**, cobertura cumplida): el flujo positivo con el
   secreto bajo control (acceso → código vigente → token), la contraseña
   incorrecta auditada, la suspensión, la renovación (extiende desde la fecha
-  vigente) y el listado con la marca de sistema.
+  vigente), el listado con la marca de sistema y la rotación del segundo factor
+  (el código del secreto viejo deja de verificar).
 - `make e2e` (**5/5**): la página del panel pasa la auditoría de accesibilidad.
-- **Pendiente declarado**: el uso agregado del ERP (productos, bodegas, ventas,
-  documentos) dentro del panel —hoy el operador lo ve con
-  `tenant-admin.sh usage`— requiere un endpoint de sistema en el ERP; y la
-  rotación del secreto TOTP del operador.
+- **Uso agregado del ERP en el panel (cerrado)**: el ERP expone
+  `GET /api/v1/internal/usage` —sin plug de identidad, alcanzable solo por la
+  malla mTLS y con la lista de negocios que le pasa el gateway— y consulta cada
+  negocio **con su propia marca `app.tenant_id`** (no se amplía la política
+  RLS). El gateway compone la vista (`/api/v1/platform/usage`, patrón BFF) y el
+  panel muestra productos, bodegas, ventas del mes y documentos por negocio:
+  **solo conteos, nunca datos de negocio**. Evidencia: 3 pruebas del gateway
+  (composición y degradación parcial), el endpoint interno inalcanzable sin
+  certificado y el humo 177/177 (un token de negocio responde 403 en
+  `/platform/usage`).
+- **Rotación del segundo factor del operador (cerrada)**: `POST
+  /platform/totp/rotate` exige sesión de plataforma (haber pasado el código),
+  invalida el secreto anterior en el acto y entrega la URI `otpauth` **una sola
+  vez**; queda auditado como `TOTP_ROTATED`. Si el operador pierde el
+  autenticador, el camino de emergencia es borrar su fila de `platform_admins` y
+  reiniciar IAM: el seeder recrea el operador y registra la URI una vez en el
+  log. Evidencia: prueba de rotación (el código del secreto viejo deja de
+  verificar) y el panel con el aviso de «se muestra una sola vez».

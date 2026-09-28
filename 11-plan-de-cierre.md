@@ -6,7 +6,7 @@
 | Objetivo | Producto comercializable en la región (Fases 0–4); la Fase 5 queda como backlog declarado |
 | Punto de partida | 44/44 comprobaciones en verde · 10 contenedores sanos · 9 repositorios limpios |
 | Dedicación | ~30 h/semana (≈ 3.75 jornadas de 8 h) |
-| Estado | Fases 0–4 completadas · Fase 5 completada salvo el backlog comercial · **Fase 6 (operación y comercial) completada**: F6.1–F6.6 construidos y verificados; quedan las mejoras continuas (métricas, rotación del segundo factor del operador) |
+| Estado | Fases 0–4 completadas · Fase 5 completada salvo el backlog comercial · **Fase 6 (operación y comercial) completada**: F6.1–F6.6 construidos y verificados, incluidos el uso del ERP en el panel y la rotación del segundo factor del operador; quedan las mejoras continuas (métricas de F6.5) y la app móvil cuando el negocio la pida (ADR-0023) |
 
 Este documento ordena los 31 pendientes de [`10-auditoria.md`](10-auditoria.md) en
 fases con criterio de cierre medible. No sustituye a la auditoría: la usa como
@@ -412,6 +412,14 @@ cierre porque es el trabajo vivo del producto.
   declararla: el manifiesto dice `fuera_del_sitio=ok|fallida|no_configurada` y
   una copia fallida termina el ciclo con error. Evidencia: ciclo real con
   `fuera_del_sitio=ok`.
+- **Uso del ERP en el panel y rotación del segundo factor (cerrados, ADR-0025)**:
+  el panel muestra los conteos por negocio (productos, bodegas, ventas del mes,
+  documentos) uniendo IAM con el endpoint interno del ERP —sin ampliar RLS y sin
+  leer datos de negocio— y el operador puede rotar su segundo factor con la URI
+  entregada una sola vez (más el camino de emergencia documentado). Evidencia:
+  humo **177/177**, contratos **23/23**, `make ci` **10/10** (IAM **69
+  pruebas**, gateway con 3 pruebas de la vista compuesta).
+
 - **F6.5 Métricas de operación y soporte**: `tenant-admin.sh usage` lista, por
   negocio, plan, estado, usuarios activos, bodegas, productos, ventas del mes,
   documentos (KB) y **accesos fallidos de los últimos 7 días** (el primer
