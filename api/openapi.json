@@ -337,6 +337,22 @@
         }
       }
     },
+    "/usage": {
+      "get": {
+        "summary": "Uso del negocio para su plan (F6.1)",
+        "description": "Bodegas, productos, ventas del mes en la zona del negocio y documentos (cantidad y bytes). Los usuarios los aporta IAM en /tenants/me.",
+        "responses": {
+          "200": {
+            "description": "Uso del negocio",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UsageItem" }
+              }
+            }
+          }
+        }
+      }
+    },
     "/documents": {
       "get": {
         "summary": "Documentos del negocio (P-25, ADR-0018)",
@@ -752,7 +768,12 @@
           "slug": { "type": "string" },
           "plan": { "type": "string" },
           "timezone": { "type": "string" },
-          "vertical": { "type": "string" }
+          "vertical": { "type": "string" },
+          "status": { "type": "string" },
+          "maxUsers": { "type": "integer" },
+          "maxWarehouses": { "type": "integer" },
+          "activeUsers": { "type": "integer" },
+          "planRenewsAt": { "type": ["string", "null"] }
         }
       },
       "UpdateTenantRequest": {
@@ -762,6 +783,36 @@
           "timezone": { "type": "string" },
           "vertical": { "type": "string", "enum": ["retail", "servicios", "restaurantes", "agro"] }
         }
+      },
+      "Usage": {
+        "type": "object",
+        "required": ["warehouses", "products", "sales_month", "documents"],
+        "properties": {
+          "warehouses": { "type": "integer" },
+          "products": { "type": "integer" },
+          "sales_month": {
+            "type": "object",
+            "required": ["month", "count", "revenue"],
+            "properties": {
+              "month": { "type": "string" },
+              "count": { "type": "integer" },
+              "revenue": { "type": "string" }
+            }
+          },
+          "documents": {
+            "type": "object",
+            "required": ["count", "bytes"],
+            "properties": {
+              "count": { "type": "integer" },
+              "bytes": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "UsageItem": {
+        "type": "object",
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Usage" } }
       },
       "Document": {
         "type": "object",

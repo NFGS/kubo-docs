@@ -6,7 +6,7 @@
 | Objetivo | Producto comercializable en la región (Fases 0–4); la Fase 5 queda como backlog declarado |
 | Punto de partida | 44/44 comprobaciones en verde · 10 contenedores sanos · 9 repositorios limpios |
 | Dedicación | ~30 h/semana (≈ 3.75 jornadas de 8 h) |
-| Estado | Fases 0–3 completadas · Fase 4 en curso (F4.6 completado) · Fase 5 como backlog declarado |
+| Estado | Fases 0–4 completadas · Fase 5 completada salvo el backlog comercial · **Fase 6 (operación y comercial) en curso** |
 
 Este documento ordena los 31 pendientes de [`10-auditoria.md`](10-auditoria.md) en
 fases con criterio de cierre medible. No sustituye a la auditoría: la usa como
@@ -208,7 +208,8 @@ verificados:
 DIAN emitida en ambiente de habilitación · notificación real entregada ·
 transferencia entre dos bodegas con kardex en ambas.
 
-**Estado: en curso (2026-09-24).**
+**Estado: completada (2026-09-24).** Los seis pasos quedaron construidos y
+verificados (F4.1 a F4.6); el detalle de cada uno está abajo.
 
 - **F4.6 ADR-0012 · zona horaria por negocio: completado.** `tenants.timezone`
   en IAM (migración `V5`), claim `tenant_timezone` en el token, cabecera
@@ -380,6 +381,45 @@ mismo API y contrato. No se escribe nativo hoy.
 | — | Multi-tenant SaaS (ADR-0021) — **primer corte implementado** |
 | — | Operador de respaldos (ADR-0022) — **completado** |
 | — | App móvil (ADR-0023) — **decisión tomada; sin trabajo hasta que el negocio lo pida** |
+
+**Estado: completada salvo el backlog comercial (2026-09-24).** Todo lo que la
+Fase 5 declaró quedó construido y verificado: mTLS interno (ADR-0020), rotación
+de claves (ADR-0019), instalación remota con Ansible, primer corte de
+multi-tenant SaaS (ADR-0021), operador de respaldos con verificación de
+restauración (ADR-0022) y superficie del operador (ADR-0024). Lo que resta no es
+deuda técnica: es el **ciclo comercial** (medir uso, cobrar, dar soporte), que se
+ordena en la Fase 6.
+
+### Fase 6 — Operación y comercial (continuo)
+
+La Fase 5 dejó el producto listo para operarse; la Fase 6 es **operarlo**: saber
+cuánto usa cada negocio, cobrar, atender y decidir con datos. No tiene fecha de
+cierre porque es el trabajo vivo del producto.
+
+| Paso | Pendiente | Esfuerzo | Estado |
+| --- | --- | --- | --- |
+| F6.1 | Medición de uso por negocio (usuarios, bodegas, productos, ventas del mes, documentos) | 2–3 d | **Completado** |
+| F6.2 | Cobro: renovación del plan (fecha) y registro manual del pago en la herramienta del operador | 1–2 d | **Completado** |
+| F6.3 | Adaptador de objeto para el destino de los respaldos (hoy disco + copia fuera del sitio) | 1 d | Planificado |
+| F6.4 | Panel del operador (listar, suspender, renovar) — requiere el rol de plataforma (ADR-0024) | 3–5 d | Planificado |
+| F6.5 | Métricas de producto y soporte (uso agregado, errores por negocio, tiempos) | continuo | Planificado |
+| F6.6 | Pasarela de pago automática como adaptador del puerto de cobro | 3–5 d | Planificado |
+
+**Criterio de aceptación de F6.1–F6.2: cumplido.**
+
+- **F6.1 Uso**: el ERP expone `GET /usage` (bodegas, productos, ventas del mes en
+  la zona del negocio y documentos con cantidad y bytes) y IAM aporta los
+  usuarios activos y los cupos en `/tenants/me`. La pantalla de Configuración
+  muestra el uso contra el plan («Usuarios activos 2 de 5», «Bodegas 2 de 2»,
+  ventas del mes, documentos). Evidencia: contratos **21/21** (`UsageItem`) y
+  humo **164/164** (uso reportado y usuarios activos en el perfil).
+- **F6.2 Cobro manual**: `tenants.plan_renews_at` (migración `V9`) y
+  `tenant-admin.sh renew <slug|correo> [días]`, que extiende desde hoy o desde la
+  renovación vigente —**la que sea mayor**: pagar antes de vencer no regala
+  días—; el listado del operador muestra la fecha y la PWA la enseña al negocio.
+  El corte del servicio sigue siendo explícito (suspender), nunca automático por
+  fecha. Evidencia: humo **164/164** (la renovación queda registrada en la fecha
+  esperada).
 | P-29 | Rotación de claves de cifrado de campo (KEK/DEK) — **completado** |
 | — | Instalación remota (Terraform/Ansible) |
 | — | Multi-tenant SaaS (onboarding y zona horaria por negocio) |
@@ -400,10 +440,12 @@ flowchart LR
 | --- | --- | --- | --- |
 | Fase 0 | 2–3 h | día 1 | Completada |
 | Fase 1 | ≈3 semanas | 1–3 | Completada |
-| Fase 2 | ≈4 semanas | 4–7 | Siguiente |
-| Fase 3 | 5–7 semanas | 8–14 | Planificada |
-| Fase 4 | 5–6 semanas | 15–20 | Planificada |
-| **Producto comercializable** | **≈17–20 semanas** | **~4–5 meses a 30 h/semana** | — |
+| Fase 2 | ≈4 semanas | 4–7 | Completada |
+| Fase 3 | 5–7 semanas | 8–14 | Completada |
+| Fase 4 | 5–6 semanas | 15–20 | Completada |
+| Fase 5 | backlog | — | Completada salvo el backlog comercial |
+| Fase 6 | continuo | — | **En curso** |
+| **Producto comercializable** | **≈17–20 semanas** | **~4–5 meses a 30 h/semana** | **Alcanzado** |
 
 Con las fases 0 y 1 cerradas, el camino restante a producto comercializable es de
 **≈14–17 semanas** a 30 h/semana (fases 2 a 4).
