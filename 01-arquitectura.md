@@ -217,6 +217,8 @@ Cada decisión relevante está registrada como ADR:
 | [0022](adr/ADR-0022-operador-de-respaldos.md) | Operador de respaldos con verificación de restauración |
 | [0023](adr/ADR-0023-app-movil.md) | App móvil: la PWA primero, Capacitor cuando el negocio lo pida |
 | [0024](adr/ADR-0024-superficie-del-operador.md) | Superficie del operador: script hoy, panel cuando haya rol |
+| [0025](adr/ADR-0025-rol-de-plataforma.md) | Rol de plataforma y panel del operador |
+| [0026](adr/ADR-0026-puerto-de-cobro.md) | Puerto de cobro y pasarela de pago |
 
 ## 7. Estructura del workspace
 

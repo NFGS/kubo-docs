@@ -400,10 +400,29 @@ cierre porque es el trabajo vivo del producto.
 | --- | --- | --- | --- |
 | F6.1 | Medición de uso por negocio (usuarios, bodegas, productos, ventas del mes, documentos) | 2–3 d | **Completado** |
 | F6.2 | Cobro: renovación del plan (fecha) y registro manual del pago en la herramienta del operador | 1–2 d | **Completado** |
-| F6.3 | Adaptador de objeto para el destino de los respaldos (hoy disco + copia fuera del sitio) | 1 d | Planificado |
-| F6.4 | Panel del operador (listar, suspender, renovar) — requiere el rol de plataforma (ADR-0024) | 3–5 d | Planificado |
-| F6.5 | Métricas de producto y soporte (uso agregado, errores por negocio, tiempos) | continuo | Planificado |
-| F6.6 | Pasarela de pago automática como adaptador del puerto de cobro | 3–5 d | Planificado |
+| F6.3 | Adaptador de objeto para el destino de los respaldos (hoy disco + copia fuera del sitio) | 1 d | **Completado** |
+| F6.4 | Panel del operador (listar, suspender, renovar) — requiere el rol de plataforma (ADR-0025) | 3–5 d | Decidido (ADR-0025) |
+| F6.5 | Métricas de producto y soporte (uso agregado, errores por negocio) | continuo | **Completado** |
+| F6.6 | Pasarela de pago automática como adaptador del puerto de cobro (ADR-0026) | 3–5 d | Decidido (ADR-0026) |
+
+- **F6.3 Copia fuera del sitio como puerto**: el operador usa **rclone**, que
+  acepta tanto una ruta montada (disco, NFS) como un remoto configurado (S3, B2,
+  Drive) con el mismo código, y **verifica la copia** (`rclone check`) antes de
+  declararla: el manifiesto dice `fuera_del_sitio=ok|fallida|no_configurada` y
+  una copia fallida termina el ciclo con error. Evidencia: ciclo real con
+  `fuera_del_sitio=ok`.
+- **F6.5 Métricas de operación y soporte**: `tenant-admin.sh usage` lista, por
+  negocio, plan, estado, usuarios activos, bodegas, productos, ventas del mes,
+  documentos (KB) y **accesos fallidos de los últimos 7 días** (el primer
+  síntoma de un problema de soporte). Solo cuenta filas: nunca lee datos de
+  negocio. Evidencia: salida real con la demo y los negocios de prueba (el
+  negocio del bloqueo muestra sus 5 accesos fallidos).
+- **F6.4 y F6.6 quedan decididos antes de construirse**: **ADR-0025** (rol de
+  plataforma separado de los roles del negocio, 2FA obligatorio, reino de token
+  propio, poder mínimo sin leer datos de negocio, auditoría propia y límite de
+  tasa) y **ADR-0026** (puerto de cobro con `payment_intents`, idempotencia por
+  referencia del proveedor, webhooks firmados como fuente de verdad y la
+  suspensión siempre humana).
 
 **Criterio de aceptación de F6.1–F6.2: cumplido.**
 
