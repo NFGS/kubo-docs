@@ -47,6 +47,7 @@ la primera vez y para consultarse por secciones después.
 | [0021](adr/ADR-0021-multi-tenant-saas.md) | Multi-tenant SaaS como modo de despliegue |
 | [0022](adr/ADR-0022-operador-de-respaldos.md) | Operador de respaldos con verificación de restauración |
 | [0023](adr/ADR-0023-app-movil.md) | App móvil: la PWA primero, Capacitor cuando el negocio lo pida |
+| [0024](adr/ADR-0024-superficie-del-operador.md) | Superficie del operador: script hoy, panel cuando haya rol |
 
 Las siguientes ADR se registran al abrir cada paso de la Fase 4. Ver
 [`11-plan-de-cierre.md`](11-plan-de-cierre.md).

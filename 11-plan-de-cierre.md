@@ -346,9 +346,16 @@ de los recursos que posee**: IAM limita los usuarios activos del plan (5 en
 las bodegas (2 y 10). Un negocio **suspendido** no inicia sesión
 (`TENANT_SUSPENDED`) pero conserva sus datos intactos y exportables, y hay
 catálogo de planes (`GET /tenants/plans`). Evidencia: IAM **48 pruebas**
-(cupo y suspensión), ERP puras con `Plans`, humo **157/157** (cupo de usuarios en
-el negocio aislado y cupo de bodegas en la demo). Pendiente declarado: medir uso
-agregado, pasarela de pago automática y panel del operador.
+(cupo y suspensión), ERP puras con `Plans`, humo **159/159** (cupo de usuarios en
+el negocio aislado, cupo de bodegas en la demo y el **ciclo de suspensión**:
+suspender con la herramienta del operador → el ingreso responde
+`TENANT_SUSPENDED` → reactivar → vuelve a entrar). **Superficie del operador
+(ADR-0024)**: `kubo-infra/scripts/tenant-admin.sh` (`list`, `suspend`,
+`activate` por slug o correo) sobre la base de identidad —sin superficie HTTP ni
+rol omnipotente—; el panel con rol de plataforma queda para cuando haya varios
+operadores, con su propio ADR (ámbito separado, segundo factor obligatorio y
+auditoría propia). Pendiente declarado: medir uso agregado y pasarela de pago
+automática.
 
 **Operador de respaldos: ADR-0022 e implementado.** Contenedor `kubo-backup`
 (perfil `backup`) que corre el ciclo **respaldo → retención → verificación →

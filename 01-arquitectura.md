@@ -216,6 +216,7 @@ Cada decisión relevante está registrada como ADR:
 | [0021](adr/ADR-0021-multi-tenant-saas.md) | Multi-tenant SaaS como modo de despliegue |
 | [0022](adr/ADR-0022-operador-de-respaldos.md) | Operador de respaldos con verificación de restauración |
 | [0023](adr/ADR-0023-app-movil.md) | App móvil: la PWA primero, Capacitor cuando el negocio lo pida |
+| [0024](adr/ADR-0024-superficie-del-operador.md) | Superficie del operador: script hoy, panel cuando haya rol |
 
 ## 7. Estructura del workspace
 
