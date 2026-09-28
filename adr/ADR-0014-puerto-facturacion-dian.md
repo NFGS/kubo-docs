@@ -48,13 +48,25 @@ intercambiables:
   negocio.
 - **Negativas**: el adaptador sandbox puede dar una falsa sensación de
   cumplimiento —por eso el plan declara la habilitación como cierre externo y el
-  módulo lo advierte—. Las notas crédito y la firma XAdES aún no están
+  módulo lo advierte—. Las notas crédito **ya están** (ver «Implementado») y la
+  firma XAdES queda del lado del proveedor tecnologico: el puerto entrega el
+  XML y el proveedor lo firma y lo envia; implementarla nosotros sin poder
+  validarla ante la DIAN seria un adorno. El detalle de por que aún no está
   implementadas: son el siguiente paso de P-18. El NIT real del emisor exigirá
   un campo en el negocio (hoy marcador).
 
 ## Verificación
 
-- `kubo-erp` puras **20/20**: CUFE hexadecimal de 96 caracteres, estable con los
+- **Nota crédito (implementada)**: anular una venta facturada emite el
+  documento que corrige la factura —la factura es inmutable: no se edita ni se
+  borra— con su propio **CUDE** (SHA-384, 96 hexadecimales), tipo 91 y la
+  referencia a la factura (número y CUFE) en UBL 2.1; su XML queda como
+  documento `CREDIT_NOTE_XML`. La emisión es idempotente por venta y exige la
+  venta anulada y facturada (`SALE_NOT_VOIDED`, `INVOICE_NOT_FOUND`). Evidencia:
+  ERP puras **32/32** e integración **16/16**, humo **184/184** (la nota
+  referencia la factura, el XML es CreditNote 91, reemitir devuelve la misma y
+  sin factura no hay nota).
+- `kubo-erp` puras **32/32**: CUFE hexadecimal de 96 caracteres, estable con los
   mismos datos y distinto al cambiar el total; XML UBL 2.1 con totales, NIT y
   datos escapados.
 - `kubo-erp` integración **9/9**: emitir dos veces devuelve la misma factura,

@@ -263,10 +263,13 @@ verificados (F4.1 a F4.6); el detalle de cada uno está abajo.
   hexadecimales), el QR del catálogo y el escapado XML. La factura se persiste
   inmutable (`invoices`, con RLS), emitir es idempotente, una venta anulada no
   se factura (409 `SALE_VOIDED`) y el nombre del emisor llega por
-  `x-tenant-name`. Evidencia: ERP puras **20/20** y integración **9/9**, humo
-  **125/125**, contratos **16/16** (esquema `InvoiceItem` contra la API viva).
-  Pendiente declarado: notas crédito, firma XAdES y registro del NIT y la clave
-  técnica ante la DIAN (trámite externo).
+  `x-tenant-name`. Evidencia: ERP puras **32/32** y integración **16/16**, humo
+  **184/184**, contratos **16/16** (esquema `InvoiceItem` contra la API viva).
+  **Notas crédito: implementadas** (anular una venta facturada emite el
+  documento que corrige la factura, con su CUDE y su XML como documento; es
+  idempotente por venta). Pendiente externo: la firma XAdES —del lado del
+  proveedor tecnológico, que es quien firma y envía— y el registro del NIT y la
+  clave técnica ante la DIAN (trámite de habilitación).
 - **F4.5 Segundo factor TOTP del propietario (P-30): completado.** El secreto se
   cifra en reposo (AES-256-GCM con `KUBO_TOTP_ENCRYPTION_KEY`; sin llave el
   servicio no arranca), la implementación es propia y verificada contra los
@@ -516,7 +519,17 @@ Con las fases 0 y 1 cerradas, el camino restante a producto comercializable es d
 | Capturas internas de la app y video demo pendientes | Guía en `evidencia/README.md` y guion en `09-demo-guion.md`; tarea del usuario |
 | La Fase 3 no debe empezar sin la Fase 1 | Orden por riesgo: no se construye producto sobre una entrega de eventos no garantizada |
 
-## 7. Catálogo de pendientes
+## 7. Runbook de operación
+
+La semana uno —el criterio de «proyecto terminado»— tiene su runbook en
+[`12-runbook-operacion.md`](12-runbook-operacion.md): el chequeo diario
+(`kubo-infra/scripts/operacion-check.sh`), los playbooks (bus caído, respaldo
+sin verificación, disco, certificados, negocio bloqueado, autenticador del
+operador perdido, pago que no cuadra, sospecha de fuga) y las métricas que se
+vigilan. **Notas crédito**: implementadas (ADR-0014); el XML del puerto queda
+sin firmar a propósito, porque XAdES lo firma el proveedor tecnológico.
+
+## 8. Catálogo de pendientes
 
 El catálogo completo con IDs, riesgo y esfuerzo vive en
 [`10-auditoria.md` §5](10-auditoria.md); este documento lo ordena por fase y fija
