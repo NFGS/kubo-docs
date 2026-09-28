@@ -353,10 +353,9 @@ suspender con la herramienta del operador → el ingreso responde
 `TENANT_SUSPENDED` → reactivar → vuelve a entrar). **Superficie del operador
 (ADR-0024)**: `kubo-infra/scripts/tenant-admin.sh` (`list`, `suspend`,
 `activate` por slug o correo) sobre la base de identidad —sin superficie HTTP ni
-rol omnipotente—; el panel con rol de plataforma queda para cuando haya varios
-operadores, con su propio ADR (ámbito separado, segundo factor obligatorio y
-auditoría propia). Pendiente declarado: medir uso agregado y pasarela de pago
-automática.
+rol omnipotente—; el panel con rol de plataforma llegó en F6.4 (ADR-0025) con
+ámbito separado, segundo factor obligatorio y auditoría propia, y el uso
+agregado y el cobro por webhook cerraron en F6.6 (ADR-0026).
 
 **Operador de respaldos: ADR-0022 e implementado.** Contenedor `kubo-backup`
 (perfil `backup`) que corre el ciclo **respaldo → retención → verificación →
