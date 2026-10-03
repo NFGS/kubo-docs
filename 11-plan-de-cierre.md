@@ -468,11 +468,6 @@ cierre porque es el trabajo vivo del producto.
   El corte del servicio sigue siendo explícito (suspender), nunca automático por
   fecha. Evidencia: humo **164/164** (la renovación queda registrada en la fecha
   esperada).
-| P-29 | Rotación de claves de cifrado de campo (KEK/DEK) — **completado** |
-| — | Instalación remota (Terraform/Ansible) |
-| — | Multi-tenant SaaS (onboarding y zona horaria por negocio) |
-| — | App móvil nativa y operador de respaldos |
-
 ## 4. Camino crítico y calendario
 
 ```mermaid
@@ -495,8 +490,9 @@ flowchart LR
 | Fase 6 | continuo | — | **Completada** (F6.1–F6.6; las métricas siguen) |
 | **Producto comercializable** | **≈17–20 semanas** | **~4–5 meses a 30 h/semana** | **Alcanzado** |
 
-Con las fases 0 y 1 cerradas, el camino restante a producto comercializable es de
-**≈14–17 semanas** a 30 h/semana (fases 2 a 4).
+Las fases 0 a 6 están completadas: el producto es operable y comercializable en
+la región. Lo que resta es trabajo continuo (métricas de producto, soporte,
+habilitación DIAN y la app móvil cuando el negocio la pida).
 
 ## 5. Definición de «proyecto terminado»
 

@@ -18,7 +18,8 @@ la primera vez y para consultarse por secciones después.
 | [09 — Guion de demostración](09-demo-guion.md) | Presentación | Guion del video de 6 minutos |
 | [10 — Auditoría técnica](10-auditoria.md) | Arquitectura · Calidad | Hallazgos, mediciones, correcciones aplicadas y catálogo de pendientes |
 | [11 — Plan de cierre](11-plan-de-cierre.md) | Gestión · Arquitectura | ¿Qué falta, en qué orden y con qué criterio se cierra cada fase? |
-| [ADRs](adr/) | Arquitectura | Las once decisiones que definen el sistema |
+| [12 — Runbook de operación](12-runbook-operacion.md) | Operación | La semana uno del negocio: chequeo diario, playbooks y métricas |
+| [ADRs](adr/) | Arquitectura | Las veintiséis decisiones que definen el sistema |
 
 ## Decisiones de arquitectura (ADR)
 
@@ -51,8 +52,8 @@ la primera vez y para consultarse por secciones después.
 | [0025](adr/ADR-0025-rol-de-plataforma.md) | Rol de plataforma y panel del operador |
 | [0026](adr/ADR-0026-puerto-de-cobro.md) | Puerto de cobro y pasarela de pago |
 
-Las siguientes ADR se registran al abrir cada paso de la Fase 4. Ver
-[`11-plan-de-cierre.md`](11-plan-de-cierre.md).
+Las 26 ADR están aceptadas; su estado y la fase en que se cerraron se detallan
+en [`08-trazabilidad.md`](08-trazabilidad.md) §4.
 
 ## Documentación por servicio
 

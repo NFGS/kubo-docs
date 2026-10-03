@@ -14,11 +14,11 @@ Estas verificaciones no dependen de capturas: se ejecutan y devuelven un
 resultado verificable.
 
 ```bash
-make smoke          # 87 comprobaciones end-to-end, todas en verde
+make smoke          # 184 comprobaciones end-to-end, todas en verde
 make bus-drill      # 4 comprobaciones: caida del bus sin perdida de eventos
 make restore-drill  # 14 comprobaciones: restauracion cronometrada
-make contracts      # 8 contratos OpenAPI validados contra la API viva
-make e2e            # 4 pruebas de navegador + accesibilidad (Playwright + axe)
+make contracts      # 23 contratos OpenAPI validados contra la API viva
+make e2e            # 5 pruebas de navegador + accesibilidad (Playwright + axe)
 make load           # 50 cajas: p95 de la venta < 300 ms
 make ci             # gate completo: secretos, suites, contratos, humo y E2E
 make ps             # los 12 contenedores en estado healthy

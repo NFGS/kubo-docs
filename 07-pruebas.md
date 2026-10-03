@@ -9,27 +9,27 @@ servicio, una prueba de humo end-to-end y verificaciones manuales de operación.
 make smoke
 ```
 
-Ejecuta **87 comprobaciones** contra el sistema en ejecución, usando el API
-Gateway como un cliente real. Resultado esperado: `87 pruebas exitosas, 0 fallidas`.
+Ejecuta **184 comprobaciones** contra el sistema en ejecución, usando el API
+Gateway como un cliente real. Resultado esperado: `184 pruebas exitosas, 0 fallidas`.
 
 | Bloque | Qué verifica | Comprobaciones |
 | --- | --- | --- |
-| 1. Salud | Los cinco servicios de aplicación responden `UP` | 5 |
-| 2. Autenticación y cookie | Login; **RS256**; negocio en el token; **JWKS**; el refresh **no viaja en el cuerpo**; la cookie es **httpOnly + SameSite=Strict**; rotación; el token refrescado autentica; **reuso → `401`**; **el reuso revoca la familia completa**; logout 204 y borra la cookie | 14 |
-| 3. Acceso, auditoría y bloqueo | Sin token → `401`; token falsificado → `401`; cabecera inyectada → **ignorada**; **5 intentos fallidos bloquean la cuenta**; **cadena intacta**; entradas verificadas; **versión vigente del hash**; `LOGIN_FAILED`, `ACCOUNT_LOCKED` y `REFRESH_REUSE_DETECTED` en la bitácora | 11 |
+| 1. Salud | Los cinco servicios de aplicación responden `UP` | 7 |
+| 2. Autenticación y cookie | Login; **RS256**; negocio en el token; **JWKS**; el refresh **no viaja en el cuerpo**; cookie **httpOnly + SameSite=Strict**; rotación; el token refrescado autentica; **reuso → `401`**; **el reuso revoca la familia completa**; logout 204 y borra la cookie | 14 |
+| 3. Acceso, auditoría y bloqueo | Sin token → `401`; token falsificado → `401`; cabecera inyectada → **ignorada**; negocio malformado → `400`; **5 intentos fallidos bloquean la cuenta**; **cadena de auditoría intacta** y hash versionado; usuarios y roles; **segundo factor TOTP completo** (secreto, URI, activación, desafío, código válido e inválido); deshabilitado no ingresa; eventos de seguridad en la bitácora | 23 |
 | 4. Clientes, cifrado y RLS | Crear cliente; detalle completo; listado **enmascarado**; texto **cifrado**; índice ciego; **búsqueda por documento**; **RLS: sin contexto 0 filas, con contexto > 0** | 8 |
-| 5. Inventario, venta y outbox | Producto; entrada de 10; venta por `35700.00`; IVA `5700.00`; stock 7; kardex 2; sobreventa → `409`; **el evento queda en la bandeja**; **se publica**; **RLS en ERP** (0 y > 0); **paginación con total real y tope de página** | 14 |
-| 6. Evento y tablero | Proyección en analítica; evento en MongoDB; tablero; **vista compuesta con las 7 vistas**; sin vistas caídas; zona horaria; **outbox sin fallidos** | 7 |
-| 7. Anulación | La venta queda `VOIDED`; el inventario vuelve a 10 | 2 |
-| 8. Aislamiento | Un segundo negocio no ve clientes ni catálogo; **RLS en IAM** (0 filas sin contexto) | 4 |
+| 5. Inventario, venta y outbox | Bodega por defecto y segunda bodega; **transferencia con kardex en ambas**; cupo de bodegas por plan; venta desde la bodega elegida; aviso de stock bajo; venta por `35700.00`; IVA `5700.00`; kardex; **importación CSV**; **paginación con total real**; sobreventa → `409`; **evento en la bandeja** y publicado; **RLS en ERP** | 30 |
+| 6. Evento, tablero y verticales | Proyección en analítica y MongoDB; tablero; **vista compuesta con las 7 vistas**; zona horaria del negocio; **cuatro verticales** y catálogo de arranque idempotente; servicio sin kardex y venta con mesa; reportes CSV; **factura DIAN con CUFE y XML**; comprobante PDF con hash; anti-inyección de fórmulas; outbox sin fallidos | 37 |
+| 7. Anulación y nota crédito | La venta queda `VOIDED`; el inventario vuelve; una venta anulada no se factura; **nota crédito con CUDE, referencia y XML UBL**; reemisión idempotente | 10 |
+| 8. Aislamiento, plataforma y cobro | Un segundo negocio no ve clientes ni catálogo; **RLS en IAM**; suspensión y reactivación; renovación del plan; **panel de plataforma con TOTP obligatorio**; uso por negocio; planes y cupos; intención de pago al precio del catálogo; **webhook firmado e idempotente** | 26 |
 | 9. Recuperación de contraseña | Solicitud 204; enlace en el buzón; consumo 204; **la cuenta se desbloquea con la clave nueva**; el enlace **no se reutiliza**; sin enumeración de usuarios | 6 |
-| 10. Compras y proveedores | Proveedor creado; compra por `25000.00`; IVA `3991.60`; **suma 5 unidades**; **el costo se actualiza sin IVA**; kardex `PURCHASE`; **anulación revierte el stock**; **RLS en compras** (0 filas sin contexto) | 9 |
-| 11. Tasa, TLS y trazas | **Límite por usuario** activo; HTTPS 200; HTTP → HTTPS (308); HSTS; **collector de trazas arriba y recibiendo spans** | 6 |
+| 10. Compras, proveedores y caja | Proveedor creado; compra por `25000.00`; IVA desagregado; soporte documental; **suma 5 unidades**; **el costo se actualiza sin IVA**; kardex `PURCHASE`; **anulación revierte el stock**; **RLS en compras**; apertura, venta en efectivo, cierre y arqueo de caja | 17 |
+| 11. Tasa, TLS y trazas | **Límite por usuario** activo; HTTPS 200; HTTP → HTTPS; HSTS; **collector de trazas arriba y recibiendo spans** | 6 |
 
-Además del humo, la Fase 2 agregó: **10 contratos OpenAPI** (`make contracts`),
-**4 pruebas de navegador con axe** (`make e2e`), la **carga a 50 cajas**
-(`make load`, p95 < 300 ms), los simulacros de bus y restauración, y el gate
-`make ci` que los reúne.
+Además del humo: **23 contratos OpenAPI** (`make contracts`), **5 pruebas de
+navegador con axe** (`make e2e`), la **carga a 50 cajas** (`make load`,
+p95 = 149.76 ms), los simulacros de bus (`make bus-drill`, 4/4) y restauración
+(`make restore-drill`, 14/14), y el gate `make ci` (10 verificaciones) que los reúne.
 
 La prueba es **idempotente**: crea sus propios datos con marcas de tiempo y puede
 ejecutarse tantas veces como haga falta.
@@ -37,50 +37,52 @@ ejecutarse tantas veces como haga falta.
 ## 2. Pruebas unitarias por servicio
 
 ```bash
-# kubo-iam — tokens, reglas de identidad y integración real (31 pruebas)
+# kubo-iam — 77 pruebas (tokens, identidad, TOTP, plataforma y cobro)
 # Incluye Testcontainers: PostgreSQL real, migraciones Flyway y RLS.
+# Gate de cobertura JaCoCo ≥ 80 % en application/domain (hoy 85.1 %).
 cd kubo-iam && mvn verify
 
-# kubo-gateway — tabla de rutas y rutas públicas (3 pruebas)
+# kubo-gateway — 12 pruebas (rutas, límite de tasa con Redis real, plataforma)
 cd kubo-gateway && npm test
 
-# kubo-crm — cifrado de campos (8 pruebas, sin base de datos)
-cd kubo-crm && ruby test/field_cipher_test.rb
+# kubo-crm — 15 pruebas (12 de cifrado + 3 de integración RLS con PostgreSQL)
+./kubo-infra/scripts/crm-tests.sh
 
-# kubo-erp — aritmética de dinero y outbox (7 pruebas, sin base de datos)
-docker run --rm -m 3g -e MIX_ENV=test \
-  -v "$PWD/kubo-erp/test:/app/test:ro" --entrypoint bash kubo-kubo-erp \
-  -c "cd /app && mix compile >/dev/null 2>&1 && ERL_LIBS=/app/_build/test/lib \
-      elixir -e 'ExUnit.start(); Code.require_file(\"test/kubo_erp/sales_totals_test.exs\"); \
-      Code.require_file(\"test/kubo_erp/outbox_test.exs\")'"
+# kubo-erp — 50 bloques ExUnit (34 puros + 16 de integración PostgreSQL)
+./kubo-infra/scripts/erp-tests.sh
 
-# kubo-analytics — conversión de eventos (6 pruebas, sin MongoDB)
-cd kubo-analytics && pip install -r requirements-dev.txt && pytest -q
+# kubo-analytics — 8 pruebas (6 unitarias + 2 de integración con MongoDB)
+./kubo-infra/scripts/analytics-tests.sh
 ```
 
-**Total: 55 pruebas** (unitarias y de integración) más 87 comprobaciones
-end-to-end, 10 contratos y 4 pruebas de navegador. La cobertura de dominio se
-vigila en CI: IAM ≥ 80 % (JaCoCo) y analítica ≥ 80 % en su módulo de
+**Total: 162 pruebas de servicio** (unitarias y de integración) más 184
+comprobaciones end-to-end, 23 contratos, 5 pruebas de navegador con axe y los
+simulacros de bus y restauración. La cobertura de dominio se vigila en CI:
+IAM ≥ 80 % (JaCoCo, hoy 85.1 %) y analítica ≥ 80 % en su módulo de
 procesamiento (pytest-cov).
 
 ### Cómo ejecutar cada suite
 
 ```bash
-make smoke                                    # 87 comprobaciones end-to-end
+make smoke                                    # 184 comprobaciones end-to-end
 make bus-drill                                # 4 comprobaciones: caida del bus
 make restore-drill                            # 14 comprobaciones: restauracion
+make contracts                                # 23 contratos OpenAPI
+make e2e                                      # 5 pruebas de navegador + axe
+make load                                     # 50 cajas, p95 < 300 ms
+make ci                                       # gate completo (10 verificaciones)
 
-cd kubo-iam        && mvn test                # 7 pruebas
-cd kubo-gateway    && npm test                # 3 pruebas
-cd kubo-crm        && ruby test/field_cipher_test.rb   # 8 pruebas
-cd kubo-analytics  && pytest -q               # 6 pruebas
+./kubo-infra/scripts/crm-tests.sh             # 15 pruebas del CRM
+./kubo-infra/scripts/erp-tests.sh             # 50 bloques del ERP
+./kubo-infra/scripts/analytics-tests.sh       # 8 pruebas de analitica
 ```
 
-Las 7 pruebas de `kubo-erp` son puras (aritmética decimal y outbox) y **no pueden
-ejecutarse dentro del contenedor de producción**: al compilar el entorno de
-pruebas el contenedor se queda sin memoria (límite de 512 MB), y además la imagen
-de ejecución no incluye `test/`. Se ejecutan con más memoria y el directorio de
-pruebas montado (comando completo arriba), o en CI con 3 GB.
+Las pruebas del ERP que no tocan base de datos son puras (aritmética decimal,
+outbox, packs, facturación, documentos) y **no pueden ejecutarse dentro del
+contenedor de producción**: al compilar el entorno de pruebas el contenedor se
+queda sin memoria (límite de 512 MB), y además la imagen de ejecución no incluye
+`test/`. Se ejecutan con más memoria y el directorio de pruebas montado
+(`erp-tests.sh`, integrado en `make ci`).
 
 ### Qué cubren las pruebas unitarias
 
@@ -151,13 +153,18 @@ el usuario):
 El detalle de las mediciones, los planes de ejecución y su análisis están en
 [`10-auditoria.md`](10-auditoria.md).
 
-## 6. Pruebas pendientes (fases 1 y 2)
+## 6. Cobertura y pendientes vivos
 
-| Prueba | ID · Fase | Por qué falta |
-| --- | --- | --- |
-| Integración con base de datos real por servicio | P-08 · Fase 2 | IAM ya la tiene (Testcontainers + RLS); falta replicarla en analítica y los demás servicios |
-| Contratos (Pact/OpenAPI) automatizados | P-09 · Fase 2 | Hoy el contrato se verifica en la prueba de humo |
-| Carga (k6): 50 cajas simultáneas | P-10 · Fase 2 | Falta escenario de estrés |
-| E2E de navegador (Playwright) | P-10 · Fase 2 | Hoy la interfaz se verifica manualmente |
-| Escaneo SAST/SCA y de secretos en CI | P-06 · Fase 2 | Las verificaciones son manuales |
-| Accesibilidad automatizada (axe) | P-26 · Fase 2 | Solo revisión manual de contraste y foco |
+Los pendientes de las fases 1 y 2 (P-06, P-08, P-09, P-10 y P-26) quedaron
+**cerrados**: el CI por repositorio, las pruebas de integración contra el motor
+real en los cinco servicios, los contratos ejecutables, la carga a 50 cajas y la
+accesibilidad automatizada corren en `make ci`.
+
+Lo que sigue abierto, sin bloquear el cierre:
+
+| Tema | Estado |
+| --- | --- |
+| Gate de cobertura en ERP, gateway, CRM y web | IAM (85.1 %, JaCoCo) y analítica (≥ 80 % en procesamiento) lo tienen; los demás miden con pruebas puras, sin umbral |
+| Pruebas unitarias de la PWA | Hoy la interfaz se cubre con E2E y axe; falta vitest para la lógica de cola y offline |
+| Contratos del lado del consumidor (Pact) | El contrato OpenAPI (23 verificaciones contra la API viva) cubre el esquema; Pact queda como mejora |
+| Carga con datos voluminosos | El escenario de 50 cajas usa un catálogo sembrado; falta un perfil con volúmenes de producción |

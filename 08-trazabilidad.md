@@ -8,18 +8,18 @@ requisito no tiene evidencia verificable, aparece marcado como pendiente.
 | # | Requisito | Implementación | Evidencia | Estado |
 | --- | --- | --- | --- | --- |
 | R1 | ERP + CRM para PYMES sin acceso a tecnología, sin pagar SaaS | Instalación de un comando en el local, licencia MIT, sin dependencias de nube | `README.md` · `05-despliegue.md` · `make up` | Cumplido |
-| R2 | Mínimo 4 microservicios | 5 servicios: IAM, CRM, ERP, Analítica y Documentos/Notificaciones (Fase 4, P-19 y P-25) | `docker compose ps` (12 contenedores) · `01-arquitectura.md` | Cumplido (4 desplegados) |
+| R2 | Mínimo 4 microservicios | 4 servicios desplegados (IAM, CRM, ERP y Analítica) más el gateway; notificaciones y documentos viven como **puertos** dentro del ERP (ADR-0017 y ADR-0018) | `docker compose ps` (12 contenedores) · `01-arquitectura.md` | Cumplido |
 | R3 | Mínimo 3 tecnologías distintas | Java, Ruby, Elixir, Python, TypeScript (5) | `01-arquitectura.md` · ADR-0004 | Cumplido |
 | R4 | Front dinámico y actual, nivel senior | React 19 + Vite 8 + Tailwind 4, design system con tokens, TanStack Query, gráficas, accesibilidad | `kubo-web/` · `kubo-web/src/components/ui.tsx` | Cumplido |
 | R5 | Conexión con PostgreSQL y MongoDB | PostgreSQL 17 (IAM, CRM, ERP) + MongoDB 8 (analítica) | `docker compose ps` · `02-modelo-datos.md` | Cumplido |
-| R6 | Interfaz UI/UX | 5 pantallas, estados de carga/vacío/error, toasts, modales accesibles, español, modo offline visible | `06-manual-usuario.md` · verificación manual en `07-pruebas.md` §3 | Cumplido |
-| R7 | API Gateway | `kubo-gateway` (NestJS): validación JWT, límites de tasa, correlación, enrutamiento | `kubo-gateway/README.md` · `make smoke` bloque 3 | Cumplido |
+| R6 | Interfaz UI/UX | 13 rutas (POS, inventario, compras, caja, bodegas, usuarios, configuración, notificaciones, panel de plataforma), estados de carga/vacío/error, toasts, modales accesibles, español, modo offline visible | `06-manual-usuario.md` · verificación manual en `07-pruebas.md` §3 | Cumplido |
+| R7 | API Gateway | `kubo-gateway` (NestJS): validación JWT, límites de tasa, correlación, enrutamiento, BFF | `kubo-gateway/README.md` · `make smoke` bloque 3 | Cumplido |
 | R8 | Cada microservicio con su base de datos | `database-per-service`: `kubo_iam`, `kubo_crm`, `kubo_erp` con roles aislados; `kubo_analytics` en MongoDB | `kubo-infra/scripts/init-db.sh` · ADR-0003 | Cumplido |
 | R9 | Repositorio separado por parte del software | 9 repositorios: 5 componentes + infra + docs + web + raíz | `ls -d kubo-*/` · ADR-0002 | Cumplido |
-| R10 | Documentación detallada del funcionamiento | 11 documentos + 11 ADRs + README por servicio + OpenAPI ejecutable + guion de video | `kubo-docs/` · `Kubo-Documentacion.pdf` | Cumplido |
+| R10 | Documentación detallada del funcionamiento | 14 documentos + 26 ADRs + README por servicio + OpenAPI ejecutable + guion de video | `kubo-docs/` · `Kubo-Documentacion.pdf` | Cumplido; capturas y video de demostración pendientes (tarea del usuario) |
 | R11 | Encriptado de datos | AES-256-GCM campo a campo + índice ciego HMAC + BCrypt + SHA-256 de refresh tokens + auditoría con cadena de hash versionada + RLS en las tres bases + outbox transaccional | `make smoke` bloques 3, 4 y 5 · `04-seguridad.md` | Cumplido |
 | R12 | PWA | Service worker, manifest, instalable, cola offline en IndexedDB, sincronización automática | `curl localhost:3000/manifest.webmanifest` · `kubo-web/vite.config.ts` | Cumplido |
-| R13 | JWT | RS256 con JWKS, access 15 min, refresh rotativo con detección de reuso y **cookie `httpOnly`** (BFF) | `make smoke` bloque 2 · ADR-0007 · ADR-0009 (outbox) | Cumplido |
+| R13 | JWT | RS256 con JWKS, access 15 min, refresh rotativo con detección de reuso y **cookie `httpOnly`** (BFF); segundo factor TOTP con desafío `typ=totp` | `make smoke` bloques 2 y 3 · ADR-0007 · ADR-0015 | Cumplido |
 | R14 | Arquitectura idónea al tipo de proyecto | Microservicios con monolito modular, polyrepo, eventos, multi-tenancy híbrido | `01-arquitectura.md` · ADR-0001 a 0008 | Cumplido |
 | R15 | Diseño y seguridad del proyecto | Modelo de confianza, STRIDE por servicio, OWASP, Ley 1581, límites de tasa, anti-suplantación | `04-seguridad.md` · `make smoke` bloque 3 y 8 | Cumplido |
 
@@ -69,26 +69,35 @@ requisito no tiene evidencia verificable, aparece marcado como pendiente.
 | 0009 | Outbox transaccional para la entrega de eventos | Aceptada (Fase 1) |
 | 0010 | RLS activo con interceptor de transacción | Aceptada (Fase 1) |
 | 0011 | BFF como capa formal del gateway | Aceptada (Fase 2) |
-
-ADR planificadas: **0012** zona horaria por negocio (Fase 4). Ver
-[`11-plan-de-cierre.md`](11-plan-de-cierre.md).
+| 0012 | Zona horaria por negocio | Aceptada (Fase 4) |
+| 0013 | Vertical Packs: el vertical como dato del negocio | Aceptada (Fase 4) |
+| 0014 | Facturación electrónica DIAN como puerto enchufable | Aceptada; habilitación externa pendiente |
+| 0015 | Segundo factor TOTP del propietario | Aceptada (Fase 4) |
+| 0016 | Stock por bodega y transferencias | Aceptada (Fase 4) |
+| 0017 | Puerto de notificaciones y buzón del negocio | Aceptada (Fase 4) |
+| 0018 | Documentos en el ERP con puerto de almacenamiento | Aceptada (Fase 4) |
+| 0019 | Rotación de claves de cifrado de campo (KEK/DEK) | Aceptada (Fase 5) |
+| 0020 | mTLS en la malla interna | Aceptada (Fase 5) |
+| 0021 | Multi-tenant SaaS como modo de despliegue | Aceptada (Fase 5) |
+| 0022 | Operador de respaldos con verificación de restauración | Aceptada (Fase 5) |
+| 0023 | App móvil: la PWA primero, Capacitor cuando el negocio lo pida | Aceptada (decisión, sin trabajo) |
+| 0024 | Superficie del operador: script hoy, panel cuando haya rol | Aceptada (Fase 5) |
+| 0025 | Rol de plataforma y panel del operador | Aceptada (Fase 6) |
+| 0026 | Puerto de cobro y pasarela de pago | Aceptada (Fase 6) |
 
 ## 5. Requisitos no cubiertos (declarados)
 
-> Los recortes de las fases 1 y 2 (*outbox*, RLS, cookie `httpOnly`,
-> recuperación de contraseña, TLS, CI, observabilidad, contratos, carga, E2E y
-> accesibilidad) quedaron **implementados y verificados**; ver
-> [`11-plan-de-cierre.md`](11-plan-de-cierre.md). Los que siguen:
+> Los recortes de las fases 1 a 6 quedaron implementados y verificados (ver
+> [`11-plan-de-cierre.md`](11-plan-de-cierre.md)). Lo que sigue fuera del
+> alcance actual:
 
 | Requisito | Motivo | Ruta |
 | --- | --- | --- |
-| Testcontainers en CRM, ERP y gateway | IAM y analítica ya los tienen | Fase 2 (P-08, parcial) |
-| Importación de datos (Excel/CSV, ruta Dolibarr) | El MVP no la incluye: el catálogo se carga por API | Fase 3 (P-24) |
-| Facturación electrónica DIAN (UBL 2.1, CUFE, QR) | Requiere ser Proveedor Tecnológico autorizado | Fase 4 (P-18) |
-| Multi-rubro (Vertical Packs) | El MVP demuestra un vertical completo | Fase 4 (P-17) |
-| Servicio de Documentos (adjuntos y plantillas) | El MVP despliega cuatro servicios; el quinto llega con las notificaciones | Fase 4 (P-25) |
-| App móvil nativa | La PWA cubre el caso de uso | Fase 5 |
-| Kubernetes | El despliegue objetivo es un local con Docker Compose | Fase 5 |
+| Habilitación DIAN y firma XAdES | Trámite externo como Proveedor Tecnológico; el puerto UBL 2.1, el CUFE y la nota crédito ya están implementados y probados | Operación (ADR-0014) |
+| App móvil nativa | La PWA cubre el caso de uso; se envuelve con Capacitor cuando el negocio pida cámara, push o impresión térmica | ADR-0023 |
+| Kubernetes | El despliegue objetivo es un local con Docker Compose; k3s es el siguiente nivel (> 50 negocios) | Fase 5 (backlog declarado) |
+| Importación desde Dolibarr | La importación CSV (P-24) está implementada; la ruta específica de Dolibarr es una mejora de adopción | Backlog comercial |
+| Capturas y video de demostración | Requieren grabación manual del usuario | `evidencia/README.md` |
 
 > Ningún requisito se declara cumplido sin evidencia verificable. Los recortes
 > están documentados en el ADR-0008 y en esta matriz.

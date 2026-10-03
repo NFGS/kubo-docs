@@ -94,10 +94,19 @@ no se hablan.
 3. Si el acceso falla con `TENANT_SUSPENDED`, es el estado del negocio, no la
    clave.
 
-### 4.6 El operador perdió el autenticador
-Camino de emergencia (ADR-0025): borrar su fila de `platform_admins` y
-reiniciar IAM; el seeder recrea el operador y **registra la URI `otpauth` una
-vez** en el log:
+### 4.6 El operador perdió el autenticador (o quedó bloqueado)
+
+Si solo está **bloqueado** por intentos fallidos (el autenticador funciona, pero
+la cuenta acumuló 5 códigos errados), se limpia el contador sin tocar el segundo
+factor:
+
+```bash
+./kubo-infra/scripts/tenant-admin.sh platform-reset
+```
+
+Si de verdad **perdió el autenticador**, camino de emergencia (ADR-0025): borrar
+su fila de `platform_admins` y reiniciar IAM; el seeder recrea el operador y
+**registra la URI `otpauth` una vez** en el log:
 ```bash
 docker exec kubo-postgres psql -U kubo_root -d kubo_iam -c "delete from platform_admins where email = 'operador@kubo.local'"
 docker compose restart kubo-iam

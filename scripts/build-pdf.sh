@@ -41,6 +41,7 @@ DOCUMENTOS=(
   "09-demo-guion.md"
   "10-auditoria.md"
   "11-plan-de-cierre.md"
+  "12-runbook-operacion.md"
   "adr/ADR-0001-microservicios-monolito-modular.md"
   "adr/ADR-0002-polyrepo-contratos.md"
   "adr/ADR-0003-multitenancy-hibrido.md"
@@ -52,6 +53,21 @@ DOCUMENTOS=(
   "adr/ADR-0009-outbox-transaccional.md"
   "adr/ADR-0010-rls-activo.md"
   "adr/ADR-0011-bff-capa-formal.md"
+  "adr/ADR-0012-zona-horaria-por-negocio.md"
+  "adr/ADR-0013-vertical-packs.md"
+  "adr/ADR-0014-puerto-facturacion-dian.md"
+  "adr/ADR-0015-segundo-factor-totp.md"
+  "adr/ADR-0016-stock-por-bodega.md"
+  "adr/ADR-0017-puerto-notificaciones.md"
+  "adr/ADR-0018-documentos.md"
+  "adr/ADR-0019-rotacion-de-claves.md"
+  "adr/ADR-0020-mtls-interno.md"
+  "adr/ADR-0021-multi-tenant-saas.md"
+  "adr/ADR-0022-operador-de-respaldos.md"
+  "adr/ADR-0023-app-movil.md"
+  "adr/ADR-0024-superficie-del-operador.md"
+  "adr/ADR-0025-rol-de-plataforma.md"
+  "adr/ADR-0026-puerto-de-cobro.md"
 )
 
 # ---------------------------------------------------------------------------
@@ -103,7 +119,7 @@ cat > "${BUILD_DIR}/documento.html" <<'HTML'
   <p class="sub">ERP + CRM autoalojable para PYMES</p>
   <p class="sub">Documentación técnica y funcional</p>
   <div class="meta">
-    Versión 0.1.0-mvp · Armenia, Quindío · Licencia MIT<br>
+    Versión 0.3.0 · Armenia, Quindío · Licencia MIT<br>
     Generado el GENERADO_EL
   </div>
 </div>
