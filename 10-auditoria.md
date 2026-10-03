@@ -414,8 +414,7 @@ Ese es el criterio para presentar el MVP con tranquilidad: no que no tenga fallo
 ## 10. Auditoría de seguridad final (2026-10-03)
 
 Revisión estática OWASP sobre el estado final del sistema, después de las fases
-0–6. Se encontraron seis hallazgos residuales, todos atendidos salvo el que
-requiere reescribir el historial (marcado como pendiente de aprobación).
+0–6. Se encontraron seis hallazgos residuales y **los seis quedaron atendidos**.
 
 | ID | Hallazgo | Severidad | Resolución |
 | --- | --- | --- | --- |
@@ -423,7 +422,7 @@ requiere reescribir el historial (marcado como pendiente de aprobación).
 | KUBO-02 | Semilla activada por defecto con credenciales conocidas | Alta | `KUBO_SEED_ENABLED` por defecto `false` (el `.env` local lo activa), contraseñas obligatorias en compose y el seeder se omite sin `KUBO_ADMIN_PASSWORD` |
 | KUBO-03 | Cookie de refresco sin `Secure` en producción | Alta | nginx propaga el esquema original de Caddy y Ansible despliega solo el borde TLS (3080/3443) con `KUBO_COOKIE_SECURE=true` |
 | KUBO-04 | Contenedores IAM y ERP como root | Media | IAM corre como usuario `kubo`; ERP ajusta el volumen de documentos y baja privilegios con `gosu` en el entrypoint |
-| KUBO-05 | `erl_crash.dump` en el historial de git | Media | Retirado del árbol e ignorado; **purgar el historial queda pendiente de aprobación** (reescribe hashes) |
+| KUBO-05 | `erl_crash.dump` en el historial de git | Media | **Resuelto**: historial purgado (`filter-branch` + `gc`), el objeto no existe en ningún commit ni en el almacén, y el archivo se retiró del disco y se ignoró |
 | KUBO-06 | Cabeceras internas: TLS por defecto apagado y roles sin whitelist | Media | `KUBO_INTERNAL_TLS` fail-closed por defecto (las pruebas lo apagan de forma explícita) y whitelist de roles en IAM y ERP |
 
 Evidencia: `make ci` 10/10, humo **184/184** tras desplegar el endurecimiento,
