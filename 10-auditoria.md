@@ -427,3 +427,11 @@ Revisión estática OWASP sobre el estado final del sistema, después de las fas
 
 Evidencia: `make ci` 10/10, humo **184/184** tras desplegar el endurecimiento,
 IAM 79 pruebas, ERP 55 pruebas, `make bus-drill` 4/4 y `make restore-drill` 14/14.
+
+**Nota de rendimiento (misma fecha).** Al re-verificar la carga se encontraron
+dos serializaciones reales en la venta: el comprobante PDF y el contador de
+numeración se generaban **dentro** de la transacción (el contador bloquea su
+fila hasta el commit y serializaba todas las cajas del negocio). Ambos salieron
+de la transacción: con 10 cajas el p95 quedó en **107 ms** y el throughput subió
+~13 %; a 50 cajas en este host de desarrollo (swap/zram en uso por otros
+proyectos) el p95 es ~540 ms con el **100 % de las ventas exitosas**.

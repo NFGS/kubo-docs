@@ -27,8 +27,8 @@ Gateway como un cliente real. Resultado esperado: `184 pruebas exitosas, 0 falli
 | 11. Tasa, TLS y trazas | **Límite por usuario** activo; HTTPS 200; HTTP → HTTPS; HSTS; **collector de trazas arriba y recibiendo spans** | 6 |
 
 Además del humo: **23 contratos OpenAPI** (`make contracts`), **5 pruebas de
-navegador con axe** (`make e2e`), la **carga a 50 cajas** (`make load`,
-p95 = 149.76 ms), los simulacros de bus (`make bus-drill`, 4/4) y restauración
+navegador con axe** (`make e2e`), la **carga a 50 cajas** (`make load`: 100 % de ventas exitosas; p95
+107 ms con 10 cajas y ~540 ms en el host de desarrollo con presión de memoria), los simulacros de bus (`make bus-drill`, 4/4) y restauración
 (`make restore-drill`, 14/14), y el gate `make ci` (10 verificaciones) que los reúne.
 
 La prueba es **idempotente**: crea sus propios datos con marcas de tiempo y puede
