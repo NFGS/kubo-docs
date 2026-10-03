@@ -16,9 +16,9 @@ técnica seria no se conforma con que funcione: busca dónde se romperá al crec
 dónde miente un indicador y qué falta para ser un producto y no una demostración.
 
 Se encontraron **17 hallazgos**, todos corregidos y medidos en esta misma sesión, y
-**31 pendientes** priorizados con su plan. De ellos, **9 quedaron resueltos y
-verificados en la Fase 1** (P-01, P-02, P-03, P-04, P-05, P-11, P-23, P-27 y P-31;
-ver [`11-plan-de-cierre.md`](11-plan-de-cierre.md)).
+**31 pendientes** priorizados con su plan. **Los 31 quedaron cerrados y verificados
+en las fases 1–6** (ver [`11-plan-de-cierre.md`](11-plan-de-cierre.md)); lo que
+sigue abierto es el backlog comercial y externo, declarado en §5.4 y en el plan.
 
 Los dos más graves no eran de rendimiento:
 
@@ -254,26 +254,26 @@ como pendiente P-23.
 
 ## 5. Pendientes priorizados
 
-> **Fase 1 aplicada (2026-09-24).** Resueltos y verificados: P-01 (outbox
-> transaccional), P-02 (RLS activo en las tres bases), P-03 (cookie `httpOnly`),
-> P-04 (recuperación de contraseña), P-05 (respaldos + simulacro), P-11 (bloqueo
-> de cuenta), P-23 (hash de auditoría versionado), P-27 (TLS en la instalación) y
-> P-31 (límite de tasa por usuario). Evidencia: `make smoke` 73/73,
-> `make bus-drill` 4/4, `make restore-drill` 14/14, ADR-0009 y ADR-0010.
+> **Catálogo cerrado (2026-10-03).** Los 31 pendientes están resueltos y
+> verificados; el detalle de cada uno, con su evidencia, vive en
+> [`11-plan-de-cierre.md`](11-plan-de-cierre.md). Resumen por fase:
 >
-> **Fase 2 aplicada (2026-09-24).** Resueltos y verificados: P-06 (CI por
-> repositorio + gate local `make ci`), P-07 (OpenTelemetry en los cinco
-> servicios con collector propio), P-09 (contratos OpenAPI ejecutables, 8/8),
-> P-10 (carga a 50 cajas con p95 149.76 ms y E2E con Playwright), P-12 (caché por
-> sesión), P-13 (paginación real en productos, ventas y kardex), P-14 (digests de
-> imágenes) y P-26 (axe en CI, con tres defectos de accesibilidad corregidos).
-> Cobertura de dominio: IAM 85.5 % y analítica 91 %, con gates en CI.
-> **P-08 queda parcial**: Testcontainers en IAM; falta replicarlo en analítica y
-> los demás servicios. `make smoke` 87/87, ADR-0011.
+> | Fase | Pendientes cerrados |
+> | --- | --- |
+> | F1 · Confiabilidad | P-01, P-02, P-03, P-04, P-05, P-11, P-23, P-27, P-31 |
+> | F2 · Calidad | P-06, P-07, P-08, P-09, P-10, P-12, P-13, P-14, P-26 |
+> | F3 · Núcleo comercial | P-15, P-16, P-20, P-21, P-24 |
+> | F4 · Diferenciadores | P-17, P-18, P-19, P-22, P-25, P-30 |
+> | F5 · Escala | P-28, P-29 |
+> | F6 · Operación | F6.1–F6.6 (uso, cobro, panel, respaldos, pasarela) |
 >
-> **Fase 3 en curso (2026-09-24).** P-15 (compras y proveedores) implementado:
-> dominio, API, RLS, evento `purchase.received`, 9 comprobaciones en el humo y
-> pantalla en la PWA. Siguen P-16 (caja), P-20, P-24 y P-21.
+> Evidencia de cierre: `make ci` 10/10 (secretos, suites, contratos 23/23, humo
+> 184/184, E2E 5/5), gates de cobertura por servicio (IAM 85.2 %, analítica
+> ≥ 80 %, gateway 95.6 %, CRM 100 %, web 100 % de líneas, ERP ratchet 36 %),
+> `make bus-drill` 4/4 y `make restore-drill` 14/14.
+>
+> Las tablas de §5.1–5.3 conservan el catálogo original con el riesgo y el
+> esfuerzo estimados al momento de la auditoría; su estado final es **cerrado**.
 
 ### 5.1 Bloqueantes para un negocio real
 
@@ -410,3 +410,21 @@ escribirlas.
 
 Ese es el criterio para presentar el MVP con tranquilidad: no que no tenga fallos
 —los tenía, diecisiete— sino que **cada fallo tiene ahora una prueba que lo vigila**.
+
+## 10. Auditoría de seguridad final (2026-10-03)
+
+Revisión estática OWASP sobre el estado final del sistema, después de las fases
+0–6. Se encontraron seis hallazgos residuales, todos atendidos salvo el que
+requiere reescribir el historial (marcado como pendiente de aprobación).
+
+| ID | Hallazgo | Severidad | Resolución |
+| --- | --- | --- | --- |
+| KUBO-01 | `SECRET_KEY_BASE` de CRM/ERP con valor por defecto en compose | **Crítica** | compose exige la variable (`:?`) y Rails falla en producción si falta: el arranque ya no puede firmar con una clave pública |
+| KUBO-02 | Semilla activada por defecto con credenciales conocidas | Alta | `KUBO_SEED_ENABLED` por defecto `false` (el `.env` local lo activa), contraseñas obligatorias en compose y el seeder se omite sin `KUBO_ADMIN_PASSWORD` |
+| KUBO-03 | Cookie de refresco sin `Secure` en producción | Alta | nginx propaga el esquema original de Caddy y Ansible despliega solo el borde TLS (3080/3443) con `KUBO_COOKIE_SECURE=true` |
+| KUBO-04 | Contenedores IAM y ERP como root | Media | IAM corre como usuario `kubo`; ERP ajusta el volumen de documentos y baja privilegios con `gosu` en el entrypoint |
+| KUBO-05 | `erl_crash.dump` en el historial de git | Media | Retirado del árbol e ignorado; **purgar el historial queda pendiente de aprobación** (reescribe hashes) |
+| KUBO-06 | Cabeceras internas: TLS por defecto apagado y roles sin whitelist | Media | `KUBO_INTERNAL_TLS` fail-closed por defecto (las pruebas lo apagan de forma explícita) y whitelist de roles en IAM y ERP |
+
+Evidencia: `make ci` 10/10, humo **184/184** tras desplegar el endurecimiento,
+IAM 79 pruebas, ERP 55 pruebas, `make bus-drill` 4/4 y `make restore-drill` 14/14.
