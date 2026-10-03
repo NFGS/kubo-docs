@@ -17,10 +17,13 @@ Capturas y comprobaciones del sistema en ejecución.
 | `09-sincronizacion.png` | Al recuperar la conexión la venta se sincroniza y la cola queda en cero |
 | `10-repositorios.txt` | Los 9 repositorios del workspace (8 hijos + el repositorio raíz) |
 | `11-documentos.png` | Documentos del negocio: facturas XML, nota crédito, comprobantes PDF y soportes, con descarga autenticada |
+| `demo-kubo.webm` | Recorrido guiado de 1:25 con subtítulos: ingreso, tablero, clientes y cifrado, catálogo, compras, caja, bodegas, POS, modo sin conexión, sincronización, documentos, notificaciones, usuarios y configuración |
 
 Las capturas de interfaz se tomaron con Playwright contra la PWA en
 `http://localhost:3000` (viewport 1360×880) sobre la semilla de demostración; la
 secuencia sigue el guion de [`../09-demo-guion.md`](../09-demo-guion.md).
+`demo-kubo.webm` es el recorrido automático con subtítulos (base visual); el
+video narrado de 6–7 minutos sigue ese mismo guion.
 
 ## Comprobaciones reproducibles
 
