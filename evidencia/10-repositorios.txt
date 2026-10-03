@@ -1,0 +1,10 @@
+$ ls -d kubo-*/
+
+kubo-analytics/
+kubo-crm/
+kubo-docs/
+kubo-erp/
+kubo-gateway/
+kubo-iam/
+kubo-infra/
+kubo-web/

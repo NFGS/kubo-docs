@@ -6,7 +6,20 @@ Capturas y comprobaciones del sistema en ejecución.
 
 | Archivo | Qué muestra |
 | --- | --- |
-| `01-ingreso.png` | Pantalla de ingreso de la PWA, renderizada desde el contenedor `kubo-web` |
+| `01-ingreso.png` | Pantalla de ingreso de la PWA |
+| `02-tablero.png` | Tablero: ventas de hoy, serie de 14 días, top productos y medios de pago |
+| `03-clientes.png` | Listado de clientes con documento y teléfono **enmascarados** |
+| `04-detalle-cliente.png` | Detalle de un cliente: documento y teléfono completos (cifrados en la base) |
+| `05-cifrado-en-base.txt` | Consulta real a PostgreSQL: los campos personales se guardan como `v1:default:…`, ilegibles |
+| `06-productos.png` | Catálogo con precio, IVA, stock y alerta de stock bajo |
+| `07-pos.png` | POS con un producto en el carrito: IVA desagregado y total a cobrar |
+| `08-pos-offline.png` | Venta sin conexión: «Sin internet» y la venta en la cola de sincronización |
+| `09-sincronizacion.png` | Al recuperar la conexión la venta se sincroniza y la cola queda en cero |
+| `10-repositorios.txt` | Los 9 repositorios del workspace (8 hijos + el repositorio raíz) |
+
+Las capturas de interfaz se tomaron con Playwright contra la PWA en
+`http://localhost:3000` (viewport 1360×880) sobre la semilla de demostración; la
+secuencia sigue el guion de [`../09-demo-guion.md`](../09-demo-guion.md).
 
 ## Comprobaciones reproducibles
 
@@ -29,24 +42,3 @@ docker stats --no-stream   # consumo por servicio (~1 GB en total)
 > Antes de grabar el video conviene ejecutar `make reset-demo`: elimina los
 > clientes y productos que dejan las ejecuciones del humo y recarga la semilla,
 > de modo que la demostración muestre solo datos presentables.
-
-## Capturas pendientes (para el video)
-
-Chrome en modo *headless* no completa la restauración de sesión del SPA
-(limitación del navegador sin interfaz, no del sistema), así que las capturas del
-interior se toman desde el navegador real durante la grabación:
-
-| # | Pantalla | Cómo llegar | Qué debe verse |
-| --- | --- | --- | --- |
-| 02 | Tablero | Ingresar con `admin@kubo.local` / `Admin123!` | Ventas de hoy, serie de 14 días, top productos, medios de pago |
-| 03 | Clientes | Menú **Clientes** | Documento enmascarado (`*******432`) |
-| 04 | Detalle de cliente | Clic en un cliente | Documento completo |
-| 05 | Cifrado en la base | `docker exec kubo-postgres psql -U kubo_root -d kubo_crm -c "select name, left(document_number_encrypted,28) from customers limit 3"` | Texto cifrado ilegible |
-| 06 | Productos | Menú **Productos** | Precio, IVA, stock y alerta de stock bajo |
-| 07 | POS | Menú **Vender** con productos en el carrito | Total y IVA desagregado |
-| 08 | Modo sin conexión | Activar modo avión y cobrar | Etiqueta «Sin internet» y venta en cola |
-| 09 | Sincronización | Recuperar la conexión | La venta pendiente desaparece |
-| 10 | Repositorios | `ls -d kubo-*/` | Los 9 repositorios |
-
-La secuencia completa, con tiempos y texto sugerido, está en
-[`../09-demo-guion.md`](../09-demo-guion.md).

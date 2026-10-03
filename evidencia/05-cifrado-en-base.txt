@@ -1,0 +1,10 @@
+$ docker exec kubo-postgres psql -U kubo_root -d kubo_crm -c "select name, left(document_number_encrypted, 28) as documento_cifrado, left(phone_encrypted, 20) as telefono_cifrado from customers limit 4"
+
+        name         |      documento_cifrado       |   telefono_cifrado   
+---------------------+------------------------------+----------------------
+ Panaderia El Trigal | v1:default:Xb4iyIoRtCykokZ+T | v1:default:n/7iZ+gQC
+ Ferreteria La 14    | v1:default:z7FR10KUZJyORNSMv | v1:default:kIMxTR4LA
+ Jose Ramirez        | v1:default:xEl9UCq2WJjyfxkBN | v1:default:cxAdOH8zC
+ Cafe Quindio S.A.S. | v1:default:47CA2SZFAqSB3kpgI | v1:default:2Ew6v0ssm
+(4 rows)
+

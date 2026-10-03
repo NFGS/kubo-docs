@@ -37,15 +37,15 @@ ejecutarse tantas veces como haga falta.
 ## 2. Pruebas unitarias por servicio
 
 ```bash
-# kubo-iam — 77 pruebas (tokens, identidad, TOTP, plataforma y cobro)
+# kubo-iam — 79 pruebas (tokens, identidad, TOTP, plataforma y cobro)
 # Incluye Testcontainers: PostgreSQL real, migraciones Flyway y RLS.
-# Gate de cobertura JaCoCo ≥ 80 % en application/domain (hoy 85.1 %).
+# Gate de cobertura JaCoCo ≥ 80 % en application/domain (hoy 85.2 %).
 cd kubo-iam && mvn verify
 
 # kubo-gateway — 12 pruebas (rutas, límite de tasa con Redis real, plataforma)
 cd kubo-gateway && npm test
 
-# kubo-crm — 15 pruebas (12 de cifrado + 3 de integración RLS con PostgreSQL)
+# kubo-crm — 20 pruebas (13 de cifrado + 7 de integración con PostgreSQL)
 ./kubo-infra/scripts/crm-tests.sh
 
 # kubo-erp — 50 bloques ExUnit (34 puros + 16 de integración PostgreSQL)
@@ -55,10 +55,10 @@ cd kubo-gateway && npm test
 ./kubo-infra/scripts/analytics-tests.sh
 ```
 
-**Total: 162 pruebas de servicio** (unitarias y de integración) más 184
+**Total: 169 pruebas de servicio** (unitarias y de integración) más 184
 comprobaciones end-to-end, 23 contratos, 5 pruebas de navegador con axe y los
 simulacros de bus y restauración. La cobertura de dominio se vigila en CI:
-IAM ≥ 80 % (JaCoCo, hoy 85.1 %) y analítica ≥ 80 % en su módulo de
+IAM ≥ 80 % (JaCoCo, hoy 85.2 %) y analítica ≥ 80 % en su módulo de
 procesamiento (pytest-cov).
 
 ### Cómo ejecutar cada suite
@@ -72,7 +72,7 @@ make e2e                                      # 5 pruebas de navegador + axe
 make load                                     # 50 cajas, p95 < 300 ms
 make ci                                       # gate completo (10 verificaciones)
 
-./kubo-infra/scripts/crm-tests.sh             # 15 pruebas del CRM
+./kubo-infra/scripts/crm-tests.sh             # 20 pruebas del CRM
 ./kubo-infra/scripts/erp-tests.sh             # 50 bloques del ERP
 ./kubo-infra/scripts/analytics-tests.sh       # 8 pruebas de analitica
 ```
@@ -164,7 +164,7 @@ Lo que sigue abierto, sin bloquear el cierre:
 
 | Tema | Estado |
 | --- | --- |
-| Gate de cobertura en ERP, gateway, CRM y web | IAM (85.1 %, JaCoCo) y analítica (≥ 80 % en procesamiento) lo tienen; los demás miden con pruebas puras, sin umbral |
+| Gate de cobertura en ERP, gateway, CRM y web | IAM (85.2 %, JaCoCo) y analítica (≥ 80 % en procesamiento) lo tienen; los demás miden con pruebas puras, sin umbral |
 | Pruebas unitarias de la PWA | Hoy la interfaz se cubre con E2E y axe; falta vitest para la lógica de cola y offline |
 | Contratos del lado del consumidor (Pact) | El contrato OpenAPI (23 verificaciones contra la API viva) cubre el esquema; Pact queda como mejora |
 | Carga con datos voluminosos | El escenario de 50 cajas usa un catálogo sembrado; falta un perfil con volúmenes de producción |
