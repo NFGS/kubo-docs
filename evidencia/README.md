@@ -16,6 +16,7 @@ Capturas y comprobaciones del sistema en ejecución.
 | `08-pos-offline.png` | Venta sin conexión: «Sin internet» y la venta en la cola de sincronización |
 | `09-sincronizacion.png` | Al recuperar la conexión la venta se sincroniza y la cola queda en cero |
 | `10-repositorios.txt` | Los 9 repositorios del workspace (8 hijos + el repositorio raíz) |
+| `11-documentos.png` | Documentos del negocio: facturas XML, nota crédito, comprobantes PDF y soportes, con descarga autenticada |
 
 Las capturas de interfaz se tomaron con Playwright contra la PWA en
 `http://localhost:3000` (viewport 1360×880) sobre la semilla de demostración; la
