@@ -57,12 +57,13 @@ cd kubo-gateway && npm test
 # kubo-analytics — 8 pruebas (6 unitarias + 2 de integración con MongoDB)
 ./kubo-infra/scripts/analytics-tests.sh
 
-# kubo-web — 9 pruebas vitest (cola offline y política de errores)
+# kubo-web — 29 pruebas vitest (cola offline, politica de errores, formato,
+# sistema de diseno y pantalla de ingreso)
 # Gate v8: líneas/funciones/statements ≥ 85 y ramas ≥ 65.
 cd kubo-web && npm test
 ```
 
-**Total: 204 pruebas de servicio** (unitarias y de integración) más 184
+**Total: 224 pruebas de servicio** (unitarias y de integración) más 184
 comprobaciones end-to-end, 23 contratos, 5 pruebas de navegador con axe y los
 simulacros de bus y restauración. La cobertura se vigila en CI con gates: IAM
 ≥ 80 % (JaCoCo, hoy 85.2 %), analítica ≥ 80 % en su módulo de procesamiento,
@@ -84,7 +85,7 @@ make ci                                       # gate completo (10 verificaciones
 ./kubo-infra/scripts/crm-tests.sh             # 34 pruebas del CRM
 ./kubo-infra/scripts/erp-tests.sh             # 55 pruebas del ERP
 ./kubo-infra/scripts/analytics-tests.sh       # 8 pruebas de analitica
-cd kubo-web && npm test                       # 9 pruebas vitest de la PWA
+cd kubo-web && npm test                       # 29 pruebas vitest de la PWA
 ```
 
 Las pruebas del ERP que no tocan base de datos son puras (aritmética decimal,
@@ -176,5 +177,5 @@ Lo que sigue abierto, sin bloquear el cierre:
 | --- | --- |
 | Gates de cobertura | IAM (85.2 %, JaCoCo), analítica (≥ 80 %), gateway (95.6 %), CRM (100 %), web (100 % de líneas) y ERP (ratchet 36 %; la capa web la cubre el humo 184/184) |
 | Pruebas unitarias de la PWA | Vitest sobre la cola offline y la política de errores (9 pruebas); los componentes se cubren con E2E y axe |
-| Contratos del lado del consumidor (Pact) | El contrato OpenAPI (23 verificaciones contra la API viva) cubre el esquema; Pact queda como mejora |
-| Carga con datos voluminosos | El escenario de 50 cajas usa un catálogo sembrado; falta un perfil con volúmenes de producción |
+| Contratos del lado del consumidor (Pact) | **Implementado**: 4 interacciones del consumidor (PWA) generan el pact y `make pact` lo verifica contra el sistema vivo; integrado en `make ci` |
+| Carga con datos voluminosos | **Implementado**: `make load-big` siembra 50.000 productos y mide la busqueda (p95 233 ms a 10 cajas; 6 ms por peticion en frio) |

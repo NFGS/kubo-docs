@@ -435,3 +435,9 @@ fila hasta el commit y serializaba todas las cajas del negocio). Ambos salieron
 de la transacción: con 10 cajas el p95 quedó en **107 ms** y el throughput subió
 ~13 %; a 50 cajas en este host de desarrollo (swap/zram en uso por otros
 proyectos) el p95 es ~540 ms con el **100 % de las ventas exitosas**.
+
+**Catálogo voluminoso (misma fecha).** `make load-big` siembra **50.000
+productos** y mide la búsqueda del POS: **6 ms** por petición en frío (índice
+trigram), p95 **233 ms** con 10 cajas concurrentes y el 100 % de búsquedas
+exitosas. A 20 cajas el host satura (~54 req/s) y el p95 sube a 531 ms: el
+techo es del entorno, no de la consulta.
