@@ -43,23 +43,32 @@ ejecutarse tantas veces como haga falta.
 cd kubo-iam && mvn verify
 
 # kubo-gateway — 12 pruebas (rutas, límite de tasa con Redis real, plataforma)
+# Gate de Node ≥ 80 % en líneas y funciones (hoy 88.7 / 85.2).
 cd kubo-gateway && npm test
 
-# kubo-crm — 20 pruebas (13 de cifrado + 7 de integración con PostgreSQL)
+# kubo-crm — 27 pruebas (13 de cifrado + 14 de integración con PostgreSQL)
+# Gate SimpleCov ≥ 80 % de líneas (hoy 92 %).
 ./kubo-infra/scripts/crm-tests.sh
 
-# kubo-erp — 50 bloques ExUnit (34 puros + 16 de integración PostgreSQL)
+# kubo-erp — 52 pruebas ExUnit (34 puras + 18 de integración PostgreSQL)
+# Ratchet de ExUnit ≥ 35 % (hoy 36 %); la capa web la cubre el humo.
 ./kubo-infra/scripts/erp-tests.sh
 
 # kubo-analytics — 8 pruebas (6 unitarias + 2 de integración con MongoDB)
 ./kubo-infra/scripts/analytics-tests.sh
+
+# kubo-web — 9 pruebas vitest (cola offline y política de errores)
+# Gate v8: líneas/funciones/statements ≥ 85 y ramas ≥ 65.
+cd kubo-web && npm test
 ```
 
-**Total: 169 pruebas de servicio** (unitarias y de integración) más 184
+**Total: 187 pruebas de servicio** (unitarias y de integración) más 184
 comprobaciones end-to-end, 23 contratos, 5 pruebas de navegador con axe y los
-simulacros de bus y restauración. La cobertura de dominio se vigila en CI:
-IAM ≥ 80 % (JaCoCo, hoy 85.2 %) y analítica ≥ 80 % en su módulo de
-procesamiento (pytest-cov).
+simulacros de bus y restauración. La cobertura se vigila en CI con gates: IAM
+≥ 80 % (JaCoCo, hoy 85.2 %), analítica ≥ 80 % en su módulo de procesamiento,
+gateway ≥ 80 % en líneas y funciones (hoy 88.7 / 85.2), CRM ≥ 80 % de líneas
+(hoy 92 %), web ≥ 85 % de líneas/funciones/statements (hoy 100 / 91.7 / 95.7) y
+ERP con ratchet ≥ 35 % (hoy 36 %; la capa web la cubre el humo).
 
 ### Cómo ejecutar cada suite
 
@@ -72,9 +81,10 @@ make e2e                                      # 5 pruebas de navegador + axe
 make load                                     # 50 cajas, p95 < 300 ms
 make ci                                       # gate completo (10 verificaciones)
 
-./kubo-infra/scripts/crm-tests.sh             # 20 pruebas del CRM
-./kubo-infra/scripts/erp-tests.sh             # 50 bloques del ERP
+./kubo-infra/scripts/crm-tests.sh             # 27 pruebas del CRM
+./kubo-infra/scripts/erp-tests.sh             # 52 pruebas del ERP
 ./kubo-infra/scripts/analytics-tests.sh       # 8 pruebas de analitica
+cd kubo-web && npm test                       # 9 pruebas vitest de la PWA
 ```
 
 Las pruebas del ERP que no tocan base de datos son puras (aritmética decimal,
@@ -164,7 +174,7 @@ Lo que sigue abierto, sin bloquear el cierre:
 
 | Tema | Estado |
 | --- | --- |
-| Gate de cobertura en ERP, gateway, CRM y web | IAM (85.2 %, JaCoCo) y analítica (≥ 80 % en procesamiento) lo tienen; los demás miden con pruebas puras, sin umbral |
-| Pruebas unitarias de la PWA | Hoy la interfaz se cubre con E2E y axe; falta vitest para la lógica de cola y offline |
+| Gates de cobertura | IAM (85.2 %, JaCoCo), analítica (≥ 80 %), gateway (88.7 %), CRM (92 %), web (100 % de líneas) y ERP (ratchet 36 %; la capa web la cubre el humo 184/184) |
+| Pruebas unitarias de la PWA | Vitest sobre la cola offline y la política de errores (9 pruebas); los componentes se cubren con E2E y axe |
 | Contratos del lado del consumidor (Pact) | El contrato OpenAPI (23 verificaciones contra la API viva) cubre el esquema; Pact queda como mejora |
 | Carga con datos voluminosos | El escenario de 50 cajas usa un catálogo sembrado; falta un perfil con volúmenes de producción |
