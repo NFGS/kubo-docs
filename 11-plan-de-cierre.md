@@ -509,7 +509,7 @@ habilitación DIAN y la app móvil cuando el negocio la pida).
 
 | Riesgo | Mitigación |
 | --- | --- |
-| Push a GitLab bloqueado (falta Personal Access Token) | `GITLAB_TOKEN=... make push`; los commits quedan locales mientras tanto |
+| Publicación de los repos pendiente | `make push` (GitLab, con `GITLAB_TOKEN`) o `make push-github` (GitHub, con `gh` autenticado); los commits quedan locales mientras tanto |
 | Las pruebas del ERP no corren en el contenedor de producción (OOM con 512 MB) | Comando con `-m 3g` documentado en `07-pruebas.md`; el CI de la Fase 2 las ejecuta |
 | DIAN exige ser Proveedor Tecnológico autorizado | Trámite externo; la Fase 4 avanza con el puerto y deja la habilitación como cierre |
 | Capturas internas de la app y video demo pendientes | Guía en `evidencia/README.md` y guion en `09-demo-guion.md`; tarea del usuario |
