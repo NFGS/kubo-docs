@@ -52,8 +52,9 @@ la primera vez y para consultarse por secciones después.
 | [0024](adr/ADR-0024-superficie-del-operador.md) | Superficie del operador: script hoy, panel cuando haya rol |
 | [0025](adr/ADR-0025-rol-de-plataforma.md) | Rol de plataforma y panel del operador |
 | [0026](adr/ADR-0026-puerto-de-cobro.md) | Puerto de cobro y pasarela de pago |
+| [0027](adr/ADR-0027-sincronizacion-4-entornos.md) | Sincronización de los 4 entornos con huella |
 
-Las 26 ADR están aceptadas; su estado y la fase en que se cerraron se detallan
+Las 27 ADR están aceptadas; su estado y la fase en que se cerraron se detallan
 en [`08-trazabilidad.md`](08-trazabilidad.md) §4.
 
 ## Documentación por servicio

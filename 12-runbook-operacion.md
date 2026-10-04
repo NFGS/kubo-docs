@@ -53,6 +53,9 @@ Debe terminar en **0 fallos**. Qué mira y qué hacer si falla:
   pendientes de confirmar.
 - **Capacidad**: uso de disco, tamaño de los documentos y ventas del mes por
   negocio (el panel muestra los conteos; nunca datos de negocio).
+- **Espejos**: `make sync-status` verifica que el directorio del proyecto,
+  GitHub, Notion y Obsidian compartan la misma huella; `make sync` propaga los
+  cambios (ADR-0027).
 
 ## 4. Playbooks (qué hacer cuando pasa)
 
