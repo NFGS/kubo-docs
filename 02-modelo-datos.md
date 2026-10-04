@@ -291,9 +291,11 @@ de forma intermitente bajo concurrencia).
 
 **Compras y proveedores (Fase 3)**: `suppliers` guarda el proveedor con su NIT
 (único por negocio y borrado lógico); `purchases` la cabecera (número `C-000001`,
-proveedor con copia del nombre, totales y estado `RECEIVED|VOIDED`) y
-`purchase_items` el detalle con el costo unitario. La compra suma inventario,
-actualiza el costo del producto sin IVA y emite `purchase.received`.
+proveedor con copia del nombre, totales, `warehouse_id` —la bodega de entrada,
+obligatoria desde la migración de compras por bodega— y estado
+`RECEIVED|VOIDED`) y `purchase_items` el detalle con el costo unitario. La
+compra suma inventario en la bodega elegida, actualiza el costo del producto sin
+IVA y emite `purchase.received`; anularla revierte el stock en esa misma bodega.
 
 ## 5. `kubo_analytics` — modelo de lectura en MongoDB
 

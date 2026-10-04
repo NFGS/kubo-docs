@@ -88,6 +88,14 @@ En **Productos** ves el catálogo con precio, IVA y existencias.
 Cuando algo está en o por debajo del mínimo, aparece un aviso amarillo arriba:
 es el momento de programar una compra.
 
+### Registrar una compra
+
+En **Compras** registras la mercancía que llega del proveedor: eliges el
+proveedor, la **bodega de entrada** (la principal viene preseleccionada) y una o
+más líneas con producto, cantidad y costo con IVA. Al guardar, el stock entra a
+esa bodega, el costo del producto se actualiza al valor sin IVA y el movimiento
+queda en el kardex. **Anular** una compra revierte el stock en la misma bodega.
+
 ## 5. Clientes
 
 En **Clientes** está tu cartera.

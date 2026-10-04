@@ -267,9 +267,9 @@ como pendiente P-23.
 > | F5 · Escala | P-28, P-29 |
 > | F6 · Operación | F6.1–F6.6 (uso, cobro, panel, respaldos, pasarela) |
 >
-> Evidencia de cierre: `make ci` 10/10 (secretos, suites, contratos 23/23, humo
-> 189/189, E2E 5/5), gates de cobertura por servicio (IAM 85.2 %, analítica
-> ≥ 80 %, gateway 95.6 %, CRM 100 %, web 100 % de líneas, ERP ratchet 36 %),
+> Evidencia de cierre: `make ci` 11/11 (secretos, suites, contratos 23/23, humo
+> 192/192, E2E 5/5), gates de cobertura por servicio (IAM 85.2 %, analítica
+> ≥ 80 %, gateway 95.6 %, CRM 100 %, web 97.3 % de líneas, ERP ratchet 37.68 %),
 > `make bus-drill` 4/4 y `make restore-drill` 14/14.
 >
 > Las tablas de §5.1–5.3 conservan el catálogo original con el riesgo y el
@@ -425,8 +425,8 @@ Revisión estática OWASP sobre el estado final del sistema, después de las fas
 | KUBO-05 | `erl_crash.dump` en el historial de git | Media | **Resuelto**: historial purgado (`filter-branch` + `gc`), el objeto no existe en ningún commit ni en el almacén, y el archivo se retiró del disco y se ignoró |
 | KUBO-06 | Cabeceras internas: TLS por defecto apagado y roles sin whitelist | Media | `KUBO_INTERNAL_TLS` fail-closed por defecto (las pruebas lo apagan de forma explícita) y whitelist de roles en IAM y ERP |
 
-Evidencia: `make ci` 10/10, humo **189/189** tras desplegar el endurecimiento,
-IAM 83 pruebas, ERP 56 pruebas, `make bus-drill` 4/4 y `make restore-drill` 14/14.
+Evidencia: `make ci` 11/11, humo **192/192** tras desplegar el endurecimiento,
+IAM 83 pruebas, ERP 57 pruebas, `make bus-drill` 4/4 y `make restore-drill` 14/14.
 
 **Nota de rendimiento (misma fecha).** Al re-verificar la carga se encontraron
 dos serializaciones reales en la venta: el comprobante PDF y el contador de

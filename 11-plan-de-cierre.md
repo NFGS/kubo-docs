@@ -7,6 +7,7 @@
 | Punto de partida | 44/44 comprobaciones en verde · 10 contenedores sanos · 9 repositorios limpios |
 | Dedicación | ~30 h/semana (≈ 3.75 jornadas de 8 h) |
 | Estado | Fases 0–4 completadas · Fase 5 completada salvo el backlog comercial · **Fase 6 (operación y comercial) completada**: F6.1–F6.6 construidos y verificados, incluidos el uso del ERP en el panel y la rotación del segundo factor del operador; quedan las mejoras continuas (métricas de F6.5) y la app móvil cuando el negocio la pida (ADR-0023) |
+| Verificación vigente | `make ci` 11/11 · humo 192/192 · 231 pruebas de servicio · contratos 23/23 · E2E 5/5 · ERP ratchet 37.68 % (2026-10-04) |
 
 Este documento ordena los 31 pendientes de [`10-auditoria.md`](10-auditoria.md) en
 fases con criterio de cierre medible. No sustituye a la auditoría: la usa como
@@ -264,7 +265,7 @@ verificados (F4.1 a F4.6); el detalle de cada uno está abajo.
   inmutable (`invoices`, con RLS), emitir es idempotente, una venta anulada no
   se factura (409 `SALE_VOIDED`) y el nombre del emisor llega por
   `x-tenant-name`. Evidencia: ERP puras **32/32** y integración **16/16**, humo
-  **189/189**, contratos **16/16** (esquema `InvoiceItem` contra la API viva).
+  **192/192**, contratos **16/16** (esquema `InvoiceItem` contra la API viva).
   **Notas crédito: implementadas** (anular una venta facturada emite el
   documento que corrige la factura, con su CUDE y su XML como documento; es
   idempotente por venta). Pendiente externo: la firma XAdES —del lado del

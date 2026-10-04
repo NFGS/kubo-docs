@@ -90,5 +90,5 @@ núcleo:
   implementar `refresh_status/1` si su proveedor valida de forma asíncrona; la
   factura guarda `status`, `provider_reference` y `status_detail`.
 - Guía paso a paso: [`13-guia-adaptador-facturacion.md`](../13-guia-adaptador-facturacion.md).
-- Evidencia: humo **189/189** (incluye el NIT con DV, el régimen y el prefijo en
+- Evidencia: humo **192/192** (incluye el NIT con DV, el régimen y el prefijo en
   el XML del sandbox).

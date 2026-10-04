@@ -9,8 +9,8 @@ servicio, una prueba de humo end-to-end y verificaciones manuales de operación.
 make smoke
 ```
 
-Ejecuta **189 comprobaciones** contra el sistema en ejecución, usando el API
-Gateway como un cliente real. Resultado esperado: `189 pruebas exitosas, 0 fallidas`.
+Ejecuta **192 comprobaciones** contra el sistema en ejecución, usando el API
+Gateway como un cliente real. Resultado esperado: `192 pruebas exitosas, 0 fallidas`.
 
 | Bloque | Qué verifica | Comprobaciones |
 | --- | --- | --- |
@@ -19,17 +19,17 @@ Gateway como un cliente real. Resultado esperado: `189 pruebas exitosas, 0 falli
 | 3. Acceso, auditoría y bloqueo | Sin token → `401`; token falsificado → `401`; cabecera inyectada → **ignorada**; negocio malformado → `400`; **5 intentos fallidos bloquean la cuenta**; **cadena de auditoría intacta** y hash versionado; usuarios y roles; **segundo factor TOTP completo** (secreto, URI, activación, desafío, código válido e inválido); deshabilitado no ingresa; eventos de seguridad en la bitácora | 23 |
 | 4. Clientes, cifrado y RLS | Crear cliente; detalle completo; listado **enmascarado**; texto **cifrado**; índice ciego; **búsqueda por documento**; **RLS: sin contexto 0 filas, con contexto > 0** | 8 |
 | 5. Inventario, venta y outbox | Bodega por defecto y segunda bodega; **transferencia con kardex en ambas**; cupo de bodegas por plan; venta desde la bodega elegida; aviso de stock bajo; venta por `35700.00`; IVA `5700.00`; kardex; **importación CSV**; **paginación con total real**; sobreventa → `409`; **evento en la bandeja** y publicado; **RLS en ERP** | 30 |
-| 6. Evento, tablero y verticales | Proyección en analítica y MongoDB; tablero; **vista compuesta con las 7 vistas**; zona horaria del negocio; **cuatro verticales** y catálogo de arranque idempotente; servicio sin kardex y venta con mesa; reportes CSV; **factura DIAN con CUFE y XML**; comprobante PDF con hash; anti-inyección de fórmulas; outbox sin fallidos | 37 |
+| 6. Evento, tablero y verticales | Proyección en analítica y MongoDB; tablero; **vista compuesta con las 7 vistas**; zona horaria del negocio; **cuatro verticales** y catálogo de arranque idempotente; servicio sin kardex y venta con mesa; reportes CSV; **factura DIAN con CUFE y XML**; comprobante PDF con hash; anti-inyección de fórmulas; outbox sin fallidos | 42 |
 | 7. Anulación y nota crédito | La venta queda `VOIDED`; el inventario vuelve; una venta anulada no se factura; **nota crédito con CUDE, referencia y XML UBL**; reemisión idempotente | 10 |
 | 8. Aislamiento, plataforma y cobro | Un segundo negocio no ve clientes ni catálogo; **RLS en IAM**; suspensión y reactivación; renovación del plan; **panel de plataforma con TOTP obligatorio**; uso por negocio; planes y cupos; intención de pago al precio del catálogo; **webhook firmado e idempotente** | 26 |
 | 9. Recuperación de contraseña | Solicitud 204; enlace en el buzón; consumo 204; **la cuenta se desbloquea con la clave nueva**; el enlace **no se reutiliza**; sin enumeración de usuarios | 6 |
-| 10. Compras, proveedores y caja | Proveedor creado; compra por `25000.00`; IVA desagregado; soporte documental; **suma 5 unidades**; **el costo se actualiza sin IVA**; kardex `PURCHASE`; **anulación revierte el stock**; **RLS en compras**; apertura, venta en efectivo, cierre y arqueo de caja | 17 |
+| 10. Compras, proveedores y caja | Proveedor creado; compra por `25000.00`; IVA desagregado; **entra a la bodega elegida**; bodega inexistente → `404`; soporte documental; **suma 5 unidades**; **el costo se actualiza sin IVA**; kardex `PURCHASE`; **la anulación revierte en la misma bodega**; **RLS en compras**; apertura, venta en efectivo, cierre y arqueo de caja | 20 |
 | 11. Tasa, TLS y trazas | **Límite por usuario** activo; HTTPS 200; HTTP → HTTPS; HSTS; **collector de trazas arriba y recibiendo spans** | 6 |
 
 Además del humo: **23 contratos OpenAPI** (`make contracts`), **5 pruebas de
 navegador con axe** (`make e2e`), la **carga a 50 cajas** (`make load`: 100 % de ventas exitosas; p95
 107 ms con 10 cajas y ~540 ms en el host de desarrollo con presión de memoria), los simulacros de bus (`make bus-drill`, 4/4) y restauración
-(`make restore-drill`, 14/14), y el gate `make ci` (10 verificaciones) que los reúne.
+(`make restore-drill`, 14/14), y el gate `make ci` (11 verificaciones) que los reúne.
 
 La prueba es **idempotente**: crea sus propios datos con marcas de tiempo y puede
 ejecutarse tantas veces como haga falta.
@@ -50,42 +50,42 @@ cd kubo-gateway && npm test
 # Gate SimpleCov ≥ 80 % de líneas (hoy 100 %).
 ./kubo-infra/scripts/crm-tests.sh
 
-# kubo-erp — 56 pruebas ExUnit (35 puras + 21 de integración/HTTP)
-# Ratchet de ExUnit ≥ 35 % (hoy 36 %); la capa web la cubre el humo.
+# kubo-erp — 57 pruebas ExUnit (35 puras + 22 de integración/HTTP)
+# Ratchet de ExUnit ≥ 35 % (hoy 37.68 %); la capa web la cubre el humo.
 ./kubo-infra/scripts/erp-tests.sh
 
 # kubo-analytics — 8 pruebas (6 unitarias + 2 de integración con MongoDB)
 ./kubo-infra/scripts/analytics-tests.sh
 
-# kubo-web — 29 pruebas vitest (cola offline, politica de errores, formato,
-# sistema de diseno y pantalla de ingreso)
+# kubo-web — 30 pruebas vitest (cola offline, politica de errores, formato,
+# sistema de diseno —con focus trap y Escape del dialogo— y pantalla de ingreso)
 # Gate v8: líneas/funciones/statements ≥ 85 y ramas ≥ 65.
 cd kubo-web && npm test
 ```
 
-**Total: 229 pruebas de servicio** (unitarias y de integración) más 189
+**Total: 231 pruebas de servicio** (unitarias y de integración) más 192
 comprobaciones end-to-end, 23 contratos, 5 pruebas de navegador con axe y los
 simulacros de bus y restauración. La cobertura se vigila en CI con gates: IAM
 ≥ 80 % (JaCoCo, hoy 85.2 %), analítica ≥ 80 % en su módulo de procesamiento,
 gateway ≥ 80 % en líneas y funciones (hoy 95.6 / 85.2), CRM ≥ 80 % de líneas
-(hoy 100 %), web ≥ 85 % de líneas/funciones/statements (hoy 100 / 91.7 / 95.7) y
-ERP con ratchet ≥ 35 % (hoy 36 %; la capa web la cubre el humo).
+(hoy 100 %), web ≥ 85 % de líneas/funciones/statements (hoy 97.3 / 95.3 / 95.9) y
+ERP con ratchet ≥ 35 % (hoy 37.68 %; la capa web la cubre el humo).
 
 ### Cómo ejecutar cada suite
 
 ```bash
-make smoke                                    # 189 comprobaciones end-to-end
+make smoke                                    # 192 comprobaciones end-to-end
 make bus-drill                                # 4 comprobaciones: caida del bus
 make restore-drill                            # 14 comprobaciones: restauracion
 make contracts                                # 23 contratos OpenAPI
 make e2e                                      # 5 pruebas de navegador + axe
 make load                                     # 50 cajas, p95 < 300 ms
-make ci                                       # gate completo (10 verificaciones)
+make ci                                       # gate completo (11 verificaciones)
 
 ./kubo-infra/scripts/crm-tests.sh             # 34 pruebas del CRM
-./kubo-infra/scripts/erp-tests.sh             # 56 pruebas del ERP
+./kubo-infra/scripts/erp-tests.sh             # 57 pruebas del ERP
 ./kubo-infra/scripts/analytics-tests.sh       # 8 pruebas de analitica
-cd kubo-web && npm test                       # 29 pruebas vitest de la PWA
+cd kubo-web && npm test                       # 30 pruebas vitest de la PWA
 ```
 
 Las pruebas del ERP que no tocan base de datos son puras (aritmética decimal,
@@ -175,8 +175,8 @@ Lo que sigue abierto, sin bloquear el cierre:
 
 | Tema | Estado |
 | --- | --- |
-| Gates de cobertura | IAM (85.2 %, JaCoCo), analítica (≥ 80 %), gateway (95.6 %), CRM (100 %), web (100 % de líneas) y ERP (ratchet 36 %; la capa web la cubre el humo 189/189) |
-| Pruebas unitarias de la PWA | Vitest: cola offline, política de errores, formato, sistema de diseño y pantalla de ingreso (29 pruebas); los flujos completos se cubren con E2E y axe |
+| Gates de cobertura | IAM (85.2 %, JaCoCo), analítica (≥ 80 %), gateway (95.6 %), CRM (100 %), web (97.3 % de líneas) y ERP (ratchet 37.68 %; la capa web la cubre el humo 192/192) |
+| Pruebas unitarias de la PWA | Vitest: cola offline, política de errores, formato, sistema de diseño —incluido el focus trap y Escape del diálogo— y pantalla de ingreso (30 pruebas); los flujos completos se cubren con E2E y axe |
 | Proveedor tecnológico DIAN | **Proyecto listo para enchufarlo**: puerto configurable (`KUBO_BILLING_ADAPTER`), datos fiscales en el token, errores tipados y guía [`13`](13-guia-adaptador-facturacion.md); falta el adaptador del PT elegido (externo) |
 | Contratos del lado del consumidor (Pact) | **Implementado**: 4 interacciones del consumidor (PWA) generan el pact y `make pact` lo verifica contra el sistema vivo; integrado en `make ci` |
 | Carga con datos voluminosos | **Implementado**: `make load-big` siembra 50.000 productos y mide la busqueda (p95 233 ms a 10 cajas; 6 ms por peticion en frio) |

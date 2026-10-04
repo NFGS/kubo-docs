@@ -124,11 +124,17 @@ personales: Rails filtra `document_number`, `phone` y `email` en sus logs.
 | XSS | React escapa por defecto; no se usa `dangerouslySetInnerHTML`; cabeceras de seguridad con Helmet |
 | Clickjacking | `X-Frame-Options` de Helmet |
 | MIME sniffing | `X-Content-Type-Options: nosniff` |
+| Cabeceras de la PWA | nginx sirve `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy` (cámara, micrófono y ubicación denegados) en todas las respuestas, incluidos los activos con caché |
 | Inyección SQL | Consultas parametrizadas en los cuatro lenguajes (JPA, ActiveRecord, Ecto, PyMongo); **no hay SQL concatenado** |
 | Inyección en búsquedas | Los comodines `%` y `_` se eliminan del término de búsqueda |
 | CSRF | La API no usa cookies de sesión: la autenticación es por cabecera `Authorization` |
 | Enumeración de usuarios | El login responde el mismo mensaje para correo inexistente y contraseña incorrecta |
 | Fuga de datos entre negocios | Aislamiento por `tenant_id` + prueba automática |
+
+Los diálogos de la PWA atrapan el foco (Tab y Shift+Tab no salen del panel),
+cierran con Escape y devuelven el foco al elemento de origen: el comportamiento
+está cubierto por una prueba unitaria y las páginas se auditan con axe en E2E
+(P-26).
 
 ### Sobre el almacenamiento del refresh token
 

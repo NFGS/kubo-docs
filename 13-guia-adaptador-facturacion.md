@@ -180,4 +180,10 @@ end
 
 Con el adaptador por defecto, el humo comprueba la cadena completa: datos
 fiscales con DV calculado, cabeceras verificadas del gateway, NIT con DV en el
-XML, prefijo del negocio y estado `ISSUED`. Evidencia: `make smoke` **189/189**.
+XML, prefijo del negocio y estado `ISSUED`. Evidencia: `make smoke` **192/192**.
+
+La emisión es **de un solo emisor por venta**: factura y nota crédito toman un
+candado por venta (`pg_advisory_xact_lock`) antes de llamar al PT, así que un
+doble clic o dos reintentos simultáneos no emiten dos documentos ni cobran dos
+veces. La idempotencia por venta ya existía; el candado cierra la carrera entre
+peticiones concurrentes.
