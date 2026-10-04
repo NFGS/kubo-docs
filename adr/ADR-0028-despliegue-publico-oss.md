@@ -25,8 +25,8 @@ ruta más pura: el tráfico no necesita pasar por ningún tercero.
 2. **Borde: Caddy + Let's Encrypt** (ya en el proyecto) con **HTTP-01** y la
    imagen oficial (sin builds custom). El perfil público vive en
    `Caddyfile.public` y se selecciona con `KUBO_CADDYFILE`.
-3. **Dominio gratis: deSEC** (`kubo.dedyn.io`) — sin ánimo de lucro, API DNS y
-   protocolo DynDNS2; la IP dinámica se mantiene con `ddns-dedyn.sh` (cron).
+3. **Dominio gratis: deSEC** (`kubo.dedyn.io`) — sin ánimo de lucro, API DNS
+   REST; la IP dinámica se mantiene con `ddns-desec.sh` (cron).
 4. **Respaldo offsite: restic/rclone hacia Storj** (S3, 25 GB gratis,
    tecnología abierta) como destino del operador de respaldos (ADR-0022).
 5. **Descartes**: Vercel (solo estático; rompe el proxy mismo-origen y la

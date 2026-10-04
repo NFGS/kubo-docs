@@ -191,23 +191,39 @@ El sistema está diseñado para crecer sin reescribir:
 
 ## 9. Demo público 100 % open source (ADR-0028)
 
-Para mostrar el sistema a cualquier persona con internet sin presupuesto:
+### 9.1 Con acceso al router (ruta directa)
 
 1. **Dominio gratis**: crear cuenta en [deSEC](https://desec.io) y registrar
    `kubo.dedyn.io`; generar un token de API y guardarlo en `.env` como
-   `KUBO_DEDYN_TOKEN`.
+   `KUBO_DESEC_TOKEN`.
 2. **Perfil público** en `kubo-infra/.env`: `KUBO_TLS_DOMAIN=kubo.dedyn.io`,
    `KUBO_CADDYFILE=Caddyfile.public`, `KUBO_TLS_HTTP_PORT=80`,
    `KUBO_TLS_HTTPS_PORT=443` y `KUBO_COOKIE_SECURE=true`.
-3. **IP dinámica**: `./kubo-infra/scripts/ddns-dedyn.sh` (cron cada 5 minutos)
+3. **IP dinámica**: `./kubo-infra/scripts/ddns-desec.sh` (cron cada 5 minutos)
    mantiene el registro A al día.
 4. **Router**: reenviar 80 y 443 a la IP del portátil (reservarla antes en el
    DHCP del router) y no abrir nada más.
-5. `make up` y verificar: Caddy emite el certificado Let's Encrypt (HTTP-01) y
-   `https://kubo.dedyn.io` sirve la PWA. Los puertos 9080–9084 y las bases no
-   deben responder desde internet (siguen en loopback).
+5. `make up` y verificar con `./kubo-infra/scripts/demo-check.sh`: Caddy emite
+   el certificado Let's Encrypt (HTTP-01) y `https://kubo.dedyn.io` sirve la
+   PWA. Los puertos 9080–9084 y las bases no deben responder desde internet
+   (siguen en loopback).
 6. **Respaldo offsite**: rclone hacia Storj (S3, 25 GB gratis) y `make backup`
    + `make restore-drill`.
 
-Si el ISP bloquea los puertos entrantes o no hay acceso al router, el plan B es
-un túnel open source (zrok/OpenZiti) y el compose no cambia.
+### 9.2 Sin acceso al router (túnel 100 % OSS con zrok)
+
+Si el router no permite administración (ni UPnP), el borde es un túnel
+open source; el compose no cambia:
+
+1. Instalar el cliente `zrok2` (Apache-2.0) desde
+   [zrok releases](https://github.com/openziti/zrok/releases).
+2. Crear la cuenta: `zrok2 invite` (el token de invitación se obtiene en
+   [zrok.io](https://zrok.io)) y `zrok2 enable <token>`.
+3. Compartir: `zrok2 share public --headless http://localhost:3000` (URL
+   `https://<aleatorio>.shares.zrok.io`); para una URL estable,
+   `zrok2 create name kubo` y seleccionar el nombre al compartir.
+4. `KUBO_COOKIE_SECURE=true` en `.env` y
+   `docker compose up -d kubo-gateway`.
+5. Detrás del túnel todos los visitantes comparten IP: el límite de
+   autenticación se vuelve global (súbelo temporalmente si hay muchos
+   espectadores).
