@@ -74,3 +74,21 @@ intercambiables:
 - `make smoke` (**125/125**): CUFE válido, idempotencia, XML UBL 2.1 con el
   nombre del negocio propagado por el gateway y 409 al facturar una venta
   anulada.
+
+## Actualización (2026-10-03)
+
+El puerto quedó **listo para enchufar un proveedor tecnológico** sin tocar el
+núcleo:
+
+- El adaptador se elige por configuración (`KUBO_BILLING_ADAPTER`) y el ambiente
+  DIAN por `KUBO_BILLING_ENVIRONMENT` (1 producción, 2 habilitación); el ERP
+  valida al arrancar que el módulo implemente el contrato.
+- Los **datos fiscales del emisor** (NIT con DV calculado, dirección, régimen,
+  resolución y prefijo) viven en `tenants`, se editan en Configuración y viajan
+  en el token como el resto de la configuración del negocio.
+- Los adaptadores reportan errores tipados (`KuboErp.Billing.Error`) y pueden
+  implementar `refresh_status/1` si su proveedor valida de forma asíncrona; la
+  factura guarda `status`, `provider_reference` y `status_detail`.
+- Guía paso a paso: [`13-guia-adaptador-facturacion.md`](../13-guia-adaptador-facturacion.md).
+- Evidencia: humo **189/189** (incluye el NIT con DV, el régimen y el prefijo en
+  el XML del sandbox).

@@ -9,8 +9,8 @@ servicio, una prueba de humo end-to-end y verificaciones manuales de operación.
 make smoke
 ```
 
-Ejecuta **184 comprobaciones** contra el sistema en ejecución, usando el API
-Gateway como un cliente real. Resultado esperado: `184 pruebas exitosas, 0 fallidas`.
+Ejecuta **189 comprobaciones** contra el sistema en ejecución, usando el API
+Gateway como un cliente real. Resultado esperado: `189 pruebas exitosas, 0 fallidas`.
 
 | Bloque | Qué verifica | Comprobaciones |
 | --- | --- | --- |
@@ -37,7 +37,7 @@ ejecutarse tantas veces como haga falta.
 ## 2. Pruebas unitarias por servicio
 
 ```bash
-# kubo-iam — 79 pruebas (tokens, identidad, TOTP, plataforma y cobro)
+# kubo-iam — 83 pruebas (tokens, identidad, TOTP, plataforma, cobro y datos fiscales)
 # Incluye Testcontainers: PostgreSQL real, migraciones Flyway y RLS.
 # Gate de cobertura JaCoCo ≥ 80 % en application/domain (hoy 85.2 %).
 cd kubo-iam && mvn verify
@@ -50,7 +50,7 @@ cd kubo-gateway && npm test
 # Gate SimpleCov ≥ 80 % de líneas (hoy 100 %).
 ./kubo-infra/scripts/crm-tests.sh
 
-# kubo-erp — 55 pruebas ExUnit (34 puras + 21 de integración/HTTP)
+# kubo-erp — 56 pruebas ExUnit (35 puras + 21 de integración/HTTP)
 # Ratchet de ExUnit ≥ 35 % (hoy 36 %); la capa web la cubre el humo.
 ./kubo-infra/scripts/erp-tests.sh
 
@@ -63,7 +63,7 @@ cd kubo-gateway && npm test
 cd kubo-web && npm test
 ```
 
-**Total: 224 pruebas de servicio** (unitarias y de integración) más 184
+**Total: 229 pruebas de servicio** (unitarias y de integración) más 189
 comprobaciones end-to-end, 23 contratos, 5 pruebas de navegador con axe y los
 simulacros de bus y restauración. La cobertura se vigila en CI con gates: IAM
 ≥ 80 % (JaCoCo, hoy 85.2 %), analítica ≥ 80 % en su módulo de procesamiento,
@@ -74,7 +74,7 @@ ERP con ratchet ≥ 35 % (hoy 36 %; la capa web la cubre el humo).
 ### Cómo ejecutar cada suite
 
 ```bash
-make smoke                                    # 184 comprobaciones end-to-end
+make smoke                                    # 189 comprobaciones end-to-end
 make bus-drill                                # 4 comprobaciones: caida del bus
 make restore-drill                            # 14 comprobaciones: restauracion
 make contracts                                # 23 contratos OpenAPI
@@ -83,7 +83,7 @@ make load                                     # 50 cajas, p95 < 300 ms
 make ci                                       # gate completo (10 verificaciones)
 
 ./kubo-infra/scripts/crm-tests.sh             # 34 pruebas del CRM
-./kubo-infra/scripts/erp-tests.sh             # 55 pruebas del ERP
+./kubo-infra/scripts/erp-tests.sh             # 56 pruebas del ERP
 ./kubo-infra/scripts/analytics-tests.sh       # 8 pruebas de analitica
 cd kubo-web && npm test                       # 29 pruebas vitest de la PWA
 ```
@@ -175,7 +175,8 @@ Lo que sigue abierto, sin bloquear el cierre:
 
 | Tema | Estado |
 | --- | --- |
-| Gates de cobertura | IAM (85.2 %, JaCoCo), analítica (≥ 80 %), gateway (95.6 %), CRM (100 %), web (100 % de líneas) y ERP (ratchet 36 %; la capa web la cubre el humo 184/184) |
-| Pruebas unitarias de la PWA | Vitest sobre la cola offline y la política de errores (9 pruebas); los componentes se cubren con E2E y axe |
+| Gates de cobertura | IAM (85.2 %, JaCoCo), analítica (≥ 80 %), gateway (95.6 %), CRM (100 %), web (100 % de líneas) y ERP (ratchet 36 %; la capa web la cubre el humo 189/189) |
+| Pruebas unitarias de la PWA | Vitest: cola offline, política de errores, formato, sistema de diseño y pantalla de ingreso (29 pruebas); los flujos completos se cubren con E2E y axe |
+| Proveedor tecnológico DIAN | **Proyecto listo para enchufarlo**: puerto configurable (`KUBO_BILLING_ADAPTER`), datos fiscales en el token, errores tipados y guía [`13`](13-guia-adaptador-facturacion.md); falta el adaptador del PT elegido (externo) |
 | Contratos del lado del consumidor (Pact) | **Implementado**: 4 interacciones del consumidor (PWA) generan el pact y `make pact` lo verifica contra el sistema vivo; integrado en `make ci` |
 | Carga con datos voluminosos | **Implementado**: `make load-big` siembra 50.000 productos y mide la busqueda (p95 233 ms a 10 cajas; 6 ms por peticion en frio) |

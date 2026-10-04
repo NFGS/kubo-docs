@@ -264,7 +264,7 @@ verificados (F4.1 a F4.6); el detalle de cada uno está abajo.
   inmutable (`invoices`, con RLS), emitir es idempotente, una venta anulada no
   se factura (409 `SALE_VOIDED`) y el nombre del emisor llega por
   `x-tenant-name`. Evidencia: ERP puras **32/32** y integración **16/16**, humo
-  **184/184**, contratos **16/16** (esquema `InvoiceItem` contra la API viva).
+  **189/189**, contratos **16/16** (esquema `InvoiceItem` contra la API viva).
   **Notas crédito: implementadas** (anular una venta facturada emite el
   documento que corrige la factura, con su CUDE y su XML como documento; es
   idempotente por venta). Pendiente externo: la firma XAdES —del lado del

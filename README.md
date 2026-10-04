@@ -19,6 +19,7 @@ la primera vez y para consultarse por secciones después.
 | [10 — Auditoría técnica](10-auditoria.md) | Arquitectura · Calidad | Hallazgos, mediciones, correcciones aplicadas y catálogo de pendientes |
 | [11 — Plan de cierre](11-plan-de-cierre.md) | Gestión · Arquitectura | ¿Qué falta, en qué orden y con qué criterio se cierra cada fase? |
 | [12 — Runbook de operación](12-runbook-operacion.md) | Operación | La semana uno del negocio: chequeo diario, playbooks y métricas |
+| [13 — Guía del adaptador de facturación](13-guia-adaptador-facturacion.md) | Desarrollo · Integración | Cómo enchufar un proveedor tecnológico DIAN sin tocar el núcleo |
 | [ADRs](adr/) | Arquitectura | Las veintiséis decisiones que definen el sistema |
 
 ## Decisiones de arquitectura (ADR)

@@ -1137,6 +1137,42 @@
               "string",
               "null"
             ]
+          },
+          "taxId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "taxIdDv": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fiscalAddress": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "taxRegime": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "invoiceResolution": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "invoicePrefix": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -1155,6 +1191,31 @@
               "restaurantes",
               "agro"
             ]
+          },
+          "tax_id": {
+            "type": "string",
+            "maxLength": 20,
+            "description": "NIT sin digito de verificacion; el DV lo calcula el servidor"
+          },
+          "fiscal_address": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "tax_regime": {
+            "type": "string",
+            "enum": [
+              "RESPONSABLE_IVA",
+              "NO_RESPONSABLE_IVA",
+              "SIMPLE"
+            ]
+          },
+          "invoice_resolution": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "invoice_prefix": {
+            "type": "string",
+            "maxLength": 6
           }
         }
       },
@@ -1571,6 +1632,18 @@
           },
           "xml": {
             "type": "string"
+          },
+          "status_detail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "provider_reference": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
