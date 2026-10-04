@@ -107,9 +107,10 @@ merge · p95 del POS por debajo de 300 ms con 50 cajas · cobertura de dominio �
 
 **Estado: completada (2026-09-24).** Evidencia:
 
-- **P-06 CI**: `.gitlab-ci.yml` en los ocho repositorios (pruebas, SAST, secretos,
-  dependencias) y gate local `make ci` → **9/9 en verde** (secretos, suites,
-  contratos, humo, E2E).
+- **P-06 CI**: gate local `make ci` → **13/13 en verde** (secretos, suites,
+  contratos, Pact, humo, E2E, enlaces y PDF al día). Los pipelines de GitLab
+  (`.gitlab-ci.yml` en los ocho repositorios, con pruebas, SAST, secretos y
+  dependencias) se retiraron el 2026-10-04 al quedar GitHub como único destino.
 - **P-07 OpenTelemetry**: collector OTLP propio (`kubo-otel`) y los **cinco
   servicios exportando trazas** (gateway, IAM, CRM, ERP y analítica), con
   `make observability` para el stack visual (Tempo + Grafana). El humo verifica
@@ -135,8 +136,8 @@ merge · p95 del POS por debajo de 300 ms con 50 cajas · cobertura de dominio �
   pruebas corren como el **rol de la aplicación**, no como superusuario: un
   superusuario ignora RLS incluso con `FORCE` y la prueba dejaría de probar
   algo. Los runners son `kubo-infra/scripts/erp-tests.sh`, `crm-tests.sh` y
-  `analytics-tests.sh` (integrados en `make ci`), y cada `.gitlab-ci.yml` añade
-  el servicio correspondiente (postgres/redis).
+  `analytics-tests.sh` (integrados en `make ci`), que corren contra los
+  servicios reales del compose (postgres/redis).
 - **Defectos reales corregidos al añadir P-08**: el CI de analítica no podía
   importar `app` (faltaba `pytest.ini` con `pythonpath`) ni tenía instalado
   `pytest-cov` pese a usar `--cov-fail-under`; el guard de las pruebas de
@@ -510,7 +511,7 @@ habilitación DIAN y la app móvil cuando el negocio la pida).
 
 | Riesgo | Mitigación |
 | --- | --- |
-| Publicación de los repos pendiente | `make push` (GitLab, con `GITLAB_TOKEN`) o `make push-github` (GitHub, con `gh` autenticado); los commits quedan locales mientras tanto |
+| Publicación de los repos | **Resuelta**: los 9 repos están publicados en GitHub (privados, cuenta NFGS) y `make push-github` republica con `gh` autenticado |
 | Las pruebas del ERP no corren en el contenedor de producción (OOM con 512 MB) | Comando con `-m 3g` documentado en `07-pruebas.md`; el CI de la Fase 2 las ejecuta |
 | DIAN exige ser Proveedor Tecnológico autorizado | Trámite externo; la Fase 4 avanza con el puerto y deja la habilitación como cierre |
 | Capturas internas de la app y video demo pendientes | Guía en `evidencia/README.md` y guion en `09-demo-guion.md`; tarea del usuario |
