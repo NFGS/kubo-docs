@@ -29,7 +29,7 @@ Gateway como un cliente real. Resultado esperado: `192 pruebas exitosas, 0 falli
 Además del humo: **23 contratos OpenAPI** (`make contracts`), **5 pruebas de
 navegador con axe** (`make e2e`), la **carga a 50 cajas** (`make load`: 100 % de ventas exitosas; p95
 107 ms con 10 cajas y ~540 ms en el host de desarrollo con presión de memoria), los simulacros de bus (`make bus-drill`, 4/4) y restauración
-(`make restore-drill`, 14/14), y el gate `make ci` (11 verificaciones) que los reúne.
+(`make restore-drill`, 14/14), el **PDF consolidado al día** (huella de las fuentes, sin abrir Chrome) y el gate `make ci` (12 verificaciones) que los reúne.
 
 La prueba es **idempotente**: crea sus propios datos con marcas de tiempo y puede
 ejecutarse tantas veces como haga falta.
@@ -80,7 +80,8 @@ make restore-drill                            # 14 comprobaciones: restauracion
 make contracts                                # 23 contratos OpenAPI
 make e2e                                      # 5 pruebas de navegador + axe
 make load                                     # 50 cajas, p95 < 300 ms
-make ci                                       # gate completo (11 verificaciones)
+make ci                                       # gate completo (12 verificaciones)
+make pdf                                      # regenera el PDF consolidado y su huella
 
 ./kubo-infra/scripts/crm-tests.sh             # 34 pruebas del CRM
 ./kubo-infra/scripts/erp-tests.sh             # 57 pruebas del ERP

@@ -37,7 +37,7 @@ make restore-drill  # 14 comprobaciones: restauracion cronometrada
 make contracts      # 23 contratos OpenAPI validados contra la API viva
 make e2e            # 5 pruebas de navegador + accesibilidad (Playwright + axe)
 make load           # 50 cajas: p95 de la venta < 300 ms
-make ci             # gate completo: secretos, suites, contratos, humo y E2E
+make ci             # gate completo: secretos, suites, contratos, Pact, humo, E2E y PDF al día
 make ps             # los 12 contenedores en estado healthy
 make reset-demo     # deja la demostracion limpia (borra y recarga la semilla)
 docker stats --no-stream   # consumo por servicio (~1 GB en total)
