@@ -172,17 +172,42 @@ El sistema está diseñado para crecer sin reescribir:
 1. **Más memoria/CPU**: subir los `mem_limit` del compose.
 2. **Más carga en la caja**: escalar el ERP horizontalmente (`docker compose up -d --scale kubo-erp=3`) porque es sin estado; el gateway reparte.
 3. **Bases separadas**: mover cada base a su propia instancia cambiando solo la URL de conexión.
-4. **Clúster**: los mismos artefactos corren en Kubernetes; falta mTLS entre servicios (Fase 5, P-28) y la activación de RLS (Fase 1, P-02).
+4. **Clúster**: los mismos artefactos corren en Kubernetes; la malla mTLS
+   (ADR-0020) y el RLS activo (ADR-0010) ya están implementados; el empaquetado
+   (manifiestos/Helm) queda como backlog declarado (ADR-0028).
 
-## 8. Lo que falta para producción real
+## 8. Lo que queda (declarado)
 
-| Pendiente | ID · Fase | Impacto |
+| Pendiente | Tipo | Impacto |
 | --- | --- | --- |
-| Testcontainers en los servicios restantes | P-08 · Fase 2 | IAM y analítica ya la tienen; faltan CRM, ERP y gateway |
-| Compras y proveedores · sesiones de caja | P-15 · P-16 · Fase 3 | El inventario solo entra por ajuste manual y no hay control de efectivo por turno |
-| Usuarios y roles en la interfaz · importación de datos | P-20 · P-24 · Fase 3 | El dueño no puede crear vendedores ni cargar su catálogo sin ayuda técnica |
-| Facturación electrónica DIAN | P-18 · Fase 4 | Requisito legal para facturar |
-| mTLS entre servicios | P-28 · Fase 5 | Movimiento lateral dentro del clúster |
+| Adaptador del proveedor tecnológico DIAN | Externo (habilitación) | La firma XAdES y el envío los hace el PT; el puerto ya está listo (guía `13`) |
+| Adaptadores reales de notificaciones (WhatsApp/SMTP) | Proveedor externo | El puerto y el buzón ya funcionan; falta la entrega real |
+| Empaquetado Kubernetes (manifiestos/Helm) | Backlog | Necesario solo para multi-nodo (>50 negocios); el compose es el despliegue soportado |
+| App móvil nativa (Capacitor) | Decisión tomada | Solo cuando el negocio pida cámara, push o impresión (ADR-0023) |
+| Capturas internas y video narrado | Tarea del usuario | Evidencia de demostración (`09-demo-guion.md`) |
 
-> Las fases 1 y 2 (confiabilidad y calidad) están cerradas y verificadas; ver
+> Las fases 0–6 están cerradas y verificadas; ver
 > [`11-plan-de-cierre.md`](11-plan-de-cierre.md).
+
+## 9. Demo público 100 % open source (ADR-0028)
+
+Para mostrar el sistema a cualquier persona con internet sin presupuesto:
+
+1. **Dominio gratis**: crear cuenta en [deSEC](https://desec.io) y registrar
+   `kubo.dedyn.io`; generar un token de API y guardarlo en `.env` como
+   `KUBO_DEDYN_TOKEN`.
+2. **Perfil público** en `kubo-infra/.env`: `KUBO_TLS_DOMAIN=kubo.dedyn.io`,
+   `KUBO_CADDYFILE=Caddyfile.public`, `KUBO_TLS_HTTP_PORT=80`,
+   `KUBO_TLS_HTTPS_PORT=443` y `KUBO_COOKIE_SECURE=true`.
+3. **IP dinámica**: `./kubo-infra/scripts/ddns-dedyn.sh` (cron cada 5 minutos)
+   mantiene el registro A al día.
+4. **Router**: reenviar 80 y 443 a la IP del portátil (reservarla antes en el
+   DHCP del router) y no abrir nada más.
+5. `make up` y verificar: Caddy emite el certificado Let's Encrypt (HTTP-01) y
+   `https://kubo.dedyn.io` sirve la PWA. Los puertos 9080–9084 y las bases no
+   deben responder desde internet (siguen en loopback).
+6. **Respaldo offsite**: rclone hacia Storj (S3, 25 GB gratis) y `make backup`
+   + `make restore-drill`.
+
+Si el ISP bloquea los puertos entrantes o no hay acceso al router, el plan B es
+un túnel open source (zrok/OpenZiti) y el compose no cambia.
