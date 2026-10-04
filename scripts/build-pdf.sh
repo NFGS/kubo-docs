@@ -71,6 +71,20 @@ DOCUMENTOS=(
   "adr/ADR-0026-puerto-de-cobro.md"
 )
 
+# Huella de las fuentes incluidas en el PDF: permite que el gate detecte si la
+# documentacion cambio despues del ultimo PDF consolidado (sin abrir Chrome).
+hash_documentos() {
+  local documento
+  for documento in "${DOCUMENTOS[@]}"; do
+    cat "${DOCS_DIR}/${documento}"
+  done | sha256sum | cut -d' ' -f1
+}
+
+if [[ "${1:-}" == "--hash" ]]; then
+  hash_documentos
+  exit 0
+fi
+
 # ---------------------------------------------------------------------------
 # 1. Portada y estilos
 # ---------------------------------------------------------------------------
@@ -188,7 +202,9 @@ echo "[kubo] imprimiendo PDF con ${BROWSER}…"
   "file://${BUILD_DIR}/documento.html" >/dev/null 2>&1
 
 if [[ -f "${OUTPUT}" ]]; then
+  printf '%s  %s\n' "$(hash_documentos)" "$(basename "${OUTPUT}")" > "${OUTPUT}.sha256"
   echo "[kubo] PDF generado: ${OUTPUT} ($(du -h "${OUTPUT}" | cut -f1))"
+  echo "[kubo] huella de las fuentes: ${OUTPUT}.sha256"
 else
   echo "ERROR: no se pudo generar el PDF" >&2
   exit 1
