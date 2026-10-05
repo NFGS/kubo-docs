@@ -204,7 +204,7 @@ El sistema está diseñado para crecer sin reescribir:
 4. **Router**: reenviar 80 y 443 a la IP del portátil (reservarla antes en el
    DHCP del router) y no abrir nada más.
 5. `make up` y verificar con `./kubo-infra/scripts/demo-check.sh`: Caddy emite
-   el certificado Let's Encrypt (HTTP-01) y `https://kubo.dedyn.io` sirve la
+   el certificado Let's Encrypt (HTTP-01) y `https://kubo-app.duckdns.org` sirve la
    PWA. Los puertos 9080–9084 y las bases no deben responder desde internet
    (siguen en loopback).
 6. **Respaldo offsite**: Storj (S3, 25 GB gratis) configurando

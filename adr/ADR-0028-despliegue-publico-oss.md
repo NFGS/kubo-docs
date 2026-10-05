@@ -54,7 +54,9 @@ ruta más pura: el tráfico no necesita pasar por ningún tercero.
 
 ## Verificación
 
-- `https://kubo.dedyn.io` sirve la PWA con certificado Let's Encrypt válido.
+- La ruta directa (`https://kubo-app.duckdns.org`) sirve la PWA con
+  certificado Let's Encrypt válido; el túnel (`https://kubo.shares.zrok.io`)
+  cubre el demo actual.
 - `check-host.net` confirma 80/443 abiertos desde nodos externos; los puertos
   9080–9084 y las bases **no** responden desde internet.
 - Login por HTTPS con cookie de refresco `Secure`; el límite de autenticación
