@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  enlaces:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Estructura del workspace (la documentacion enlaza a los 9 repos)
+        run: |
+          mkdir -p Kubo
+          git clone --depth 1 https://github.com/NFGS/kubo-workspace.git Kubo
+          for r in kubo-gateway kubo-iam kubo-crm kubo-erp kubo-analytics kubo-web kubo-infra; do
+            git clone --depth 1 "https://github.com/NFGS/${r}.git" "Kubo/${r}"
+          done
+      - uses: actions/checkout@v4
+        with:
+          path: Kubo/kubo-docs
+      - name: Enlaces relativos de la documentacion
+        run: ./Kubo/kubo-docs/scripts/check-links.sh
