@@ -193,14 +193,14 @@ El sistema está diseñado para crecer sin reescribir:
 
 ### 9.1 Con acceso al router (ruta directa)
 
-1. **Dominio gratis**: crear cuenta en [dynv6.net](https://dynv6.com) y la
-   zona `kubo.dynv6.net`; generar un token HTTP (https://dynv6.com/keys) y
-   guardarlo en `.env` como `KUBO_DYNV6_TOKEN`. (deSEC con `dedyn.io` queda
-   como alternativa: hoy tiene los registros pausados.)
-2. **Perfil público** en `kubo-infra/.env`: `KUBO_TLS_DOMAIN=kubo.dynv6.net`,
+1. **Dominio gratis**: crear cuenta en [DuckDNS](https://www.duckdns.org)
+   (login con GitHub) y el subdominio `kubo`; copiar el token y guardarlo en
+   `.env` como `KUBO_DUCK_TOKEN`. (Alternativas: dynv6 —hoy con su dominio
+   padre `dynv6.net` caído en DNS— y deSEC —con `dedyn.io` pausado—.)
+2. **Perfil público** en `kubo-infra/.env`: `KUBO_TLS_DOMAIN=kubo.duckdns.org`,
    `KUBO_CADDYFILE=Caddyfile.public`, `KUBO_TLS_HTTP_PORT=80`,
    `KUBO_TLS_HTTPS_PORT=443` y `KUBO_COOKIE_SECURE=true`.
-3. **IP dinámica**: `./kubo-infra/scripts/ddns-dynv6.sh` (cron cada 5 minutos)
+3. **IP dinámica**: `./kubo-infra/scripts/ddns-duckdns.sh` (cron cada 5 minutos)
    mantiene el registro A al día.
 4. **Router**: reenviar 80 y 443 a la IP del portátil (reservarla antes en el
    DHCP del router) y no abrir nada más.
@@ -208,8 +208,11 @@ El sistema está diseñado para crecer sin reescribir:
    el certificado Let's Encrypt (HTTP-01) y `https://kubo.dedyn.io` sirve la
    PWA. Los puertos 9080–9084 y las bases no deben responder desde internet
    (siguen en loopback).
-6. **Respaldo offsite**: rclone hacia Storj (S3, 25 GB gratis) y `make backup`
-   + `make restore-drill`.
+6. **Respaldo offsite**: Storj (S3, 25 GB gratis) configurando
+   `KUBO_BACKUP_OFFSITE_DIR=storj:kubo-backups` y las credenciales
+   `KUBO_STORJ_ACCESS_KEY`/`KUBO_STORJ_SECRET_KEY` en `.env` (el operador trae
+   rclone y verifica la copia); luego `make backup-operator` +
+   `make restore-drill`.
 
 ### 9.2 Sin acceso al router (túnel 100 % OSS con zrok)
 
