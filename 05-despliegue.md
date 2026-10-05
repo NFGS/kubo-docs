@@ -219,9 +219,9 @@ open source; el compose no cambia:
    [zrok releases](https://github.com/openziti/zrok/releases).
 2. Crear la cuenta: `zrok2 invite` (el token de invitación se obtiene en
    [zrok.io](https://zrok.io)) y `zrok2 enable <token>`.
-3. Compartir: `zrok2 share public --headless http://localhost:3000` (URL
-   `https://<aleatorio>.shares.zrok.io`); para una URL estable,
-   `zrok2 create name kubo` y seleccionar el nombre al compartir.
+3. Compartir: `./kubo-infra/scripts/demo-tunnel.sh start` (URL estable
+   `https://kubo.shares.zrok.io`; `status` y `stop` para operarlo). Manualmente:
+   `zrok2 share public --headless -n public:kubo http://localhost:3000`.
 4. `KUBO_COOKIE_SECURE=true` en `.env` y
    `docker compose up -d kubo-gateway`.
 5. Detrás del túnel todos los visitantes comparten IP: el límite de
