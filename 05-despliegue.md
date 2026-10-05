@@ -193,13 +193,14 @@ El sistema está diseñado para crecer sin reescribir:
 
 ### 9.1 Con acceso al router (ruta directa)
 
-1. **Dominio gratis**: crear cuenta en [deSEC](https://desec.io) y registrar
-   `kubo.dedyn.io`; generar un token de API y guardarlo en `.env` como
-   `KUBO_DESEC_TOKEN`.
-2. **Perfil público** en `kubo-infra/.env`: `KUBO_TLS_DOMAIN=kubo.dedyn.io`,
+1. **Dominio gratis**: crear cuenta en [dynv6.net](https://dynv6.com) y la
+   zona `kubo.dynv6.net`; generar un token HTTP (https://dynv6.com/keys) y
+   guardarlo en `.env` como `KUBO_DYNV6_TOKEN`. (deSEC con `dedyn.io` queda
+   como alternativa: hoy tiene los registros pausados.)
+2. **Perfil público** en `kubo-infra/.env`: `KUBO_TLS_DOMAIN=kubo.dynv6.net`,
    `KUBO_CADDYFILE=Caddyfile.public`, `KUBO_TLS_HTTP_PORT=80`,
    `KUBO_TLS_HTTPS_PORT=443` y `KUBO_COOKIE_SECURE=true`.
-3. **IP dinámica**: `./kubo-infra/scripts/ddns-desec.sh` (cron cada 5 minutos)
+3. **IP dinámica**: `./kubo-infra/scripts/ddns-dynv6.sh` (cron cada 5 minutos)
    mantiene el registro A al día.
 4. **Router**: reenviar 80 y 443 a la IP del portátil (reservarla antes en el
    DHCP del router) y no abrir nada más.
