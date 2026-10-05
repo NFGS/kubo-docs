@@ -194,10 +194,9 @@ El sistema está diseñado para crecer sin reescribir:
 ### 9.1 Con acceso al router (ruta directa)
 
 1. **Dominio gratis**: crear cuenta en [DuckDNS](https://www.duckdns.org)
-   (login con GitHub) y el subdominio `kubo`; copiar el token y guardarlo en
-   `.env` como `KUBO_DUCK_TOKEN`. (Alternativas: dynv6 —hoy con su dominio
-   padre `dynv6.net` caído en DNS— y deSEC —con `dedyn.io` pausado—.)
-2. **Perfil público** en `kubo-infra/.env`: `KUBO_TLS_DOMAIN=kubo.duckdns.org`,
+   (login con GitHub) y el subdominio (p. ej. `kubo-app`); copiar el token y
+   guardarlo en `.env` como `KUBO_DUCK_TOKEN`.
+2. **Perfil público** en `kubo-infra/.env`: `KUBO_TLS_DOMAIN=kubo-app.duckdns.org`,
    `KUBO_CADDYFILE=Caddyfile.public`, `KUBO_TLS_HTTP_PORT=80`,
    `KUBO_TLS_HTTPS_PORT=443` y `KUBO_COOKIE_SECURE=true`.
 3. **IP dinámica**: `./kubo-infra/scripts/ddns-duckdns.sh` (cron cada 5 minutos)

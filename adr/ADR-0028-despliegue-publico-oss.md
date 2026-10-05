@@ -25,9 +25,10 @@ ruta más pura: el tráfico no necesita pasar por ningún tercero.
 2. **Borde: Caddy + Let's Encrypt** (ya en el proyecto) con **HTTP-01** y la
    imagen oficial (sin builds custom). El perfil público vive en
    `Caddyfile.public` y se selecciona con `KUBO_CADDYFILE`.
-3. **Dominio gratis: DuckDNS** (`kubo.duckdns.org`) — API de actualización
-   para IP dinámica (`ddns-duckdns.sh`). Alternativas documentadas: dynv6 (su
-   dominio padre `dynv6.net` está caído en DNS) y deSEC (`dedyn.io` pausado).
+3. **Dominio gratis: DuckDNS** (`kubo-app.duckdns.org`) — API de actualización
+   para IP dinámica (`ddns-duckdns.sh`). Se descartaron deSEC (`dedyn.io`
+   pausado) y dynv6 (dominio padre caído en DNS); sus herramientas se
+   eliminaron del repositorio.
 4. **Respaldo offsite: restic/rclone hacia Storj** (S3, 25 GB gratis,
    tecnología abierta) como destino del operador de respaldos (ADR-0022).
 5. **Descartes**: Vercel (solo estático; rompe el proxy mismo-origen y la
