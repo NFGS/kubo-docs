@@ -1,5 +1,7 @@
 # Documentación de Kubo
 
+> Parte del proyecto **Kubo** — [kubo-workspace](https://github.com/NFGS/kubo-workspace) (ERP + CRM autoalojable para PYMES).
+
 Documentación técnica y funcional del sistema. Está pensada para leerse en orden
 la primera vez y para consultarse por secciones después.
 
