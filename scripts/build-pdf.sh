@@ -69,6 +69,9 @@ DOCUMENTOS=(
   "adr/ADR-0024-superficie-del-operador.md"
   "adr/ADR-0025-rol-de-plataforma.md"
   "adr/ADR-0026-puerto-de-cobro.md"
+  "adr/ADR-0027-sincronizacion-4-entornos.md"
+  "adr/ADR-0028-despliegue-publico-oss.md"
+  "adr/ADR-0029-repositorios-publicos-y-ci.md"
 )
 
 # Huella de las fuentes incluidas en el PDF: permite que el gate detecte si la

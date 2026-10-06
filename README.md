@@ -1,5 +1,7 @@
 # Documentación de Kubo
 
+[![CI](https://github.com/NFGS/kubo-docs/actions/workflows/ci.yml/badge.svg)](https://github.com/NFGS/kubo-docs/actions/workflows/ci.yml)
+
 > Parte del proyecto **Kubo** — [kubo-workspace](https://github.com/NFGS/kubo-workspace) (ERP + CRM autoalojable para PYMES).
 
 Documentación técnica y funcional del sistema. Está pensada para leerse en orden
@@ -22,7 +24,7 @@ la primera vez y para consultarse por secciones después.
 | [11 — Plan de cierre](11-plan-de-cierre.md) | Gestión · Arquitectura | ¿Qué falta, en qué orden y con qué criterio se cierra cada fase? |
 | [12 — Runbook de operación](12-runbook-operacion.md) | Operación | La semana uno del negocio: chequeo diario, playbooks y métricas |
 | [13 — Guía del adaptador de facturación](13-guia-adaptador-facturacion.md) | Desarrollo · Integración | Cómo enchufar un proveedor tecnológico DIAN sin tocar el núcleo |
-| [ADRs](adr/) | Arquitectura | Las veintiséis decisiones que definen el sistema |
+| [ADRs](adr/) | Arquitectura | Las veintinueve decisiones que definen el sistema |
 
 ## Decisiones de arquitectura (ADR)
 
@@ -56,8 +58,9 @@ la primera vez y para consultarse por secciones después.
 | [0026](adr/ADR-0026-puerto-de-cobro.md) | Puerto de cobro y pasarela de pago |
 | [0027](adr/ADR-0027-sincronizacion-4-entornos.md) | Sincronización de los 4 entornos con huella |
 | [0028](adr/ADR-0028-despliegue-publico-oss.md) | Despliegue público de demostración 100 % open source |
+| [0029](adr/ADR-0029-repositorios-publicos-y-ci.md) | Repositorios públicos, licencia MIT y CI en GitHub Actions |
 
-Las 28 ADR están aceptadas; su estado y la fase en que se cerraron se detallan
+Las 29 ADR están aceptadas; su estado y la fase en que se cerraron se detallan
 en [`08-trazabilidad.md`](08-trazabilidad.md) §4.
 
 ## Documentación por servicio
