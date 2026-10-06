@@ -72,6 +72,7 @@ DOCUMENTOS=(
   "adr/ADR-0027-sincronizacion-4-entornos.md"
   "adr/ADR-0028-despliegue-publico-oss.md"
   "adr/ADR-0029-repositorios-publicos-y-ci.md"
+  "adr/ADR-0030-sincronizacion-bidireccional.md"
 )
 
 # Huella de las fuentes incluidas en el PDF: permite que el gate detecte si la

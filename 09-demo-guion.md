@@ -162,7 +162,7 @@ ls kubo-docs/
 
 > "La documentación incluye arquitectura con diagramas C4, modelo de datos,
 > contrato de la API, seguridad, despliegue, plan de pruebas, matriz de
-> trazabilidad y veintinueve decisiones de arquitectura registradas como ADR.
+> trazabilidad y treinta decisiones de arquitectura registradas como ADR.
 >
 > Kubo se instala con un comando, corre en menos de 2 GB de memoria y está
 > pensado para que un negocio de barrio digitalice sus ventas sin pagar

@@ -53,9 +53,11 @@ Debe terminar en **0 fallos**. Qué mira y qué hacer si falla:
   pendientes de confirmar.
 - **Capacidad**: uso de disco, tamaño de los documentos y ventas del mes por
   negocio (el panel muestra los conteos; nunca datos de negocio).
-- **Espejos**: `make sync-status` verifica que el directorio del proyecto,
-  GitHub, Notion y Obsidian compartan la misma huella; `make sync` propaga los
-  cambios (ADR-0027).
+- **Espejos**: `make sync-status` verifica la huella de los 4 entornos y
+  `make sync-check` detecta deriva por ediciones manuales; `make sync` propaga
+  el canónico, `make sync-pull` importa cambios de los espejos y `make sync-auto`
+  corre el ciclo completo (con staging de conflictos en `.sync/conflictos/`).
+  El ciclo se ejecuta solo cada 15 minutos (`kubo-sync.timer`, ADR-0030).
 
 ## 4. Playbooks (qué hacer cuando pasa)
 
