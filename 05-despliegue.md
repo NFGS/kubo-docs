@@ -230,3 +230,6 @@ open source; el compose no cambia:
 5. Detrás del túnel todos los visitantes comparten IP: el límite de
    autenticación se vuelve global (súbelo temporalmente si hay muchos
    espectadores).
+6. Verificar: `./kubo-infra/scripts/demo-check.sh` comprueba el stack local,
+   el DNS, el servicio del túnel y la URL pública del demo. La ruta directa
+   (§9.1) se reporta como informativa hasta que exista reenvío de puertos.
