@@ -6,7 +6,7 @@
 | Objetivo | Producto comercializable en la región (Fases 0–4); la Fase 5 queda como backlog declarado |
 | Punto de partida | 44/44 comprobaciones en verde · 10 contenedores sanos · 9 repositorios limpios |
 | Dedicación | ~30 h/semana (≈ 3.75 jornadas de 8 h) |
-| Estado | Fases 0–4 completadas · Fase 5 completada salvo el backlog comercial · **Fase 6 (operación y comercial) completada**: F6.1–F6.6 construidos y verificados, incluidos el uso del ERP en el panel y la rotación del segundo factor del operador; quedan las mejoras continuas (métricas de F6.5) y la app móvil cuando el negocio la pida (ADR-0023) |
+| Estado | Fases 0–4 completadas · Fase 5 completada salvo el backlog comercial · **Fase 6 (operación y comercial) completada**: F6.1–F6.6 construidos y verificados, incluidos el uso del ERP en el panel y la rotación del segundo factor del operador; quedan las mejoras continuas (métricas de F6.5) y la app móvil cuando el negocio la pida (ADR-0023; plan por fases en [`14-plan-app-movil.md`](14-plan-app-movil.md)) |
 | Verificación vigente | `make ci` 13/13 · humo 192/192 · 231 pruebas de servicio · contratos 23/23 · E2E 5/5 · ERP ratchet 37.68 % (2026-10-07) |
 
 Este documento ordena los 31 pendientes de [`10-auditoria.md`](10-auditoria.md) en

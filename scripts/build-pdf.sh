@@ -43,6 +43,7 @@ DOCUMENTOS=(
   "11-plan-de-cierre.md"
   "12-runbook-operacion.md"
   "13-guia-adaptador-facturacion.md"
+  "14-plan-app-movil.md"
   "adr/ADR-0001-microservicios-monolito-modular.md"
   "adr/ADR-0002-polyrepo-contratos.md"
   "adr/ADR-0003-multitenancy-hibrido.md"
