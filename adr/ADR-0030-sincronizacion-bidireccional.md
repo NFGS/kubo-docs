@@ -82,3 +82,23 @@ historial; Notion: presentación; Obsidian: grafo y wikilinks; local: fuente).
 - `kubo-sync.timer` activo (cada 15 min) con `auto --commit`; `auto.log`
   registra cada ciclo y su resumen.
 - `make sync-check` → sin deriva; `make sync-status` → SINCRONIZADO.
+
+## Actualización — 2026-10-07 (incidente de carrera y fidelidad)
+
+La operación real expuso dos fallas, ya corregidas:
+
+1. **Carrera timer ↔ sync manual**: el ciclo del timer se disparó mientras
+   corría un `make sync` manual; la detección de deriva leyó páginas a medio
+   escribir e importó 15 archivos con contenido redondeado. **Corrección**:
+   `kubo-sync.sh` toma un candado (`flock`) — un solo ciclo a la vez; las
+   ejecuciones concurrentes se omiten con aviso.
+2. **El redondeo de Notion no es fiel**: su export markdown convierte tablas a
+   HTML, escapa enlaces dentro de formato y usa tabs. La importación automática
+   escribió esas versiones en los canónicos (detectado, revertido con
+   `git revert` en los 9 repos y espejos regenerados). **Corrección**:
+   `notion-pull.sh` solo importa páginas cuyo redondeo es limpio; con pérdida,
+   la versión queda en `.sync/conflictos/` y se reporta (nada se pisa en
+   silencio).
+3. **Alcance del commit acotado**: en el repo `kubo-docs` solo se agregaba su
+   README; ahora el commit del sync incluye todo `kubo-docs/` (documentos,
+   ADRs, evidencia y diagramas).
