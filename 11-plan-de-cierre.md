@@ -7,7 +7,7 @@
 | Punto de partida | 44/44 comprobaciones en verde · 10 contenedores sanos · 9 repositorios limpios |
 | Dedicación | ~30 h/semana (≈ 3.75 jornadas de 8 h) |
 | Estado | Fases 0–4 completadas · Fase 5 completada salvo el backlog comercial · **Fase 6 (operación y comercial) completada**: F6.1–F6.6 construidos y verificados, incluidos el uso del ERP en el panel y la rotación del segundo factor del operador; quedan las mejoras continuas (métricas de F6.5) y la app móvil cuando el negocio la pida (ADR-0023) |
-| Verificación vigente | `make ci` 13/13 · humo 192/192 · 231 pruebas de servicio · contratos 23/23 · E2E 5/5 · ERP ratchet 37.68 % (2026-10-06) |
+| Verificación vigente | `make ci` 13/13 · humo 192/192 · 231 pruebas de servicio · contratos 23/23 · E2E 5/5 · ERP ratchet 37.68 % (2026-10-07) |
 
 Este documento ordena los 31 pendientes de [`10-auditoria.md`](10-auditoria.md) en
 fases con criterio de cierre medible. No sustituye a la auditoría: la usa como
@@ -111,7 +111,7 @@ merge · p95 del POS por debajo de 300 ms con 50 cajas · cobertura de dominio �
   contratos, Pact, humo, E2E, enlaces y PDF al día). Los pipelines de GitLab
   (`.gitlab-ci.yml` en los ocho repositorios, con pruebas, SAST, secretos y
   dependencias) se retiraron el 2026-10-04 al quedar GitHub como único destino;
-  desde el 2026-10-06 cada repositorio tiene su flujo propio en GitHub Actions
+  desde el 2026-10-05 cada repositorio tiene su flujo propio en GitHub Actions
   (ADR-0029).
 - **P-07 OpenTelemetry**: collector OTLP propio (`kubo-otel`) y los **cinco
   servicios exportando trazas** (gateway, IAM, CRM, ERP y analítica), con
