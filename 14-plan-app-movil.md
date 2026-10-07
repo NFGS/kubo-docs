@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 | --- | --- |
-| Estado | Planificado — backlog activable (no arranca hasta que un disparador real lo exija) |
+| Estado | **En ejecución** — activado por decisión del propietario (2026-10-07): vitrina móvil + preparación para clientes. Fase 0 completada; Fase 1 (envoltura Android) en curso |
 | Decisión marco | [ADR-0023](adr/ADR-0023-app-movil.md): la PWA primero; Capacitor antes que reescribir |
 | Disparadores | Cámara/código de barras · Notificaciones push · Biometría para el 2FA · Impresión térmica Bluetooth |
 | Esfuerzo estimado | ~20–30 días hábiles de desarrollo + 1 semana de piloto (por tramos; cada fase deja valor) |
@@ -43,14 +43,18 @@
 - Documentar el caso real (qué negocio, qué flujo, qué duele hoy).
 - Mini-ADR de las decisiones nuevas que aparezcan (p. ej. transporte de push en
   D2; estrategia de origen/sesión en WebView, §5).
-- Elegir el modo de empaquetado: **remoto** (el WebView carga la URL del negocio)
-  vs **empaquetado** (activos locales + API remota). Recomendación inicial:
-  empaquetado para POS (offline robusto), validando cookies y origen en la
-  Fase 1.
+- Modo de empaquetado elegido: **empaquetado** (activos locales + servidor
+  configurable en el primer arranque), decisión en
+  [ADR-0031](adr/ADR-0031-empaquetado-movil.md); el modo remoto queda como
+  plan B si la sesión nativa no resulta viable.
 - Priorizar capacidades si hay más de una y fijar el tramo presupuestado.
 
 **Criterios de aceptación**: caso real escrito · mini-ADR aceptado · alcance y
 tramo aprobados.
+
+**Estado: completada (2026-10-07)** — activación por decisión del propietario
+(vitrina móvil + preparación para clientes); alcance del primer tramo: Fase 1
+(envoltura Android).
 
 ### Fase 1 — Envoltura Capacitor, Android primero (3–4 días)
 
@@ -73,6 +77,10 @@ tramo aprobados.
 instalable en un equipo real; E2E móvil inicial con **Maestro** (OSS) cubriendo
 ingreso y venta offline; contrato OpenAPI validado igual que hoy (verificación
 del ADR-0023).
+
+**Estado: en curso (2026-10-07)** — proyecto Android y APK de depuración en CI;
+siguiente tramo: modo nativo (URL del servidor + sesión) y prueba en
+dispositivo.
 
 ### Fase 2 — Capacidades nativas, por prioridad
 
@@ -187,7 +195,10 @@ el runbook; la revocación de sesión del dispositivo funciona.
 
 ## 7. Estado
 
-- **Hoy**: planificado; la PWA ya cubre el caso móvil (instalable, offline,
-  accesible) y `make e2e` la verifica en viewport móvil.
-- **Activación**: cuando un negocio real pida D1–D4; se arranca por la Fase 0 y
-  este documento pasa a "En ejecución" con fechas y evidencia.
+- **Activación**: 2026-10-07, por decisión explícita del propietario (vitrina
+  móvil + preparación para los primeros clientes; el primer objetivo de prueba
+  es la demo pública). Los disparadores D1–D4 siguen ordenando las capacidades
+  cuando existan negocios reales.
+- **Avance**: Fase 0 completada (alcance + ADR-0031) · Fase 1 en curso (proyecto
+  Android + APK de depuración en CI). La PWA sigue cubriendo el caso móvil
+  mientras tanto (`make e2e` en viewport móvil).

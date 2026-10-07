@@ -25,7 +25,7 @@ la primera vez y para consultarse por secciones después.
 | [12 — Runbook de operación](12-runbook-operacion.md) | Operación | La semana uno del negocio: chequeo diario, playbooks y métricas |
 | [13 — Guía del adaptador de facturación](13-guia-adaptador-facturacion.md) | Desarrollo · Integración | Cómo enchufar un proveedor tecnológico DIAN sin tocar el núcleo |
 | [14 — Plan de la app móvil](14-plan-app-movil.md) | Producto · Móvil | ¿Cuándo y cómo se envuelve la PWA con Capacitor? Disparadores, fases y criterios de aceptación |
-| [ADRs](adr/) | Arquitectura | Las treinta decisiones que definen el sistema |
+| [ADRs](adr/) | Arquitectura | Las treinta y una decisiones que definen el sistema |
 
 ## Decisiones de arquitectura (ADR)
 
@@ -61,8 +61,9 @@ la primera vez y para consultarse por secciones después.
 | [0028](adr/ADR-0028-despliegue-publico-oss.md) | Despliegue público de demostración 100 % open source |
 | [0029](adr/ADR-0029-repositorios-publicos-y-ci.md) | Repositorios públicos, licencia MIT y CI en GitHub Actions |
 | [0030](adr/ADR-0030-sincronizacion-bidireccional.md) | Sincronización bidireccional de los 4 entornos con reconciliación |
+| [0031](adr/ADR-0031-empaquetado-movil.md) | Empaquetado móvil: assets locales y servidor configurable |
 
-Las 30 ADR están aceptadas; su estado y la fase en que se cerraron se detallan
+Las 31 ADR están aceptadas; su estado y la fase en que se cerraron se detallan
 en [`08-trazabilidad.md`](08-trazabilidad.md) §4.
 
 ## Documentación por servicio
