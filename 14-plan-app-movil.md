@@ -78,10 +78,11 @@ instalable en un equipo real; E2E móvil inicial con **Maestro** (OSS) cubriendo
 ingreso y venta offline; contrato OpenAPI validado igual que hoy (verificación
 del ADR-0023).
 
-**Estado: en curso (2026-10-07)** — proyecto Android + APK de depuración en CI
-+ **modo nativo implementado** (pantalla de conexión al servidor, base del API
-configurable y HTTP nativo; ADR-0031). Pendiente: prueba de sesión en un
-dispositivo real.
+**Estado: avanzada (2026-10-07)** — proyecto Android + APK en CI + modo nativo
++ **prueba de sesión en emulador (Maestro) en verde**: primer arranque,
+conexión a la demo, ingreso real y restauración de la sesión por cookie tras
+relanzar. Pendiente del tramo: venta de POS y cola offline en el binario
+(criterios de la fase) e instalación en un equipo físico (opcional).
 
 ### Fase 2 — Capacidades nativas, por prioridad
 
@@ -200,6 +201,6 @@ el runbook; la revocación de sesión del dispositivo funciona.
   móvil + preparación para los primeros clientes; el primer objetivo de prueba
   es la demo pública). Los disparadores D1–D4 siguen ordenando las capacidades
   cuando existan negocios reales.
-- **Avance**: Fase 0 completada (alcance + ADR-0031) · Fase 1 en curso (proyecto
-  Android + APK de depuración en CI). La PWA sigue cubriendo el caso móvil
-  mientras tanto (`make e2e` en viewport móvil).
+- **Avance**: Fase 0 completada (alcance + ADR-0031) · Fase 1 avanzada (APK en
+  CI, modo nativo y sesión verificada en emulador; faltan POS/cola offline en
+  el binario). La PWA cubre el caso móvil mientras tanto.

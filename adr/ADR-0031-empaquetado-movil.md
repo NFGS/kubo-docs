@@ -55,3 +55,17 @@ cómo llega al servidor de cada negocio sin tocar el contrato del API.
   subido por cada tag/ejecución manual.
 - Fase 1 (siguiente tramo): ingreso + POS + cola offline funcionando en el
   binario; contrato OpenAPI validado igual que hoy (verificación del ADR-0023).
+
+## Actualización — 2026-10-07 (prueba de sesión en emulador)
+
+- La **prueba de sesión pasó en el emulador Android de CI** (Maestro, flujo
+  `.maestro/sesion.yaml`): primer arranque, conexión a la demo, ingreso real y
+  **restauración de la sesión por cookie tras relanzar la app** (cookie
+  httpOnly a través del puente nativo).
+- Dos hallazgos implementados en el camino: (1) en la app móvil el **service
+  worker se desregistra** — interceptaba los GET y devolvía el `index.html`
+  local; (2) las llamadas del API usan **`CapacitorHttp` directo**, porque el
+  proxy del parche de `fetch` resultó frágil en el WebView (trataba el GET
+  como documento y servía el `index.html`). El contrato no cambió.
+- Queda como verificación opcional instalar el APK en un equipo físico del
+  negocio (el APK se descarga del artefacto de CI o del release).

@@ -102,3 +102,7 @@ La operación real expuso dos fallas, ya corregidas:
 3. **Alcance del commit acotado**: en el repo `kubo-docs` solo se agregaba su
    README; ahora el commit del sync incluye todo `kubo-docs/` (documentos,
    ADRs, evidencia y diagramas).
+4. **Verificación en operación real (mismo día)**: un `make sync` manual
+   durante un ciclo del timer se omitió con aviso (el candado funcionó); una
+   edición hecha a mitad de ciclo dejó la huella del estado un paso atrás y el
+   siguiente `make sync` la convergió sin intervención.
