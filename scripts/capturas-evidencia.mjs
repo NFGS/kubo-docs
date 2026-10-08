@@ -24,7 +24,10 @@ const SALIDA = resolve(process.cwd(), '../kubo-docs/evidencia');
 const WORKSPACE = resolve(process.cwd(), '..');
 const TMP_CUADROS = '/tmp/opencode/kubo-evidencia-cuadros';
 const VIEWPORT = { width: 1360, height: 880 };
-const PAUSA = VIDEO ? 3000 : 700; // respiro por seccion (mas largo al grabar)
+const PAUSA_ARG = Number(process.argv.find((a) => a.startsWith('--pausa='))?.split('=')[1]);
+// Pausa por seccion: 25 s al grabar (comodo para narrar los 6-7 min del
+// guion; ajustable con --pausa=<segundos>); 0.7 s para capturas rapidas.
+const PAUSA = VIDEO ? (PAUSA_ARG > 0 ? PAUSA_ARG * 1000 : 25_000) : 700;
 
 const marcas = []; // subtitulos: {t, texto}
 let t0 = 0;
@@ -51,7 +54,7 @@ function srt() {
   };
   return marcas
     .map((marca, i) => {
-      const fin = marcas[i + 1]?.t ?? marca.t + 4;
+      const fin = marcas[i + 1]?.t ?? marca.t + PAUSA / 1000 + 2;
       return `${i + 1}\n${fmt(marca.t)} --> ${fmt(fin)}\n${marca.texto}\n`;
     })
     .join('\n');
@@ -84,11 +87,11 @@ if (VIDEO) {
   (async () => {
     while (capturando) {
       const t = (Date.now() - t0) / 1000;
-      const ruta = join(TMP_CUADROS, `f${String(cuadros.length).padStart(5, '0')}.png`);
+      const ruta = join(TMP_CUADROS, `f${String(cuadros.length).padStart(5, '0')}.jpg`);
       try {
-        // Con tope de tiempo: si una captura se cuelga (pagina ocupada), el
-        // bucle sigue y el hueco queda como una pausa del cuadro anterior.
-        await page.screenshot({ path: ruta, timeout: 2500 });
+        // JPEG (mas liviano para miles de cuadros) con tope de tiempo: si una
+        // captura se cuelga, el bucle sigue y el hueco queda como una pausa.
+        await page.screenshot({ path: ruta, type: 'jpeg', quality: 90, timeout: 2500 });
         cuadros.push({ t, ruta });
       } catch {
         // Navegacion en curso o captura lenta: se salta el cuadro.
@@ -116,9 +119,9 @@ await page.waitForURL(/tablero/, { timeout: 20_000 });
 
 // 02 · Tablero
 await page.getByRole('heading', { name: /tablero del negocio/i }).waitFor();
-await page.waitForTimeout(1600); // que rendericen las graficas
+await pausa(page, VIDEO ? PAUSA : 1600); // render de las graficas incluido
 await page.screenshot({ path: join(SALIDA, '02-tablero.png') });
-marcar('Tablero: indicadores construidos desde los eventos de venta', 1.9);
+marcar('Tablero: indicadores construidos desde los eventos de venta');
 
 // 03 · Clientes (enmascarados)
 await page.goto(`${BASE}/clientes`);
@@ -131,9 +134,9 @@ marcar('Clientes: documento y telefono enmascarados');
 // 04 · Detalle del cliente (datos completos; cifrados en la base)
 await page.getByRole('button', { name: /^Editar / }).first().click();
 await page.getByRole('dialog').waitFor();
-await page.waitForTimeout(1500); // el detalle se pide al API (descifrado)
+await pausa(page, VIDEO ? PAUSA : 1500); // el detalle se pide al API (descifrado)
 await page.screenshot({ path: join(SALIDA, '04-detalle-cliente.png') });
-marcar('Detalle: documento y telefono completos (en la base van cifrados)', 1.8);
+marcar('Detalle: documento y telefono completos (en la base van cifrados)');
 await page.keyboard.press('Escape');
 
 // 06 · Catalogo
@@ -191,9 +194,9 @@ marcar('Al reconectar, la cola se vacia sola y el tablero se actualiza');
 // 11 · Documentos
 await page.goto(`${BASE}/documentos`);
 await page.getByRole('heading', { name: /^documentos$/i }).waitFor();
-await page.waitForTimeout(1500);
+await pausa(page, VIDEO ? PAUSA : 1500);
 await page.screenshot({ path: join(SALIDA, '11-documentos.png') });
-marcar('Documentos: facturas XML, nota credito, comprobantes PDF y soportes', 1.8);
+marcar('Documentos: facturas XML, nota credito, comprobantes PDF y soportes');
 
 // Notificaciones · Usuarios · Configuracion (recorrido del video)
 await page.goto(`${BASE}/notificaciones`);
@@ -208,8 +211,8 @@ marcar('Usuarios y roles del negocio');
 
 await page.goto(`${BASE}/configuracion`);
 await page.getByRole('heading', { name: /configuración del negocio/i }).waitFor();
-await pausa(page, VIDEO ? 3200 : PAUSA);
-marcar('Configuracion: vertical, zona horaria, datos fiscales y plan', VIDEO ? 3.5 : 1);
+await pausa(page);
+marcar('Configuracion: vertical, zona horaria, datos fiscales y plan');
 
 // ---------------------------------------------------------------------------
 // Cierre: video + comprobaciones de texto
@@ -236,7 +239,7 @@ if (VIDEO) {
   execSync(
     `ffmpeg -y -loglevel error -f concat -safe 0 -i "${lista}" ` +
       `-vf "fps=25,subtitles=${srtPath}:force_style='FontName=DejaVu Sans,FontSize=17,PrimaryColour=&H00FFFFFF,BorderStyle=3,OutlineColour=&HCC000000,BackColour=&HCC000000,MarginV=26,Alignment=2'" ` +
-      `-fps_mode cfr -c:v libvpx -b:v 2M -crf 10 -an "${destino}"`,
+      `-fps_mode cfr -c:v libvpx -b:v 1M -crf 22 -an "${destino}"`,
     { stdio: 'inherit' }
   );
   console.log(`✓ demo-kubo.webm regenerado (${(statSync(destino).size / 1e6).toFixed(1)} MB)`);

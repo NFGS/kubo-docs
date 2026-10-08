@@ -58,13 +58,14 @@ cd kubo-gateway && npm test
 # kubo-analytics — 8 pruebas (6 unitarias + 2 de integración con MongoDB)
 ./kubo-infra/scripts/analytics-tests.sh
 
-# kubo-web — 30 pruebas vitest (cola offline, politica de errores, formato,
-# sistema de diseno —con focus trap y Escape del dialogo— y pantalla de ingreso)
+# kubo-web — 45 pruebas vitest (cola offline, politica de errores, formato,
+# sistema de diseno —con focus trap y Escape del dialogo—, pantalla de ingreso
+# y modo nativo —servidor configurable y HTTP nativo—)
 # Gate v8: líneas/funciones/statements ≥ 85 y ramas ≥ 65.
 cd kubo-web && npm test
 ```
 
-**Total: 231 pruebas de servicio** (unitarias y de integración) más 192
+**Total: 246 pruebas de servicio** (unitarias y de integración) más 192
 comprobaciones end-to-end, 23 contratos, 5 pruebas de navegador con axe y los
 simulacros de bus y restauración. La cobertura se vigila en CI con gates: IAM
 ≥ 80 % (JaCoCo, hoy 85.2 %), analítica ≥ 80 % en su módulo de procesamiento,
@@ -88,7 +89,7 @@ make pdf                                      # regenera el PDF consolidado y su
 ./kubo-infra/scripts/crm-tests.sh             # 34 pruebas del CRM
 ./kubo-infra/scripts/erp-tests.sh             # 57 pruebas del ERP
 ./kubo-infra/scripts/analytics-tests.sh       # 8 pruebas de analitica
-cd kubo-web && npm test                       # 30 pruebas vitest de la PWA
+cd kubo-web && npm test                       # 45 pruebas vitest de la PWA
 ```
 
 Las pruebas del ERP que no tocan base de datos son puras (aritmética decimal,
@@ -196,7 +197,7 @@ Lo que sigue abierto, sin bloquear el cierre:
 | Tema | Estado |
 | --- | --- |
 | Gates de cobertura | IAM (85.2 %, JaCoCo), analítica (≥ 80 %), gateway (95.6 %), CRM (100 %), web (97.3 % de líneas) y ERP (ratchet 37.68 %; la capa web la cubre el humo 192/192) |
-| Pruebas unitarias de la PWA | Vitest: cola offline, política de errores, formato, sistema de diseño —incluido el focus trap y Escape del diálogo— y pantalla de ingreso (30 pruebas); los flujos completos se cubren con E2E y axe |
+| Pruebas unitarias de la PWA | Vitest: cola offline, política de errores, formato, sistema de diseño —incluido el focus trap y Escape del diálogo—, pantalla de ingreso y modo nativo —servidor configurable y HTTP nativo— (45 pruebas); los flujos completos se cubren con E2E y axe |
 | Proveedor tecnológico DIAN | **Proyecto listo para enchufarlo**: puerto configurable (`KUBO_BILLING_ADAPTER`), datos fiscales en el token, errores tipados y guía [`13`](13-guia-adaptador-facturacion.md); falta el adaptador del PT elegido (externo) |
 | Contratos del lado del consumidor (Pact) | **Implementado**: 4 interacciones del consumidor (PWA) generan el pact y `make pact` lo verifica contra el sistema vivo; integrado en `make ci` |
 | Carga con datos voluminosos | **Implementado**: `make load-big` siembra 50.000 productos y mide la busqueda (p95 233 ms a 10 cajas; 6 ms por peticion en frio) |
