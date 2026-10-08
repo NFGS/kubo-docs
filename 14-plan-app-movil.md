@@ -78,11 +78,11 @@ instalable en un equipo real; E2E móvil inicial con **Maestro** (OSS) cubriendo
 ingreso y venta offline; contrato OpenAPI validado igual que hoy (verificación
 del ADR-0023).
 
-**Estado: avanzada (2026-10-07)** — proyecto Android + APK en CI + modo nativo
-+ **prueba de sesión en emulador (Maestro) en verde**: primer arranque,
-conexión a la demo, ingreso real y restauración de la sesión por cookie tras
-relanzar. Pendiente del tramo: venta de POS y cola offline en el binario
-(criterios de la fase) e instalación en un equipo físico (opcional).
+**Estado: completada (2026-10-07)** — proyecto Android + APK en CI + modo
+nativo + **suite móvil completa en verde en el emulador (Maestro)**: sesión
+(primer arranque, ingreso y restauración por cookie), **venta de POS**, **venta
+sin conexión a la cola local** y **sincronización automática al reconectar**.
+La instalación en un equipo físico queda como verificación opcional.
 
 ### Fase 2 — Capacidades nativas, por prioridad
 
@@ -201,6 +201,10 @@ el runbook; la revocación de sesión del dispositivo funciona.
   móvil + preparación para los primeros clientes; el primer objetivo de prueba
   es la demo pública). Los disparadores D1–D4 siguen ordenando las capacidades
   cuando existan negocios reales.
-- **Avance**: Fase 0 completada (alcance + ADR-0031) · Fase 1 avanzada (APK en
-  CI, modo nativo y sesión verificada en emulador; faltan POS/cola offline en
-  el binario). La PWA cubre el caso móvil mientras tanto.
+- **Avance**: Fase 0 completada (alcance + ADR-0031) · **Fase 1 completada**
+  (APK en CI, modo nativo y suite móvil completa en el emulador: sesión, venta
+  de POS, cola offline y sincronización). Hallazgos de la suite: el túnel
+  público gratuito a veces responde 502 en el primer cobro (la app conserva el
+  carrito y el flujo reintenta); backlog declarado: clave de idempotencia en
+  las ventas del POS para que un reintento tras un fallo ambiguo no pueda
+  duplicar la venta.

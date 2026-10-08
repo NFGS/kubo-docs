@@ -69,3 +69,15 @@ cómo llega al servidor de cada negocio sin tocar el contrato del API.
   como documento y servía el `index.html`). El contrato no cambió.
 - Queda como verificación opcional instalar el APK en un equipo físico del
   negocio (el APK se descarga del artefacto de CI o del release).
+
+### Suite móvil completa (2026-10-07)
+
+El job `Android` corre en cada push la suite `e2e-android/run-sesion.sh`
+(cuatro flujos Maestro sobre el emulador): sesión con restauración por cookie,
+**venta de POS con conexión**, **venta sin conexión a la cola local** (red
+cortada y verificada con `ping` desde el propio emulador) y **sincronización
+automática al reconectar** (la cola reintenta cada 30 s). Notas de operación:
+el túnel público gratuito puede responder 502 en el primer cobro (la app
+conserva el carrito y el flujo reintenta el cobro); y queda como backlog una
+clave de idempotencia en las ventas del POS para que un reintento tras un
+fallo ambiguo no pueda duplicar la venta.
