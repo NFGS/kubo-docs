@@ -2,9 +2,9 @@ $ docker exec kubo-postgres psql -U kubo_root -d kubo_crm -c "select name, left(
 
         name         |      documento_cifrado       |   telefono_cifrado   
 ---------------------+------------------------------+----------------------
- Panaderia El Trigal | v1:default:Xb4iyIoRtCykokZ+T | v1:default:n/7iZ+gQC
- Ferreteria La 14    | v1:default:z7FR10KUZJyORNSMv | v1:default:kIMxTR4LA
- Jose Ramirez        | v1:default:xEl9UCq2WJjyfxkBN | v1:default:cxAdOH8zC
- Cafe Quindio S.A.S. | v1:default:47CA2SZFAqSB3kpgI | v1:default:2Ew6v0ssm
+ Panaderia El Trigal | v1:default:uIhn0Qn1Edxk6R0E7 | v1:default:jD/LD0s9d
+ Ferreteria La 14    | v1:default:TOn4Jmm7NL/DprKbD | v1:default:f/pDpyZ4Z
+ Jose Ramirez        | v1:default:ZPOTH9Zu1z9mIihTN | v1:default:2ga2KA7Fp
+ Cafe Quindio S.A.S. | v1:default:67J7Y+2xo/6Ib6I+J | v1:default:T2x7AliHT
 (4 rows)
 
