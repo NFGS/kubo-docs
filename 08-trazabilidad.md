@@ -80,7 +80,7 @@ requisito no tiene evidencia verificable, aparece marcado como pendiente.
 | 0020 | mTLS en la malla interna | Aceptada (Fase 5) |
 | 0021 | Multi-tenant SaaS como modo de despliegue | Aceptada (Fase 5) |
 | 0022 | Operador de respaldos con verificación de restauración | Aceptada (Fase 5) |
-| 0023 | App móvil: la PWA primero, Capacitor cuando el negocio lo pida | Aceptada (decisión, sin trabajo) |
+| 0023 | App móvil: la PWA primero, Capacitor cuando el negocio lo pida | Aceptada; empaquetado ejecutado en la fase 1 del plan móvil (ADR-0031) |
 | 0024 | Superficie del operador: script hoy, panel cuando haya rol | Aceptada (Fase 5) |
 | 0025 | Rol de plataforma y panel del operador | Aceptada (Fase 6) |
 | 0026 | Puerto de cobro y pasarela de pago | Aceptada (Fase 6) |
@@ -94,7 +94,7 @@ requisito no tiene evidencia verificable, aparece marcado como pendiente.
 | Requisito | Motivo | Ruta |
 | --- | --- | --- |
 | Habilitación DIAN y firma XAdES | Trámite externo como Proveedor Tecnológico; el puerto UBL 2.1, el CUFE y la nota crédito ya están implementados y probados | Operación (ADR-0014) |
-| App móvil nativa | La PWA cubre el caso de uso; se envuelve con Capacitor cuando el negocio pida cámara, push o impresión térmica | ADR-0023 |
+| Capacidades nativas (cámara, push, impresión térmica) | El empaquetado base está hecho y verificado (fase 1 del plan móvil: APK, assets locales y suite en el emulador); las capacidades nativas se activan cuando el negocio las pida | ADR-0023 · ADR-0031 · [`14`](14-plan-app-movil.md) |
 | Kubernetes | El despliegue objetivo es un local con Docker Compose; k3s es el siguiente nivel (> 50 negocios) | Fase 5 (backlog declarado) |
 | Importación desde Dolibarr | La importación CSV (P-24) está implementada; la ruta específica de Dolibarr es una mejora de adopción | Backlog comercial |
 | Capturas y video de demostración | Requieren grabación manual del usuario | `evidencia/README.md` |

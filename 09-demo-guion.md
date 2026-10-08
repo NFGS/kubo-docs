@@ -18,6 +18,8 @@ Deja abiertas estas ventanas:
 2. Navegador en `http://localhost:3000` (sin sesión iniciada).
 3. Terminal secundaria para consultar PostgreSQL.
 4. Explorador de archivos con la carpeta `Kubo/`.
+5. (Opcional) Teléfono con el APK de Kubo instalado, si quieres mostrar la app
+   Android (ver `kubo-docs/14-plan-app-movil.md`).
 
 ---
 
@@ -162,7 +164,9 @@ ls kubo-docs/
 
 > "La documentación incluye arquitectura con diagramas C4, modelo de datos,
 > contrato de la API, seguridad, despliegue, plan de pruebas, matriz de
-> trazabilidad y treinta y una decisiones de arquitectura registradas como ADR.
+> trazabilidad, treinta y una decisiones de arquitectura registradas como ADR y
+> el plan de la app móvil con su primera fase completada (APK y suite en el
+> emulador).
 >
 > Kubo se instala con un comando, corre en menos de 2 GB de memoria y está
 > pensado para que un negocio de barrio digitalice sus ventas sin pagar

@@ -1,7 +1,8 @@
 # 07 — Pruebas
 
-La verificación del sistema tiene tres niveles: pruebas unitarias dentro de cada
-servicio, una prueba de humo end-to-end y verificaciones manuales de operación.
+La verificación del sistema tiene cuatro niveles: pruebas unitarias dentro de cada
+servicio, una prueba de humo end-to-end, la suite móvil en el emulador y
+verificaciones manuales de operación.
 
 ## 1. Prueba de humo end-to-end (la principal)
 
@@ -29,7 +30,7 @@ Gateway como un cliente real. Resultado esperado: `192 pruebas exitosas, 0 falli
 Además del humo: **23 contratos OpenAPI** (`make contracts`), **5 pruebas de
 navegador con axe** (`make e2e`), la **carga a 50 cajas** (`make load`: 100 % de ventas exitosas; p95
 107 ms con 10 cajas y ~540 ms en el host de desarrollo con presión de memoria), los simulacros de bus (`make bus-drill`, 4/4) y restauración
-(`make restore-drill`, 14/14), los **enlaces de la documentación** (98 resueltos, sin rotos) y el **PDF consolidado al día** (huella de las fuentes, sin abrir Chrome), y el gate `make ci` (13 verificaciones) que los reúne.
+(`make restore-drill`, 14/14), la **suite móvil** (4 flujos en el emulador Android), los **enlaces de la documentación** (98 resueltos, sin rotos) y el **PDF consolidado al día** (huella de las fuentes, sin abrir Chrome), y el gate `make ci` (13 verificaciones) que los reúne.
 
 La prueba es **idempotente**: crea sus propios datos con marcas de tiempo y puede
 ejecutarse tantas veces como haga falta.
@@ -82,6 +83,7 @@ make e2e                                      # 5 pruebas de navegador + axe
 make load                                     # 50 cajas, p95 < 300 ms
 make ci                                       # gate completo (13 verificaciones)
 make pdf                                      # regenera el PDF consolidado y su huella
+./kubo-web/e2e-android/run-sesion.sh          # suite móvil: 4 flujos en el emulador (Maestro)
 
 ./kubo-infra/scripts/crm-tests.sh             # 34 pruebas del CRM
 ./kubo-infra/scripts/erp-tests.sh             # 57 pruebas del ERP
@@ -106,7 +108,24 @@ queda sin memoria (límite de 512 MB), y además la imagen de ejecución no incl
 | ERP | IVA desagregado de un precio con impuesto incluido; suma de varias líneas; producto exento; el total siempre es subtotal + impuesto |
 | Analítica | Conversión de importes y cantidades desde el evento; tolerancia a entradas inválidas; normalización del detalle; fechas a UTC |
 
-## 3. Verificación manual de la interfaz
+## 3. Suite móvil (emulador Android)
+
+```bash
+./kubo-web/e2e-android/run-sesion.sh    # requiere un emulador o un teléfono conectado por adb
+```
+
+Cuatro flujos de **Maestro** (`kubo-web/.maestro/`) sobre el APK real contra el
+servidor de demostración: sesión (primer arranque, conexión y **restauración por
+cookie**), **venta de POS**, **venta sin conexión** (la red se corta y se verifica
+con `ping` desde el propio emulador; la venta queda en la cola local) y
+**sincronización automática al reconectar** (la cola reintenta cada 30 s).
+
+Corren en el flujo `Android` de GitHub Actions (emulador API 34 + Maestro; el APK
+queda como artefacto de cada push). Resultado vigente: **4/4 en verde**
+(2026-10-07). La instalación del APK en un equipo físico es la verificación
+manual opcional (ver [`14-plan-app-movil.md`](14-plan-app-movil.md)).
+
+## 4. Verificación manual de la interfaz
 
 | # | Paso | Resultado esperado |
 | --- | --- | --- |
@@ -121,7 +140,7 @@ queda sin memoria (límite de 512 MB), y además la imagen de ejecución no incl
 | 9 | Intentar vender más unidades que el stock | Mensaje «Stock insuficiente» con la cantidad disponible |
 | 10 | En el ingreso, «¿Olvidaste tu contraseña?» → pedir el enlace | El correo queda en el buzón de demostración (`mail_outbox`) y el enlace de `/recuperar?token=…` permite elegir una contraseña nueva |
 
-## 4. Verificación de seguridad
+## 5. Verificación de seguridad
 
 ```bash
 # Sin token
@@ -145,7 +164,7 @@ for i in $(seq 1 50); do
 done; echo                                                                          # incluye 429
 ```
 
-## 5. Rendimiento observado
+## 6. Rendimiento observado
 
 Medido en un equipo de 16 núcleos, a través del gateway (la latencia que percibe
 el usuario):
@@ -165,7 +184,7 @@ el usuario):
 El detalle de las mediciones, los planes de ejecución y su análisis están en
 [`10-auditoria.md`](10-auditoria.md).
 
-## 6. Cobertura y pendientes vivos
+## 7. Cobertura y pendientes vivos
 
 Los pendientes de las fases 1 y 2 (P-06, P-08, P-09, P-10 y P-26) quedaron
 **cerrados**: el CI por repositorio, las pruebas de integración contra el motor
