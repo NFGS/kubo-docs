@@ -1,0 +1,353 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Kubo — Flujo de venta con outbox transaccional",
+    "locale": "es",
+    "subtitle": "Secuencia crítica: la caja no espera a la analítica · el evento viaja aparte",
+    "output": ".archify/sequence-kubo-venta-20261021-032013/kubo-flujo-venta.html",
+    "visual_preset": "signal-flow",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/NFGS/kubo-docs.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "f39db9224822dab14a178e2b795edb4a24ef2f44"
+    },
+    "legend": {
+      "mode": "all",
+      "entries": {
+        "default": {
+          "label": "Llamada síncrona (REST / HTTP)"
+        },
+        "emphasis": {
+          "label": "Paso principal del camino crítico"
+        },
+        "security": {
+          "label": "Verificación de identidad"
+        },
+        "dashed": {
+          "label": "Evento asíncrono (RabbitMQ)"
+        },
+        "return": {
+          "label": "Respuesta hacia el llamador"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "pwa",
+      "type": "frontend",
+      "label": "kubo-web",
+      "sublabel": "React 19",
+      "brand": "react",
+      "sources": [
+        {
+          "path": "01-arquitectura.md",
+          "line": 26,
+          "end_line": 26
+        }
+      ]
+    },
+    {
+      "id": "gateway",
+      "type": "backend",
+      "label": "kubo-gateway",
+      "sublabel": "NestJS 12",
+      "sources": [
+        {
+          "path": "01-arquitectura.md",
+          "line": 32,
+          "end_line": 32
+        }
+      ]
+    },
+    {
+      "id": "iam",
+      "type": "security",
+      "label": "kubo-iam",
+      "sublabel": "Spring Boot 4",
+      "brand": "spring",
+      "sources": [
+        {
+          "path": "01-arquitectura.md",
+          "line": 33,
+          "end_line": 33
+        }
+      ]
+    },
+    {
+      "id": "erp",
+      "type": "backend",
+      "label": "kubo-erp",
+      "sublabel": "Phoenix 1.8",
+      "sources": [
+        {
+          "path": "01-arquitectura.md",
+          "line": 35,
+          "end_line": 35
+        }
+      ]
+    },
+    {
+      "id": "postgres",
+      "type": "database",
+      "label": "Postgres",
+      "sublabel": "kubo_erp",
+      "brand": "postgresql",
+      "sources": [
+        {
+          "path": "01-arquitectura.md",
+          "line": 38,
+          "end_line": 38
+        }
+      ]
+    },
+    {
+      "id": "rabbitmq",
+      "type": "messagebus",
+      "label": "RabbitMQ",
+      "sublabel": "kubo.events",
+      "brand": "rabbitmq",
+      "sources": [
+        {
+          "path": "01-arquitectura.md",
+          "line": 40,
+          "end_line": 40
+        }
+      ]
+    },
+    {
+      "id": "analytics",
+      "type": "backend",
+      "label": "kubo-analytics",
+      "sublabel": "FastAPI",
+      "sources": [
+        {
+          "path": "01-arquitectura.md",
+          "line": 36,
+          "end_line": 36
+        }
+      ]
+    },
+    {
+      "id": "mongo",
+      "type": "database",
+      "label": "MongoDB",
+      "sublabel": "kubo_analytics",
+      "sources": [
+        {
+          "path": "01-arquitectura.md",
+          "line": 39,
+          "end_line": 39
+        }
+      ]
+    }
+  ],
+  "segments": [
+    {
+      "from": 160,
+      "to": 250,
+      "label": "Autenticación"
+    },
+    {
+      "from": 270,
+      "to": 640,
+      "label": "Venta transaccional"
+    },
+    {
+      "from": 650,
+      "to": 830,
+      "label": "Propagación asíncrona"
+    }
+  ],
+  "messages": [
+    {
+      "id": "post-sale",
+      "from": "pwa",
+      "to": "gateway",
+      "y": 170,
+      "label": "POST /api/v1/sales",
+      "variant": "emphasis"
+    },
+    {
+      "id": "verify-jwks",
+      "from": "gateway",
+      "to": "iam",
+      "y": 205,
+      "label": "verifica JWKS",
+      "variant": "security"
+    },
+    {
+      "id": "claims",
+      "from": "iam",
+      "to": "gateway",
+      "y": 240,
+      "label": "claims y roles",
+      "variant": "return"
+    },
+    {
+      "id": "forward-sale",
+      "from": "gateway",
+      "to": "erp",
+      "y": 285,
+      "label": "POST /sales + identidad",
+      "variant": "emphasis"
+    },
+    {
+      "id": "tx-begin",
+      "from": "erp",
+      "to": "postgres",
+      "y": 330,
+      "label": "BEGIN + SELECT ... FOR UPDATE",
+      "variant": "default"
+    },
+    {
+      "id": "tx-write",
+      "from": "erp",
+      "to": "postgres",
+      "y": 375,
+      "label": "INSERT venta, líneas, kardex",
+      "variant": "default"
+    },
+    {
+      "id": "tx-outbox",
+      "from": "erp",
+      "to": "postgres",
+      "y": 420,
+      "label": "INSERT outbox_events",
+      "variant": "emphasis",
+      "note": "Venta y evento, una sola transacción"
+    },
+    {
+      "id": "tx-commit",
+      "from": "erp",
+      "to": "postgres",
+      "y": 495,
+      "label": "COMMIT",
+      "variant": "default"
+    },
+    {
+      "id": "created-erp",
+      "from": "erp",
+      "to": "gateway",
+      "y": 535,
+      "label": "201 Created",
+      "variant": "return"
+    },
+    {
+      "id": "created-pwa",
+      "from": "gateway",
+      "to": "pwa",
+      "y": 575,
+      "label": "201 Created",
+      "variant": "return",
+      "note": "La caja ya tiene su respuesta"
+    },
+    {
+      "id": "publish",
+      "from": "erp",
+      "to": "rabbitmq",
+      "y": 670,
+      "label": "sale.created (outbox)",
+      "variant": "dashed"
+    },
+    {
+      "id": "deliver",
+      "from": "rabbitmq",
+      "to": "analytics",
+      "y": 710,
+      "label": "sale.created",
+      "variant": "dashed"
+    },
+    {
+      "id": "project",
+      "from": "analytics",
+      "to": "mongo",
+      "y": 755,
+      "label": "proyección deduplicada",
+      "variant": "dashed",
+      "note": "El tablero refleja la venta en menos de un segundo"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "pwa",
+      "from": 170,
+      "to": 590,
+      "type": "frontend"
+    },
+    {
+      "participant": "gateway",
+      "from": 170,
+      "to": 590,
+      "type": "backend"
+    },
+    {
+      "participant": "iam",
+      "from": 200,
+      "to": 248,
+      "type": "security"
+    },
+    {
+      "participant": "erp",
+      "from": 285,
+      "to": 680,
+      "type": "backend"
+    },
+    {
+      "participant": "postgres",
+      "from": 325,
+      "to": 505,
+      "type": "database"
+    },
+    {
+      "participant": "rabbitmq",
+      "from": 665,
+      "to": 715,
+      "type": "messagebus"
+    },
+    {
+      "participant": "analytics",
+      "from": 705,
+      "to": 760,
+      "type": "backend"
+    },
+    {
+      "participant": "mongo",
+      "from": 750,
+      "to": 760,
+      "type": "database"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Camino crítico",
+      "items": [
+        "La caja recibe 201 en menos de un segundo: nunca espera a la analítica",
+        "El gateway valida la firma RS256 contra el JWKS de kubo-iam y propaga la identidad",
+        "Cada servicio expone /api/v1/health con el estado de sus dependencias"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Outbox transaccional",
+      "items": [
+        "La venta y su evento se confirman en la misma transacción (ADR-0009)",
+        "Si el bus está caído, el evento espera en outbox_events y se entrega al volver",
+        "make bus-drill comprueba que la caída del bus no pierde eventos"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Lectura desacoplada",
+      "items": [
+        "El tablero lee el modelo de lectura en MongoDB, no el ERP transaccional",
+        "La deduplicación por event_id evita reprocesar la misma venta",
+        "El negocio sigue vendiendo aunque el bus o la analítica estén caídos"
+      ]
+    }
+  ]
+}

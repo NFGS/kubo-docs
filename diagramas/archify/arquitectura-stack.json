@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Kubo — ERP + CRM autoalojable para PYMES",
+    "locale": "es",
+    "subtitle": "Arquitectura y stack tecnológico · 9 repositorios · 5 servicios de aplicación · 4 almacenes · 12 contenedores",
+    "output": ".archify/architecture-kubo-stack-20261021-032013/kubo-arquitectura.html",
+    "visual_preset": "blueprint",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/NFGS/kubo-docs.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "f39db9224822dab14a178e2b795edb4a24ef2f44"
+    },
+    "legend": {
+      "mode": "all",
+      "entries": {
+        "frontend": { "label": "Presentación · PWA y app Android" },
+        "backend": { "label": "Servicios de dominio y puerta de entrada" },
+        "database": { "label": "Datos · almacenes y caché" },
+        "cloud": { "label": "Borde TLS y plataforma de operación" },
+        "security": { "label": "Identidad, tokens y acceso" },
+        "messagebus": { "label": "Mensajería asíncrona" },
+        "external": { "label": "Personas del negocio" }
+      }
+    },
+    "views": [
+      {
+        "id": "borde",
+        "label": "Borde y puerta de entrada",
+        "focus": ["usuario", "pwa", "android", "caddy", "nginx", "gateway"],
+        "note": "Del navegador al gateway: TLS, proxy y autenticación"
+      },
+      {
+        "id": "dominio",
+        "label": "Servicios de dominio",
+        "focus": ["iam", "crm", "erp", "analytics"],
+        "note": "Cuatro servicios, cuatro lenguajes, una sola entrada"
+      },
+      {
+        "id": "datos",
+        "label": "Datos y mensajería",
+        "focus": ["postgres", "mongo", "redis", "rabbitmq"],
+        "note": "Tres bases, un bus de eventos y una caché de límites"
+      },
+      {
+        "id": "plataforma",
+        "label": "Plataforma y operación",
+        "focus": ["cicd", "docker", "otel", "grafana", "k6", "backup"],
+        "note": "Cómo se construye, se observa y se respalda"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "usuario",
+      "type": "external",
+      "label": "Dueño / Vendedor",
+      "sublabel": "Negocio PYME",
+      "pos": [40, 40],
+      "size": [200, 84],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 9, "end_line": 19 },
+        { "path": "05-despliegue.md", "line": 40, "end_line": 40 }
+      ]
+    },
+    {
+      "id": "pwa",
+      "type": "frontend",
+      "label": "kubo-web · PWA",
+      "sublabel": "React 19 · Vite 8",
+      "tag": "Tailwind 4 · offline-first",
+      "brand": "react",
+      "pos": [300, 40],
+      "size": [230, 84],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 26, "end_line": 26 },
+        { "path": "05-despliegue.md", "line": 46, "end_line": 46 }
+      ]
+    },
+    {
+      "id": "android",
+      "type": "frontend",
+      "label": "App Android",
+      "sublabel": "Capacitor 8 · mismo bundle",
+      "tag": "misma base de código",
+      "pos": [300, 150],
+      "size": [230, 84],
+      "sources": [
+        { "path": "14-plan-app-movil.md", "line": 1, "end_line": 15 }
+      ]
+    },
+    {
+      "id": "caddy",
+      "type": "cloud",
+      "label": "Caddy 2 · TLS",
+      "sublabel": "HTTPS · HSTS",
+      "tag": "puertos 3443 · 3080",
+      "pos": [590, 95],
+      "size": [220, 84],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 30, "end_line": 30 },
+        { "path": "05-despliegue.md", "line": 47, "end_line": 47 }
+      ]
+    },
+    {
+      "id": "nginx",
+      "type": "cloud",
+      "label": "nginx",
+      "sublabel": "activos + proxy /api",
+      "tag": "mismo origen · sin CORS",
+      "pos": [590, 235],
+      "size": [220, 84],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 31, "end_line": 31 },
+        { "path": "05-despliegue.md", "line": 46, "end_line": 46 }
+      ]
+    },
+    {
+      "id": "gateway",
+      "type": "backend",
+      "label": "kubo-gateway",
+      "sublabel": "NestJS 12 · Express 5",
+      "tag": "BFF · puerto 8080",
+      "pos": [590, 375],
+      "size": [220, 84],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 32, "end_line": 32 },
+        { "path": "05-despliegue.md", "line": 50, "end_line": 50 },
+        { "path": "04-seguridad.md", "line": 34, "end_line": 34 }
+      ]
+    },
+    {
+      "id": "redis",
+      "type": "database",
+      "label": "Redis 7",
+      "sublabel": "límites de tasa",
+      "tag": "puerto 6379",
+      "brand": "redis",
+      "pos": [870, 375],
+      "size": [180, 84],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 41, "end_line": 41 },
+        { "path": "05-despliegue.md", "line": 54, "end_line": 54 }
+      ]
+    },
+    {
+      "id": "iam",
+      "type": "security",
+      "label": "kubo-iam",
+      "sublabel": "Java 21 · Spring Boot 4",
+      "tag": "JWKS · TOTP · auditoría",
+      "brand": "spring",
+      "pos": [307, 545],
+      "size": [170, 88],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 33, "end_line": 33 },
+        { "path": "05-despliegue.md", "line": 51, "end_line": 51 }
+      ]
+    },
+    {
+      "id": "crm",
+      "type": "backend",
+      "label": "kubo-crm",
+      "sublabel": "Ruby 3.4 · Rails 8",
+      "tag": "PII cifrado · 8082",
+      "pos": [512, 545],
+      "size": [170, 88],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 34, "end_line": 34 },
+        { "path": "05-despliegue.md", "line": 51, "end_line": 51 }
+      ]
+    },
+    {
+      "id": "erp",
+      "type": "backend",
+      "label": "kubo-erp",
+      "sublabel": "Elixir 1.17 · Phoenix 1.8",
+      "tag": "catálogo · ventas · 8083",
+      "pos": [717, 545],
+      "size": [170, 88],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 35, "end_line": 35 },
+        { "path": "05-despliegue.md", "line": 51, "end_line": 51 }
+      ]
+    },
+    {
+      "id": "analytics",
+      "type": "backend",
+      "label": "kubo-analytics",
+      "sublabel": "Python 3.13 · FastAPI",
+      "tag": "ventas · 8084",
+      "brand": "fastapi",
+      "pos": [922, 545],
+      "size": [170, 88],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 36, "end_line": 36 },
+        { "path": "05-despliegue.md", "line": 51, "end_line": 51 }
+      ]
+    },
+    {
+      "id": "rabbitmq",
+      "type": "messagebus",
+      "label": "RabbitMQ 4",
+      "sublabel": "exchange kubo.events",
+      "tag": "relay del outbox",
+      "brand": "rabbitmq",
+      "pos": [717, 733],
+      "size": [170, 80],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 40, "end_line": 40 },
+        { "path": "05-despliegue.md", "line": 53, "end_line": 53 }
+      ]
+    },
+    {
+      "id": "postgres",
+      "type": "database",
+      "label": "PostgreSQL 17",
+      "sublabel": "kubo_iam · kubo_crm · kubo_erp",
+      "tag": "RLS por negocio",
+      "brand": "postgresql",
+      "pos": [307, 883],
+      "size": [380, 80],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 38, "end_line": 38 },
+        { "path": "05-despliegue.md", "line": 52, "end_line": 52 }
+      ]
+    },
+    {
+      "id": "mongo",
+      "type": "database",
+      "label": "MongoDB 8",
+      "sublabel": "kubo_analytics",
+      "tag": "modelo de lectura",
+      "brand": "mongodb",
+      "pos": [922, 883],
+      "size": [170, 80],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 39, "end_line": 39 },
+        { "path": "05-despliegue.md", "line": 52, "end_line": 52 }
+      ]
+    },
+    {
+      "id": "cicd",
+      "type": "cloud",
+      "label": "CI/CD",
+      "sublabel": "GitHub Actions",
+      "tag": "gate de 13 verificaciones",
+      "brand": "github-actions",
+      "pos": [40, 1003],
+      "size": [145, 76],
+      "sources": [
+        { "path": "07-pruebas.md", "line": 33, "end_line": 33 },
+        { "path": "07-pruebas.md", "line": 124, "end_line": 124 }
+      ]
+    },
+    {
+      "id": "docker",
+      "type": "cloud",
+      "label": "Docker Compose",
+      "sublabel": "12 contenedores",
+      "tag": "instalación local",
+      "brand": "docker",
+      "pos": [230, 1003],
+      "size": [145, 76],
+      "sources": [
+        { "path": "05-despliegue.md", "line": 10, "end_line": 10 },
+        { "path": "05-despliegue.md", "line": 35, "end_line": 35 }
+      ]
+    },
+    {
+      "id": "otel",
+      "type": "cloud",
+      "label": "OpenTelemetry",
+      "sublabel": "collector OTLP",
+      "tag": "trazas de 5 servicios",
+      "pos": [420, 1003],
+      "size": [145, 76],
+      "sources": [
+        { "path": "01-arquitectura.md", "line": 42, "end_line": 42 },
+        { "path": "05-despliegue.md", "line": 48, "end_line": 48 }
+      ]
+    },
+    {
+      "id": "grafana",
+      "type": "cloud",
+      "label": "Tempo + Grafana",
+      "sublabel": "tablero de trazas",
+      "tag": "perfil opcional · 3001",
+      "brand": "grafana",
+      "pos": [610, 1003],
+      "size": [145, 76],
+      "sources": [
+        { "path": "05-despliegue.md", "line": 49, "end_line": 49 },
+        { "path": "05-despliegue.md", "line": 94, "end_line": 94 }
+      ]
+    },
+    {
+      "id": "k6",
+      "type": "cloud",
+      "label": "k6 + Ansible",
+      "sublabel": "carga · despliegue",
+      "tag": "50 cajas · smoke",
+      "pos": [800, 1003],
+      "size": [145, 76],
+      "sources": [
+        { "path": "07-pruebas.md", "line": 31, "end_line": 31 },
+        { "path": "11-plan-de-cierre.md", "line": 340, "end_line": 340 }
+      ]
+    },
+    {
+      "id": "backup",
+      "type": "cloud",
+      "label": "Respaldos",
+      "sublabel": "Storj S3 offsite",
+      "tag": "simulacro de restauración",
+      "pos": [990, 1003],
+      "size": [145, 76],
+      "sources": [
+        { "path": "05-despliegue.md", "line": 125, "end_line": 132 },
+        { "path": "05-despliegue.md", "line": 210, "end_line": 212 }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Cliente · navegador y dispositivo",
+      "wraps": ["usuario", "pwa", "android"],
+      "pad": 16
+    },
+    {
+      "kind": "region",
+      "label": "Borde TLS · Caddy 2 + nginx",
+      "wraps": ["caddy", "nginx"],
+      "pad": 16
+    },
+    {
+      "kind": "region",
+      "label": "Servidor del negocio · Docker Compose",
+      "wraps": ["gateway", "redis", "iam", "crm", "erp", "analytics", "rabbitmq", "postgres", "mongo"],
+      "pad": 16
+    },
+    {
+      "kind": "region",
+      "label": "Plataforma y operación",
+      "wraps": ["cicd", "docker", "otel", "grafana", "k6", "backup"],
+      "pad": 16
+    }
+  ],
+  "connections": [
+    { "id": "user-pwa", "from": "usuario", "to": "pwa" },
+    { "id": "user-android", "from": "usuario", "to": "android", "fromSide": "bottom", "toSide": "left" },
+    { "id": "pwa-caddy", "from": "pwa", "to": "caddy", "label": "HTTPS" },
+    { "id": "android-caddy", "from": "android", "to": "caddy", "label": "HTTPS" },
+    { "id": "caddy-nginx", "from": "caddy", "to": "nginx", "label": "proxy" },
+    { "id": "nginx-gateway", "from": "nginx", "to": "gateway", "label": "/api" },
+    { "id": "gw-redis", "from": "gateway", "to": "redis" },
+    { "id": "gw-iam", "from": "gateway", "to": "iam", "label": "JWKS", "variant": "security" },
+    { "id": "gw-crm", "from": "gateway", "to": "crm", "label": "clientes" },
+    { "id": "gw-erp", "from": "gateway", "to": "erp", "label": "ventas" },
+    { "id": "gw-analytics", "from": "gateway", "to": "analytics", "label": "tablero" },
+    { "id": "iam-pg", "from": "iam", "to": "postgres" },
+    { "id": "crm-pg", "from": "crm", "to": "postgres" },
+    { "id": "erp-pg", "from": "erp", "to": "postgres", "fromSide": "left", "toSide": "top" },
+    { "id": "erp-mq", "from": "erp", "to": "rabbitmq", "label": "sale.created", "variant": "dashed" },
+    { "id": "mq-analytics", "from": "rabbitmq", "to": "analytics", "label": "sale.created", "variant": "dashed" },
+    { "id": "analytics-mongo", "from": "analytics", "to": "mongo" },
+    { "id": "cicd-docker", "from": "cicd", "to": "docker" },
+    { "id": "otel-grafana", "from": "otel", "to": "grafana" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Polyglotismo deliberado",
+      "items": [
+        "Un lenguaje por contexto: TypeScript, Java, Ruby, Elixir y Python (ADR-0004)",
+        "9 repositorios con contratos OpenAPI como fuente de verdad (ADR-0002)",
+        "El frontend es un solo bundle: PWA instalable y app Android"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Persistencia y eventos",
+      "items": [
+        "Una instancia PostgreSQL 17 con tres bases: kubo_iam, kubo_crm y kubo_erp",
+        "RabbitMQ 4 publica el exchange kubo.events desde el outbox transaccional",
+        "MongoDB sostiene el modelo de lectura que alimenta el tablero"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Seguridad en la malla",
+      "items": [
+        "JWT RS256: el gateway valida la firma contra el JWKS de kubo-iam",
+        "El gateway enruta /api/v1/auth, /users, /audit y /tenants a IAM",
+        "Límites de tasa en Redis y RLS activo en las tres bases de PostgreSQL"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Operación",
+      "items": [
+        "12 contenedores en Docker Compose; cabe en un VPS de USD 6-12 al mes",
+        "Trazas OTLP de los cinco servicios hacia Tempo y Grafana (perfil opcional)",
+        "Respaldo verificado con simulacro de restauración y copia offsite en Storj"
+      ]
+    }
+  ]
+}

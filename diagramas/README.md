@@ -32,10 +32,18 @@ HTML es la fuente interactiva y el PNG/SVG/WebM son sus exportaciones. El WebM
 graba la misma traza que el botón *Live* del visor, así que el vídeo y el
 diagrama no pueden divergir.
 
-Los candidatos JSON y los recibos de verificación quedan en
-`.archify/architecture-kubo-stack-*/` y `.archify/sequence-kubo-venta-*/` del
-workspace; la evidencia de cada nodo se cita contra `kubo-docs` (el repositorio
-que documenta la arquitectura del polyrepo) en la revisión `f39db92`.
+Los candidatos JSON y el script de exportación quedan en
+[`archify/`](archify/): son la fuente de la que salen el HTML interactivo y sus
+exportaciones, de modo que las imágenes se regeneran de forma reproducible con
+
+```bash
+node bin/archify.mjs finalize architecture <candidato>.json <salida>.html \
+  --quality showcase --repo-root kubo-docs
+node archify/export-archivos.mjs <salida>.html <prefijo-de-salida> light [--webm]
+```
+
+La evidencia de cada nodo se cita contra `kubo-docs` (el repositorio que
+documenta la arquitectura del polyrepo) en la revisión `f39db92`.
 
 Los diagramas fuente en Mermaid viven en los documentos (`01-arquitectura.md`,
 `02-modelo-datos.md`, `04-seguridad.md`, `11-plan-de-cierre.md`); estas
