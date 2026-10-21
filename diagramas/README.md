@@ -17,6 +17,26 @@ fuente durable de las imágenes que se incrustan en esos dos entornos.
 | `modelo-confianza.png` | Modelo de confianza (seguridad) |
 | `camino-critico.png` | Camino crítico y calendario del plan de cierre |
 
+## Stack y arquitectura (interactivos, con animación)
+
+| Archivo | Diagrama |
+| --- | --- |
+| `arquitectura-stack.png` / `.svg` | **Mapa de arquitectura y stack tecnológico**: 7 servicios con runtime, 4 almacenes, borde TLS y plataforma de operación |
+| `flujo-venta-outbox.png` / `.svg` | Secuencia de la venta con el outbox transaccional resaltado y la analítica desacoplada |
+| `flujo-venta-outbox.webm` | La misma secuencia en movimiento: traza animada de 6 s (VP9, 30 fps) |
+| `html/arquitectura-stack.html` | Mapa de arquitectura interactivo (vistas guiadas por capa, modo claro/oscuro) |
+| `html/flujo-venta-outbox.html` | Secuencia interactiva con animación de flujo encendida/pausada |
+
+Los cuatro formatos (PNG, SVG, WebM y HTML) salen del mismo candidato JSON: el
+HTML es la fuente interactiva y el PNG/SVG/WebM son sus exportaciones. El WebM
+graba la misma traza que el botón *Live* del visor, así que el vídeo y el
+diagrama no pueden divergir.
+
+Los candidatos JSON y los recibos de verificación quedan en
+`.archify/architecture-kubo-stack-*/` y `.archify/sequence-kubo-venta-*/` del
+workspace; la evidencia de cada nodo se cita contra `kubo-docs` (el repositorio
+que documenta la arquitectura del polyrepo) en la revisión `f39db92`.
+
 Los diagramas fuente en Mermaid viven en los documentos (`01-arquitectura.md`,
 `02-modelo-datos.md`, `04-seguridad.md`, `11-plan-de-cierre.md`); estas
 versiones archify se generaron con la skill `archify` (calidad *showcase*) y se
