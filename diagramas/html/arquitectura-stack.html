@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="generator" content="archify 3.1.0">
+  <meta name="generator" content="archify 3.2.0">
   <meta name="archify-reader-contract" content="declared-wide-v1">
   <title>Kubo — ERP + CRM autoalojable para PYMES · Diagrama</title>
   <script>
@@ -2736,19 +2736,31 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     }
     html[data-reader-rail="bottom"] .node-outline-head { padding: 1rem 2.5rem 0.375rem 0.25rem; }
     html[data-reader-rail="bottom"] .node-outline-list {
-      columns: 15rem;
-      column-gap: 1.75rem;
+      display: grid;
+      gap: 0.5rem;
       padding: 0;
       overflow: visible;
       -webkit-mask-image: none;
       mask-image: none;
     }
-    /* Named groups stay whole; a single unnamed group may split across columns,
-       where a continuous spine would read as a broken line. */
     html[data-reader-rail="bottom"] .node-outline-group + .node-outline-group { margin-top: 0; }
-    html[data-reader-rail="bottom"] .node-outline-group:has(> .node-outline-heading) { break-inside: avoid; padding-bottom: 0.25rem; }
-    html[data-reader-rail="bottom"] .node-outline-group:not(:has(> .node-outline-heading)) > ul::before { display: none; }
-    html[data-reader-rail="bottom"] .node-outline-group li { break-inside: avoid; }
+    html[data-reader-rail="bottom"] .node-outline-group:has(> .node-outline-heading) { padding-bottom: 0.25rem; }
+    html[data-reader-rail="bottom"] .node-outline-group > ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 0.5rem;
+    }
+    html[data-reader-rail="bottom"] .node-outline-group > ul::before { display: none; }
+    html[data-reader-rail="bottom"] .node-outline-group li {
+      flex: 0 1 auto;
+      min-width: min(100%, 12rem);
+      max-width: min(100%, 32rem);
+    }
+    html[data-reader-rail="bottom"] .node-outline-heading {
+      justify-content: flex-start;
+      gap: 0.5rem;
+    }
+    html[data-reader-rail="bottom"] .node-outline-heading > span { overflow-wrap: anywhere; }
     .rail-controls { display: none; }
     html:is([data-reader-rail="true"], [data-reader-rail="overlay"], [data-reader-rail="bottom"]) .rail-controls {
       display: flex;
@@ -2964,6 +2976,37 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     .node-outline-item:hover small,
     .node-outline-item[data-previewing] small,
     .node-outline-item[aria-current="true"] small { color: var(--text-muted); }
+
+    /* The desktop bottom rail is an index: compact rows keep related nodes
+       together while allowing full names and descriptions to wrap naturally. */
+    html[data-reader-rail="bottom"] .node-outline-item {
+      grid-template-columns: 0.625rem minmax(0, 1fr) 0.75rem;
+      align-items: first baseline;
+      column-gap: 0.375rem;
+      min-height: 0;
+      padding-block: 0.375rem;
+    }
+    html[data-reader-rail="bottom"] .node-outline-item strong,
+    html[data-reader-rail="bottom"] .node-outline-item small {
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    html[data-reader-rail="bottom"] .node-outline-item strong {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    html[data-reader-rail="bottom"] .node-outline-item small {
+      grid-column: 2;
+      grid-row: 2;
+      text-align: left;
+    }
+    html[data-reader-rail="bottom"] .node-outline-item::after {
+      grid-column: 3;
+      grid-row: 1;
+      align-self: center;
+    }
 
     .card-header {
       display: flex;
@@ -5152,7 +5195,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <div class="pulse-dot"></div>
         <h1>Kubo — ERP + CRM autoalojable para PYMES</h1>
       </div>
-      <p class="subtitle">Arquitectura y stack tecnológico · 9 repositorios · 7 servicios con runtime · 4 almacenes · 12 contenedores</p>
+      <p class="subtitle">Arquitectura y stack tecnológico · 9 repositorios · 5 servicios de aplicación · 4 almacenes · 12 contenedores</p>
     </div>
 
     <script id="archify-source-evidence-data" type="application/json">{"schemaVersion":1,"verified":true,"repository":{"url":"https://github.com/NFGS/kubo-docs","revision":"f39db9224822dab14a178e2b795edb4a24ef2f44","shortRevision":"f39db92","label":"NFGS/kubo-docs","href":"https://github.com/NFGS/kubo-docs/tree/f39db9224822dab14a178e2b795edb4a24ef2f44"},"referenceCount":40,"nodes":{"usuario":[{"path":"01-arquitectura.md","line":9,"endLine":19,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L9-L19"},{"path":"05-despliegue.md","line":40,"endLine":40,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L40"}],"pwa":[{"path":"01-arquitectura.md","line":26,"endLine":26,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L26"},{"path":"05-despliegue.md","line":46,"endLine":46,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L46"}],"android":[{"path":"14-plan-app-movil.md","line":1,"endLine":15,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/14-plan-app-movil.md#L1-L15"}],"caddy":[{"path":"01-arquitectura.md","line":30,"endLine":30,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L30"},{"path":"05-despliegue.md","line":47,"endLine":47,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L47"}],"nginx":[{"path":"01-arquitectura.md","line":31,"endLine":31,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L31"},{"path":"05-despliegue.md","line":46,"endLine":46,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L46"}],"gateway":[{"path":"01-arquitectura.md","line":32,"endLine":32,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L32"},{"path":"05-despliegue.md","line":50,"endLine":50,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L50"},{"path":"04-seguridad.md","line":34,"endLine":34,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/04-seguridad.md#L34"}],"redis":[{"path":"01-arquitectura.md","line":41,"endLine":41,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L41"},{"path":"05-despliegue.md","line":54,"endLine":54,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L54"}],"iam":[{"path":"01-arquitectura.md","line":33,"endLine":33,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L33"},{"path":"05-despliegue.md","line":51,"endLine":51,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L51"}],"crm":[{"path":"01-arquitectura.md","line":34,"endLine":34,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L34"},{"path":"05-despliegue.md","line":51,"endLine":51,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L51"}],"erp":[{"path":"01-arquitectura.md","line":35,"endLine":35,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L35"},{"path":"05-despliegue.md","line":51,"endLine":51,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L51"}],"analytics":[{"path":"01-arquitectura.md","line":36,"endLine":36,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L36"},{"path":"05-despliegue.md","line":51,"endLine":51,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L51"}],"rabbitmq":[{"path":"01-arquitectura.md","line":40,"endLine":40,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L40"},{"path":"05-despliegue.md","line":53,"endLine":53,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L53"}],"postgres":[{"path":"01-arquitectura.md","line":38,"endLine":38,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L38"},{"path":"05-despliegue.md","line":52,"endLine":52,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L52"}],"mongo":[{"path":"01-arquitectura.md","line":39,"endLine":39,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L39"},{"path":"05-despliegue.md","line":52,"endLine":52,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L52"}],"cicd":[{"path":"07-pruebas.md","line":33,"endLine":33,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/07-pruebas.md#L33"},{"path":"07-pruebas.md","line":124,"endLine":124,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/07-pruebas.md#L124"}],"docker":[{"path":"05-despliegue.md","line":10,"endLine":10,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L10"},{"path":"05-despliegue.md","line":35,"endLine":35,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L35"}],"otel":[{"path":"01-arquitectura.md","line":42,"endLine":42,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/01-arquitectura.md#L42"},{"path":"05-despliegue.md","line":48,"endLine":48,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L48"}],"grafana":[{"path":"05-despliegue.md","line":49,"endLine":49,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L49"},{"path":"05-despliegue.md","line":94,"endLine":94,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L94"}],"k6":[{"path":"07-pruebas.md","line":31,"endLine":31,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/07-pruebas.md#L31"},{"path":"11-plan-de-cierre.md","line":340,"endLine":340,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/11-plan-de-cierre.md#L340"}],"backup":[{"path":"05-despliegue.md","line":125,"endLine":132,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L125-L132"},{"path":"05-despliegue.md","line":210,"endLine":212,"href":"https://github.com/NFGS/kubo-docs/blob/f39db9224822dab14a178e2b795edb4a24ef2f44/05-despliegue.md#L210-L212"}]}}</script>
@@ -5162,7 +5205,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
          data-preset-badge-editorial-plate="ARCHIFY / LÁMINA 04">
       <svg viewBox="0 0 1191 1189" role="img" lang="es" aria-labelledby="archify-diagram-title archify-diagram-description" data-animation="trace" data-preset="blueprint" data-quality-profile="showcase" data-node-ui="" data-reader-fit="intrinsic-height" data-reader-min-text="7.5" data-reader-primary-text="14">
         <title id="archify-diagram-title">Kubo — ERP + CRM autoalojable para PYMES</title>
-        <desc id="archify-diagram-description">Arquitectura y stack tecnológico · 9 repositorios · 7 servicios con runtime · 4 almacenes · 12 contenedores</desc>
+        <desc id="archify-diagram-description">Arquitectura y stack tecnológico · 9 repositorios · 5 servicios de aplicación · 4 almacenes · 12 contenedores</desc>
         <!-- Definitions -->
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
@@ -6103,6 +6146,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         else open(false);
       });
       btn.addEventListener('keydown', function (e) {
+        if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) return;
         if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
           e.preventDefault();
           if (!isOpen()) open(e.key === 'ArrowUp');
@@ -6119,6 +6163,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       menu.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') { e.preventDefault(); close(true); return; }
         if (e.key === 'Tab') { close(false); return; }
+        if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) return;
         var available = options();
         var active = available.indexOf(document.activeElement);
         switch (e.key) {
@@ -7542,6 +7587,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       });
       // APG menu-button pattern: ArrowDown/ArrowUp on the trigger opens the menu.
       btn.addEventListener('keydown', function (e) {
+        if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) return;
         if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
           e.preventDefault();
           if (!isOpen()) open(e.key === 'ArrowUp');
@@ -7557,6 +7603,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       menu.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') { e.preventDefault(); close(true); return; }
         if (e.key === 'Tab')    { close(false); return; }
+        if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) return;
 
         var available = items().filter(function (i) { return !i.hidden && !i.disabled; });
         var current = available.indexOf(document.activeElement);
@@ -10184,6 +10231,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         syncRelationshipPreview();
       });
       relationshipList.addEventListener('keydown', function (event) {
+        if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
         if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Home' && event.key !== 'End') return;
         var buttons = Array.prototype.slice.call(relationshipList.querySelectorAll('[data-relationship-target]'));
         if (!buttons.length) return;
@@ -12972,6 +13020,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       closeBtn.addEventListener('click', function () { close(); });
       input.addEventListener('input', function () { render(input.value); });
       input.addEventListener('keydown', function (event) {
+        if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
         var buttons = resultButtons();
         if (event.key === 'ArrowDown' && buttons.length) {
           event.preventDefault();
@@ -12982,6 +13031,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         }
       });
       results.addEventListener('keydown', function (event) {
+        if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
         var buttons = resultButtons();
         var index = buttons.indexOf(document.activeElement);
         if (index < 0 || !buttons.length) return;
@@ -13016,6 +13066,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         count: items.length
       };
     })();
+
 
     /* ============================================================
        Node Outline — a rail index of the semantic nodes, grouped by their
@@ -14121,6 +14172,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         if (journeyPlaying && event.target.closest('[data-route-journey-index]')) pauseJourney({ preserveElapsed: true });
       });
       path.addEventListener('keydown', function (event) {
+        if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
         var button = event.target.closest('[data-route-journey-index]');
         if (!button) return;
         var index = Number(button.getAttribute('data-route-journey-index'));
@@ -14796,6 +14848,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         select(button.getAttribute('data-kind'));
       });
       kindsRoot.addEventListener('keydown', function (event) {
+        if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
         var buttons = Array.prototype.slice.call(kindsRoot.querySelectorAll('button:not(:disabled)'));
         var index = buttons.indexOf(document.activeElement);
         var next = null;
@@ -15033,6 +15086,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
        ============================================================ */
     document.addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.shiftKey && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End')) return;
       if (e.defaultPrevented) return;
       var t = e.target;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
