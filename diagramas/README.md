@@ -50,6 +50,21 @@ Los diagramas fuente en Mermaid viven en los documentos (`01-arquitectura.md`,
 versiones archify se generaron con la skill `archify` (calidad *showcase*) y se
 incrustan en Notion y en el vault de Obsidian.
 
+## Versiones duales por diagrama (Beru + Archify)
+
+Dos diagramas nuevos existen en dos versiones comparables, cada una en su
+propio directorio:
+
+| Directorio | Diagrama | Versiones |
+| --- | --- | --- |
+| `estructura-funcionamiento/` | **Estructura del proyecto y cómo funciona**: polyrepo de 9 repos, recorrido de una venta (outbox), transversal de operación | `beru.html` / `beru.png` (diseño artesanal) · `archify.png` / `.svg` (skill archify, blueprint) |
+| `stack-tecnologico/` | **Stack tecnológico**: un lenguaje por contexto (ADR-0004), 9 repos × sus tecnologías | `beru.html` / `beru.png` (matriz de 6 capas con logos) · `archify.png` / `.svg` (árbol editorial) |
+
+Las versiones `beru.*` son HTML autocontenido sin red (fuentes y logos
+base64, tema claro fijo) hechas a mano con el sistema de tokens del proyecto;
+las `archify.*` salen del pipeline reproducible descrito abajo. Ambas citan la
+misma evidencia de `kubo-docs` en la revisión `f39db92`.
+
 ## Portadas
 
 `portada-kubo.png`, `portada-documentacion.png`, `portada-adrs.png`,
